@@ -89,3 +89,5 @@ Built with Vodka and Hatred ontop of Laravel. Full Docker stack included.
     - Maybe move away from gulp?
 - Re-evaluate what is needed from NPM
 - Storage permissions need sorting
+
+### New Line
