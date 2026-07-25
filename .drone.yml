@@ -80,7 +80,7 @@ steps:
   - name: build-nginx
     image: plugins/docker
     settings:
-      repo: th0rn0/lanops-manager
+      repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/nginx/Dockerfile
       dry_run: true
     when:
@@ -94,7 +94,7 @@ steps:
   - name: build-app
     image: plugins/docker
     settings:
-      repo: th0rn0/lanops-manager
+      repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/php/Dockerfile
       dry_run: true
     when:
@@ -108,7 +108,7 @@ steps:
   - name: build-push-nginx
     image: plugins/docker
     settings:
-      repo: th0rn0/lanops-manager
+      repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/nginx/Dockerfile
       username:
         from_secret: dockerhub_username
@@ -125,7 +125,7 @@ steps:
   - name: build-push-app
     image: plugins/docker
     settings:
-      repo: th0rn0/lanops-manager
+      repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/php/Dockerfile
       username:
         from_secret: dockerhub_username
@@ -142,7 +142,7 @@ steps:
   - name: build-push-nginx-release
     image: plugins/docker
     settings:
-      repo: th0rn0/lanops-manager
+      repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/nginx/Dockerfile
       username:
         from_secret: dockerhub_username
@@ -157,7 +157,7 @@ steps:
   - name: build-push-app-release
     image: plugins/docker
     settings:
-      repo: th0rn0/lanops-manager
+      repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/php/Dockerfile
       username:
         from_secret: dockerhub_username
