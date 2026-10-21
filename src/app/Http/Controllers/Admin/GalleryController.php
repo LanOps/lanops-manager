@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Image;
 use Session;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -14,7 +13,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 
-use Spatie\Image\Manipulations;
 
 use App\Jobs\ProcessUploadedImages;
 
