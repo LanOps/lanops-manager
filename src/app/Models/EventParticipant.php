@@ -174,9 +174,7 @@ class EventParticipant extends Model implements HasMedia
     public function generateQRCode()
     {
         $ticketUrl = 'https://' . config('app.url') . '/tickets/retrieve/' . $this->id;
-        QrCode::format('png');
-        QrCode::size(300);
-        $qr = QrCode::generate($ticketUrl);
+        $qr = (string) QrCode::format('png')->size(300)->generate($ticketUrl);
         if ($this->hasMedia()) {
             $this->clearMediaCollection();
         }
