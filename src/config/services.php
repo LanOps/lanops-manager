@@ -40,6 +40,13 @@ return [
         'client_secret' => '',
         'redirect' => env('FACEBOOK_REDIRECT'),
     ],
+    'steam' => [
+        'client_id'     => null,
+        'client_secret' => env('STEAM_API_KEY'),
+        // Set at runtime in SteamController so the return URL uses the right scheme
+        'redirect'      => null,
+        'force_https'   => env('STEAM_ENABLE_HTTPS', true),
+    ],
     'igdb' => [
         'key' => env('IGDB_API_KEY'),
         'url' => env('IGDB_API_URL'),

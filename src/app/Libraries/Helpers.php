@@ -343,7 +343,7 @@ class Helpers
                 $response = Http::timeout(10)->get(
                     'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
                     [
-                        'key' => config('steam-auth.api_key'),
+                        'key' => config('services.steam.client_secret'),
                         'steamids' => $steamId,
                     ]
                 );
