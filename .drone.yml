@@ -2,10 +2,10 @@ kind: pipeline
 type: docker
 name: ci
 
+# No pull_request event: every PR branch push already gets a push build, so PRs would run twice
 trigger:
   event:
     - push
-    - pull_request
     - tag
 
 services:
@@ -84,7 +84,8 @@ steps:
         - failure
 
 # ── Docker Build & Push ───────────────────────────────────────────────────────
-# Dry-run on all branches except main. Push on main push and tags.
+# Images are only built and pushed for pushes to main and for tags.
+# ref (not branch) is used because Drone sets DRONE_BRANCH to the target branch on pull_request builds.
 
   - name: discord-build-start
     image: curlimages/curl:8.7.1
@@ -96,39 +97,12 @@ steps:
       - |
         curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Build Started!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
     when:
-      branch:
-        - main
+      ref:
+        - refs/heads/main
+        - refs/tags/*
       event:
         - push
         - tag
-
-  - name: build-nginx
-    image: plugins/docker
-    settings:
-      repo: lanopsdev/lanops-manager
-      dockerfile: resources/docker/nginx/Dockerfile
-      dry_run: true
-    when:
-      event:
-        - push
-        - pull_request
-      branch:
-        exclude:
-          - main
-
-  - name: build-app
-    image: plugins/docker
-    settings:
-      repo: lanopsdev/lanops-manager
-      dockerfile: resources/docker/php/Dockerfile
-      dry_run: true
-    when:
-      event:
-        - push
-        - pull_request
-      branch:
-        exclude:
-          - main
 
   - name: build-push-nginx
     image: plugins/docker
@@ -142,8 +116,8 @@ steps:
       tags:
         - nginx-main
     when:
-      branch:
-        - main
+      ref:
+        - refs/heads/main
       event:
         - push
 
@@ -159,8 +133,8 @@ steps:
       tags:
         - app-main
     when:
-      branch:
-        - main
+      ref:
+        - refs/heads/main
       event:
         - push
 
@@ -204,8 +178,9 @@ steps:
       - |
         curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Build Success!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
     when:
-      branch:
-        - main
+      ref:
+        - refs/heads/main
+        - refs/tags/*
       event:
         - push
         - tag
@@ -222,8 +197,9 @@ steps:
       - |
         curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Build Failure!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
     when:
-      branch:
-        - main
+      ref:
+        - refs/heads/main
+        - refs/tags/*
       event:
         - push
         - tag
