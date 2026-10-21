@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         colors="true"
+>
+    <testsuites>
+        <testsuite name="Feature">
+            <directory suffix="Test.php">./tests/Feature</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <!-- The database name and credentials are forced so tests never run against (and wipe) a real database. -->
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:2fl+Ktvkfl+Fuz4Qp/A75G2RTiWVA/ZoKZvp6fiiM10="/>
+        <env name="APP_DEBUG" value="false"/>
+        <env name="APP_URL" value="http://localhost"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="DB_CONNECTION" value="mysql"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="3306"/>
+        <env name="DB_DATABASE" force="true" value="lanops_test"/>
+        <env name="DB_USERNAME" force="true" value="lanops"/>
+        <env name="DB_PASSWORD" force="true" value="secret"/>
+        <env name="MAIL_DRIVER" value="array"/>
+        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="MEDIA_DISK" value="public"/>
+        <env name="STRIPE_SECRET_KEY" value="sk_test_dummy"/>
+        <env name="STRIPE_PUBLIC_KEY" value="pk_test_dummy"/>
+        <env name="DISCORD_BOT_URL" value=""/>
+        <env name="SENTRY_LARAVEL_DSN" value=""/>
+    </php>
+</phpunit>

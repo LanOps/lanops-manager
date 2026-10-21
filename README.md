@@ -25,6 +25,14 @@ Built with Vodka and Hatred ontop of Laravel. Full Docker stack included.
 - ```make build-init```
 - ```docker compose up -d```
 
+### Tests
+
+Feature tests live in `src/tests` and run in Drone on every push, against a MariaDB service. They cover the main pages, the Stripe checkout (with the gateway mocked) and login, registration and password reset.
+
+To run them locally you need a MariaDB database called `lanops_test` that the user `lanops` (password `secret`) can use. `phpunit.xml` forces those settings so the tests can never touch your real database. Then:
+
+- ```cd src && vendor/bin/phpunit```
+
 
 ## Features
 

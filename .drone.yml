@@ -8,9 +8,18 @@ trigger:
     - pull_request
     - tag
 
+services:
+  - name: database
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: lanops_test
+      MARIADB_USER: lanops
+      MARIADB_PASSWORD: secret
+      MARIADB_RANDOM_ROOT_PASSWORD: "yes"
+
 steps:
 
-# ── Lint ──────────────────────────────────────────────────────────────────────
+# ── Lint & Test ────────────────────────────────────────────────────────────────
 
   - name: discord-lint-start
     image: curlimages/curl:8.7.1
@@ -20,7 +29,7 @@ steps:
         from_secret: discord_webhook_url
     commands:
       - |
-        curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint Started!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
+        curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint & Test Started!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
 
   - name: lint
     image: php:8.3-cli
@@ -32,6 +41,18 @@ steps:
       - cd /drone/src/src && composer install --no-interaction --prefer-dist --no-progress
       - vendor/bin/phpcs
 
+  - name: test
+    image: php:8.3-cli
+    environment:
+      DB_HOST: database
+    commands:
+      - apt-get update -q && apt-get install -yq libfreetype-dev libjpeg62-turbo-dev libpng-dev
+      - docker-php-ext-configure gd --with-freetype --with-jpeg
+      - docker-php-ext-install bcmath exif gd pdo_mysql
+      - cd /drone/src/src
+      - php -r 'for ($i = 0; $i < 30; $i++) { try { new PDO("mysql:host=database;dbname=lanops_test", "lanops", "secret"); exit(0); } catch (PDOException $e) { sleep(2); } } exit(1);'
+      - vendor/bin/phpunit
+
   - name: discord-lint-success
     image: curlimages/curl:8.7.1
     failure: ignore
@@ -40,7 +61,7 @@ steps:
         from_secret: discord_webhook_url
     commands:
       - |
-        curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint Success!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
+        curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint & Test Success!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
     when:
       status:
         - success
@@ -53,7 +74,7 @@ steps:
         from_secret: discord_webhook_url
     commands:
       - |
-        curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint Failure!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
+        curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint & Test Failure!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
     when:
       status:
         - failure
