@@ -2,10 +2,10 @@ kind: pipeline
 type: docker
 name: ci
 
+# No pull_request event: every PR branch push already gets a push build, so PRs would run twice
 trigger:
   event:
     - push
-    - pull_request
     - tag
 
 services:
