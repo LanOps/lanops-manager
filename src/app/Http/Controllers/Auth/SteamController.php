@@ -13,61 +13,63 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
-use Invisnik\LaravelSteamAuth\SteamAuth;
+use Laravel\Socialite\Facades\Socialite;
+use SocialiteProviders\Steam\OpenIDValidationException;
 
 use Carbon\Carbon;
 
 class SteamController extends Controller
 {
-    private $steam;
-
-    /**
-     * @param SteamAuth $steam
-     */
-    public function __construct(SteamAuth $steam)
-    {
-        $this->steam = $steam;
-    }
-
     /**
      * Login User
+     * @param  Request $request
      * @return Redirect
      */
-    public function login()
+    public function login(Request $request)
     {
-        if ($this->steam->validate()) {
-            $info = $this->steam->getUserInfo();
-            if (!is_null($info)) {
-                $user = User::where('steamid', $info->steamID64)->first();
-                if (!is_null($user)) {
-                    if ($user->banned) {
-                        Session::flash('alert-danger', 'You have been banned!');
-                        return Redirect::back()->withError('You have been banned.');
-                    }
-                    //username found... Log user in
-                    Auth::login($user, true);
-                    //Check if the user has changed their steam details
-                    $steam_changes = false;
-                    if ($info->avatarfull != $user->avatar) {
-                        $user->avatar = $info->avatarfull;
-                        $steam_changes = true;
-                    }
-                    $user->last_login = Carbon::now()->toDateTimeString();
-                    $user->save();
-                    return redirect('/'); // redirect to site
-                } else {
-                    $user = [
-                            'avatar'        => $info->avatarfull,
-                            'steamid'       => $info->steamID64,
-                    ];
-                    Session::put('user', $user);
-                    Session::save();
-                    return Redirect('/register/steam');
-                }
-            }
-        } else {
-            return $this->steam->redirect(); // redirect to Steam login page
+        $steam = Socialite::driver('steam')
+            ->redirectUrl(url('/login/steam', [], config('services.steam.force_https')));
+        // Steam's OpenID response arrives as query params (PHP turns "openid.x" into "openid_x")
+        if (!$request->has('openid_assoc_handle')) {
+            return $steam->redirect(); // redirect to Steam login page
         }
+        try {
+            $steamUser = $steam->user();
+        } catch (OpenIDValidationException $e) {
+            Session::flash('alert-danger', 'Steam login failed. Please try again.');
+            return Redirect('/login');
+        }
+        $info = (object) $steamUser->getRaw();
+        if (!empty($info->steamid)) {
+            $user = User::where('steamid', $info->steamid)->first();
+            if (!is_null($user)) {
+                if ($user->banned) {
+                    Session::flash('alert-danger', 'You have been banned!');
+                    return Redirect::back()->withError('You have been banned.');
+                }
+                //username found... Log user in
+                Auth::login($user, true);
+                //Check if the user has changed their steam details
+                $steam_changes = false;
+                if ($info->avatarfull != $user->avatar) {
+                    $user->avatar = $info->avatarfull;
+                    $steam_changes = true;
+                }
+                $user->last_login = Carbon::now()->toDateTimeString();
+                $user->save();
+                return redirect('/'); // redirect to site
+            } else {
+                $user = [
+                        'avatar'        => $info->avatarfull,
+                        'steamid'       => $info->steamid,
+                ];
+                Session::put('user', $user);
+                Session::save();
+                return Redirect('/register/steam');
+            }
+        }
+        Session::flash('alert-danger', 'Steam login failed. Please try again.');
+        return Redirect('/login');
     }
 
     /**

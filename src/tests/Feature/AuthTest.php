@@ -4,14 +4,20 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Notifications\ResetPassword;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
-use Invisnik\LaravelSteamAuth\SteamAuth;
-use Invisnik\LaravelSteamAuth\SteamInfo;
+use Laravel\Socialite\Facades\Socialite;
+use Mockery;
 use Mews\Captcha\Facades\Captcha;
+use SocialiteProviders\Manager\OAuth2\User as SocialiteUser;
+use SocialiteProviders\Steam\OpenIDValidationException;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -150,30 +156,79 @@ class AuthTest extends TestCase
         $this->assertTrue(Hash::check('new-password-123', $user->fresh()->password));
     }
 
-    protected function fakeSteamLogin(string $steamId, string $avatar = 'https://avatars.example/new.jpg'): void
+    /**
+     * Query params Steam sends back to /login/steam after the user signs in.
+     */
+    protected const STEAM_RETURN = '/login/steam?openid.assoc_handle=1234567890&openid.signed=signed&openid.sig=sig'
+        . '&openid.return_to=https%3A%2F%2Flocalhost%2Flogin%2Fsteam';
+
+    protected function fakeSteamProvider(): Mockery\MockInterface
     {
-        $this->mock(SteamAuth::class, function ($mock) use ($steamId, $avatar) {
-            $mock->shouldReceive('validate')->andReturn(true);
-            $mock->shouldReceive('getUserInfo')->andReturn(new SteamInfo([
-                'steamid'      => $steamId,
-                'personaname'  => 'Steam Person',
-                'avatarfull'   => $avatar,
-                'profileurl'   => 'https://steamcommunity.com/id/person',
-                'avatar'       => $avatar,
-                'avatarmedium' => $avatar,
-                'realname'     => 'Steam Person',
-            ]));
-        });
+        $provider = Mockery::mock();
+        $provider->shouldReceive('redirectUrl')->with('https://localhost/login/steam')->andReturnSelf();
+        Socialite::shouldReceive('driver')->with('steam')->andReturn($provider);
+        return $provider;
     }
 
-    public function testSteamLoginRedirectsToSteamWhenNotReturningFromIt()
+    protected function fakeSteamLogin(string $steamId, string $avatar = 'https://avatars.example/new.jpg'): void
     {
-        $this->mock(SteamAuth::class, function ($mock) {
-            $mock->shouldReceive('validate')->andReturn(false);
-            $mock->shouldReceive('redirect')->andReturn(redirect('https://steamcommunity.com/openid/login'));
-        });
+        $this->fakeSteamProvider()->shouldReceive('user')->andReturn((new SocialiteUser())->setRaw([
+            'steamid'      => $steamId,
+            'personaname'  => 'Steam Person',
+            'avatarfull'   => $avatar,
+            'profileurl'   => 'https://steamcommunity.com/id/person',
+            'avatar'       => $avatar,
+            'avatarmedium' => $avatar,
+            'realname'     => 'Steam Person',
+        ]));
+    }
 
-        $this->get('/login/steam')->assertRedirect('https://steamcommunity.com/openid/login');
+    public function testSteamLoginRedirectsToSteamOpenId()
+    {
+        $response = $this->get('/login/steam');
+
+        $location = $response->assertRedirect()->headers->get('Location');
+        $this->assertStringStartsWith('https://steamcommunity.com/openid/login?', $location);
+        parse_str(parse_url($location, PHP_URL_QUERY), $params);
+        $this->assertSame('https://localhost/login/steam', $params['openid_return_to']);
+        $this->assertSame('https://localhost', $params['openid_realm']);
+    }
+
+    public function testSteamLoginValidatesTheOpenIdResponseWithSteam()
+    {
+        $user = $this->createUser(['steamid' => '76561198000000005']);
+        config(['services.steam.client_secret' => 'test-steam-key']);
+        $history = [];
+        $handler = HandlerStack::create(new MockHandler([
+            new Response(200, [], "ns:http://specs.openid.net/auth/2.0\nis_valid:true\n"),
+            new Response(200, [], json_encode(['response' => ['players' => [[
+                'steamid'    => '76561198000000005',
+                'avatarfull' => 'https://avatars.example/full.jpg',
+            ]]]])),
+        ]));
+        $handler->push(Middleware::history($history));
+        // The provider is built per request, so hand it the fake HTTP handler through config
+        config(['services.steam.guzzle' => ['handler' => $handler]]);
+
+        $this->get(self::STEAM_RETURN . '&openid.claimed_id='
+            . urlencode('https://steamcommunity.com/openid/id/76561198000000005'))
+            ->assertRedirect('/');
+
+        $this->assertAuthenticatedAs($user);
+        $this->assertSame('https://avatars.example/full.jpg', $user->fresh()->avatar);
+        $this->assertSame('https://steamcommunity.com/openid/login', (string) $history[0]['request']->getUri());
+        $this->assertStringContainsString('steamids=76561198000000005', (string) $history[1]['request']->getUri());
+    }
+
+    public function testSteamLoginRejectsAFailedOpenIdCheck()
+    {
+        $this->fakeSteamProvider()->shouldReceive('user')->andThrow(new OpenIDValidationException('nope'));
+
+        $this->get(self::STEAM_RETURN)
+            ->assertRedirect('/login')
+            ->assertSessionHas('alert-danger', 'Steam login failed. Please try again.');
+
+        $this->assertGuest();
     }
 
     public function testSteamLoginLogsInAnExistingUserAndUpdatesTheirAvatar()
@@ -181,7 +236,7 @@ class AuthTest extends TestCase
         $user = $this->createUser(['steamid' => '76561198000000001', 'avatar' => 'https://avatars.example/old.jpg']);
         $this->fakeSteamLogin('76561198000000001');
 
-        $this->get('/login/steam')->assertRedirect('/');
+        $this->get(self::STEAM_RETURN)->assertRedirect('/');
 
         $this->assertAuthenticatedAs($user);
         $this->assertSame('https://avatars.example/new.jpg', $user->fresh()->avatar);
@@ -191,7 +246,7 @@ class AuthTest extends TestCase
     {
         $this->fakeSteamLogin('76561198000000002');
 
-        $this->get('/login/steam')
+        $this->get(self::STEAM_RETURN)
             ->assertRedirect('/register/steam')
             ->assertSessionHas('user.steamid', '76561198000000002');
 
@@ -203,7 +258,7 @@ class AuthTest extends TestCase
         $this->createUser(['steamid' => '76561198000000003', 'banned' => true]);
         $this->fakeSteamLogin('76561198000000003');
 
-        $this->get('/login/steam')->assertSessionHas('alert-danger', 'You have been banned!');
+        $this->get(self::STEAM_RETURN)->assertSessionHas('alert-danger', 'You have been banned!');
 
         $this->assertGuest();
     }
