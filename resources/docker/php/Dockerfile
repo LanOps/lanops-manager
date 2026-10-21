@@ -26,6 +26,9 @@ RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg
 
 RUN docker-php-ext-install mysqli pdo_mysql gd bcmath intl zip xml mbstring exif
 
+# imagick is needed by simplesoftwareio/simple-qrcode 2+ for PNG ticket QR codes
+RUN pecl install imagick-3.8.0 && docker-php-ext-enable imagick
+
 COPY src/ /var/www/html
 COPY --from=node-builder /app/public/build /var/www/html/public/build
 

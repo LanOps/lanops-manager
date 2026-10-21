@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Input;
 use Image;
 use Session;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin\Events;
 
 use Session;
-use Input;
 
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -105,7 +104,7 @@ class VenuesController extends Controller
             return Redirect::back();
         }
 
-        if (Input::file('images') !== null && !$venue->addMediaFromRequest('images')->toMediaCollection()) {
+        if ($request->file('images') !== null && !$venue->addMediaFromRequest('images')->toMediaCollection()) {
             Session::flash('alert-danger', 'Cannot save Venue Image!');
             return Redirect::back();
         }
@@ -194,7 +193,7 @@ class VenuesController extends Controller
             return Redirect::back();
         }
         
-        if (Input::file('images') !== null && !$venue->addMediaFromRequest('images')->toMediaCollection()) {
+        if ($request->file('images') !== null && !$venue->addMediaFromRequest('images')->toMediaCollection()) {
             Session::flash('alert-danger', 'Cannot save Venue Image!');
             return Redirect::back();
         }

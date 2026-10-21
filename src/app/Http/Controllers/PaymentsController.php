@@ -111,7 +111,7 @@ class PaymentsController extends Controller
             foreach ($basket['tickets'] as $ticketId => $quantity) {
                 $ticket = EventTicket::where('id', $ticketId)->first();
                 if ($ticket->event->capacity <= $ticket->event->EventParticipants->count()) {
-                    Session::flash('alert-danger', '{{ $ticket->event->display_name }} Has sold out!');
+                    Session::flash('alert-danger', $ticket->event->display_name . ' has sold out!');
                     return Redirect::back();
                 }
             }
@@ -409,7 +409,6 @@ class PaymentsController extends Controller
         $acceptedPaymentGateways = [];
         foreach (config('laravel-omnipay.gateways') as $key => $acceptedPaymentGateway) {
             array_push($acceptedPaymentGateways, $key);
-            echo $key;
         }
         if (in_array(strtolower($paymentGateway), $acceptedPaymentGateways)) {
             $paymentGateway = strtolower($paymentGateway);
