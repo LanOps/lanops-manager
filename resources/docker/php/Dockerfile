@@ -8,6 +8,18 @@ RUN npm ci
 COPY src/ ./
 RUN npm run build
 
+FROM composer:2 AS composer-builder
+
+WORKDIR /app
+
+# Production packages only. Scripts are skipped because artisan needs the app's .env;
+# the entrypoint runs artisan optimize at start-up, which also discovers packages.
+COPY src/composer.json src/composer.lock ./
+RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts --no-autoloader --ignore-platform-req=ext-*
+
+COPY src/ ./
+RUN composer dump-autoload --optimize --no-dev --no-scripts
+
 FROM php:8.3-fpm AS php-base
 LABEL maintainer="Thornton Phillis (dev@th0rn0.co.uk)"
 
@@ -30,6 +42,7 @@ RUN docker-php-ext-install mysqli pdo_mysql gd bcmath intl zip xml mbstring exif
 RUN pecl install imagick-3.8.0 && docker-php-ext-enable imagick
 
 COPY src/ /var/www/html
+COPY --from=composer-builder /app/vendor /var/www/html/vendor
 COPY --from=node-builder /app/public/build /var/www/html/public/build
 
 RUN chown -R www-data:www-data /var/www

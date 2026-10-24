@@ -56,7 +56,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        if (config('app.debug') === true) {
+        // debugbar is a dev dependency, so it is not installed in the production image
+        if (config('app.debug') === true && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
             $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
         }
     }
