@@ -1,5 +1,7 @@
 <?php
 
+Route::get('/robots.txt', 'RobotsController@index')->name('robots.txt');
+
 /**
  * API
  */

@@ -76,6 +76,23 @@ class SmokeTest extends TestCase
             ->assertSee($article->title);
     }
 
+    public function testRobotsTxtBlocksCrawlersOutsideProduction()
+    {
+        $this->get('/robots.txt')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'text/plain; charset=UTF-8')
+            ->assertSeeText("User-agent: *\nDisallow: /", false);
+    }
+
+    public function testRobotsTxtAllowsCrawlersInProduction()
+    {
+        config(['app.env' => 'production']);
+
+        $this->get('/robots.txt')
+            ->assertOk()
+            ->assertSeeText("Disallow: \nSitemap: http://localhost/sitemap.xml", false);
+    }
+
     public function testAccountPageRenders()
     {
         $this->actingAs($this->createUser())
