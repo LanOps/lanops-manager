@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\NewsArticle;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -11,7 +12,7 @@ use Tests\TestCase;
  */
 class SmokeTest extends TestCase
 {
-    public function publicPageProvider(): array
+    public static function publicPageProvider(): array
     {
         return [
             'home'            => ['/'],
@@ -33,9 +34,7 @@ class SmokeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider publicPageProvider
-     */
+    #[DataProvider('publicPageProvider')]
     public function testPublicPageRenders(string $url)
     {
         $this->createEventWithTicket();
@@ -68,7 +67,7 @@ class SmokeTest extends TestCase
             ->assertOk();
     }
 
-    public function adminPageProvider(): array
+    public static function adminPageProvider(): array
     {
         return [
             'dashboard' => ['/admin'],
@@ -82,9 +81,7 @@ class SmokeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider adminPageProvider
-     */
+    #[DataProvider('adminPageProvider')]
     public function testAdminPageRenders(string $url)
     {
         $this->createEventWithTicket();
