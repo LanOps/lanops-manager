@@ -26,9 +26,9 @@ services:
       - php
     networks:
       - internal
-  
+
   db:
-    image: mariadb:10.11
+    image: mariadb:11
     volumes:
       - db:/var/lib/mysql
     env_file: $PWD/src/.env
@@ -110,7 +110,7 @@ services:
       - "host.docker.internal:host-gateway"
     depends_on:
       - php
-    
+
 volumes:
   db:
 
