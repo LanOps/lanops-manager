@@ -263,6 +263,13 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
+    public function testSteamProfileLookupSurvivesASteamTimeout()
+    {
+        Http::fake(['api.steampowered.com/*' => fn () => throw new \Illuminate\Http\Client\ConnectionException('timed out')]);
+
+        $this->assertNull(\App\Libraries\Helpers::getSteamProfile('76561198000000009'));
+    }
+
     public function testSteamRegistrationCreatesAVerifiedUser()
     {
         Http::fake(['api.steampowered.com/*' => Http::response(['response' => ['players' => [['personaname' => 'Steam Person']]]])]);

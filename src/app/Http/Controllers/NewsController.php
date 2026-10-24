@@ -58,9 +58,10 @@ class NewsController extends Controller
             ->description('Browse ' . config('app.name') . ' news articles tagged with "' . $newsTag->tag . '".')
             ->url(url('/news/tags/' . $newsTag->slug));
 
-        foreach (NewsTag::where('tag', $newsTag->tag)->get()->reverse() as $newsTag) {
-            $newsArticles[] = $newsTag->newsArticle;
-        }
+        $newsArticles = NewsTag::where('tag', $newsTag->tag)->get()->reverse()
+            ->map(fn ($taggedArticle) => $taggedArticle->newsArticle)
+            ->filter()
+            ->values();
         return view('news.tag')
             ->withTag($newsTag->tag)
             ->withNewsArticles($newsArticles);

@@ -2,6 +2,7 @@
 
 namespace App\Libraries;
 
+use Illuminate\Http\Client\ConnectionException;
 use DB;
 use Auth;
 use App\Models\User;
@@ -340,13 +341,18 @@ class Helpers
             "steam_profile_{$steamId}",
             now()->addDays(1),
             function () use ($steamId) {
-                $response = Http::timeout(10)->get(
-                    'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-                    [
-                        'key' => config('services.steam.client_secret'),
-                        'steamids' => $steamId,
-                    ]
-                );
+                // Steam being slow or down must not break the admin pages that show profiles
+                try {
+                    $response = Http::timeout(5)->get(
+                        'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
+                        [
+                            'key' => config('services.steam.client_secret'),
+                            'steamids' => $steamId,
+                        ]
+                    );
+                } catch (ConnectionException $e) {
+                    return null;
+                }
 
                 if (! $response->successful()) {
                     return null;

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\NewsArticle;
+use App\Models\NewsTag;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -58,6 +59,19 @@ class SmokeTest extends TestCase
         $article = factory(NewsArticle::class)->create();
 
         $this->get('/news/' . $article->fresh()->slug)
+            ->assertOk()
+            ->assertSee($article->title);
+    }
+
+    public function testNewsTagPageListsTaggedArticles()
+    {
+        $article = factory(NewsArticle::class)->create();
+        $tag = new NewsTag();
+        $tag->tag = 'Summer LAN';
+        $tag->news_feed_id = $article->id;
+        $tag->save();
+
+        $this->get('/news/tags/' . $tag->fresh()->slug)
             ->assertOk()
             ->assertSee($article->title);
     }
