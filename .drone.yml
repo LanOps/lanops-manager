@@ -10,7 +10,7 @@ trigger:
 
 services:
   - name: database
-    image: mariadb:10.11
+    image: mariadb:11
     environment:
       MARIADB_DATABASE: lanops_test
       MARIADB_USER: lanops
