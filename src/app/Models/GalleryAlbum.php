@@ -11,7 +11,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\Image\Manipulations;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class GalleryAlbum extends Model implements HasMedia
@@ -105,15 +105,15 @@ class GalleryAlbum extends Model implements HasMedia
         return $this->getFirstMedia('images')->getUrl('thumb');
     }
 
-    public function registerMediaConversions(Media $media = null): void
+    public function registerMediaConversions(?Media $media = null): void
     {
         $this
             ->addMediaConversion('thumb')
-            ->fit(Manipulations::FIT_CROP, 300, 300)
+            ->fit(Fit::Crop, 300, 300)
             ->queued();
         $this
             ->addMediaConversion('optimized')
-            ->fit(Manipulations::FIT_MAX, 2000, 2000)
+            ->fit(Fit::Max, 2000, 2000)
             ->optimize()
             ->queued();
     }
