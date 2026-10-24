@@ -50,7 +50,7 @@ services:
       - php
 
   npm:
-    image: node:23
+    image: node:24
     entrypoint: [ "npm" ]
     working_dir: /app
     command: [ "-v" ]
