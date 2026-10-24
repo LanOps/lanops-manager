@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\NewsArticle;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -98,6 +100,28 @@ class SmokeTest extends TestCase
         $this->actingAs($this->createUser(['admin' => true]))
             ->get('/admin/events/' . $ticket->event->slug)
             ->assertOk();
+    }
+
+    public function testAdminDashboardListsOnlyActivePolls()
+    {
+        $admin = $this->createUser(['admin' => true]);
+        foreach (['Open poll' => null, 'Future poll' => now()->addDay(), 'Closed poll' => now()->subDay()] as $name => $end) {
+            DB::table('polls')->insert([
+                'name'       => $name,
+                'slug'       => Str::slug($name),
+                'status'     => 'PUBLISHED',
+                'user_id'    => $admin->id,
+                'end'        => $end,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $this->actingAs($admin)->get('/admin')
+            ->assertOk()
+            ->assertSee('Open poll')
+            ->assertSee('Future poll')
+            ->assertDontSee('Closed poll');
     }
 
     public function testAdminPagesRedirectNonAdmins()
