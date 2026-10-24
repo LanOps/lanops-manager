@@ -248,7 +248,7 @@ class Helpers
      * @param $itemId
      * @return Boolean
      */
-    public static function formatBasket($basket, User $user = null, $referralDiscountAmountOverride = null, $skipAvailableReferralsCheck = false)
+    public static function formatBasket($basket, ?User $user = null, $referralDiscountAmountOverride = null, $skipAvailableReferralsCheck = false)
     {
         if (!$user) {
             $user = Auth::user();
