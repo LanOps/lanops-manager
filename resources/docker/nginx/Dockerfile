@@ -8,7 +8,7 @@ RUN npm ci
 COPY src/ ./
 RUN npm run build
 
-FROM nginx:latest
+FROM nginx:stable
 LABEL maintainer="Thornton Phillis (dev@th0rn0.co.uk)"
 
 WORKDIR /var/www/html
