@@ -20,7 +20,7 @@ RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-
 COPY src/ ./
 RUN composer dump-autoload --optimize --no-dev --no-scripts
 
-FROM php:8.3-fpm AS php-base
+FROM php:8.4-fpm AS php-base
 LABEL maintainer="Thornton Phillis (dev@th0rn0.co.uk)"
 
 RUN apt-get update && apt-get install -y \
