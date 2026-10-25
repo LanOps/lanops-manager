@@ -254,7 +254,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return bin2hex(random_bytes(10));
     }
 
-    public static function isValidReferralCode($referralCode, User $excludeUser = null)
+    public static function isValidReferralCode($referralCode, ?User $excludeUser = null)
     {
         if ($excludeUser) {
             return User::where('referral_code', $referralCode)
