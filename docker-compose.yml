@@ -28,7 +28,7 @@ services:
       - internal
 
   db:
-    image: mariadb:11
+    image: mariadb:12
     volumes:
       - db:/var/lib/mysql
     env_file: $PWD/src/.env
