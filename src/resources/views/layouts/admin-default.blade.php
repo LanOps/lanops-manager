@@ -23,30 +23,22 @@
 		<!-- Custom Fonts -->
 		<link href="/fonts/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
-		<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-		<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-		<!--[if lt IE 9]>
-				<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-				<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-		<![endif]-->
-
 		<!-- Jquery Core JavaScript -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.2/dist/themes/smoothness/jquery-ui.min.css" integrity="sha384-e4Bm/JKXqLbEnnDNLZIbB0u9VBy3H9D+TNdLb22ybxTLsmtWgRhQ3/BKEgJ13zU2" crossorigin="anonymous">
+		<script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.2/dist/jquery-ui.min.js" integrity="sha384-tBcEcHGtNy7/Mx08+YxuvQ6v6s0N2jgehtFiT+bLtGwTj/txXtB/L5GqXfggm5sS" crossorigin="anonymous"></script>
 
 		<!-- Bootstrap Core JavaScript -->
-		<script src="/js/bootstrap-admin.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
 
 		<!-- Morris Charts JavaScript -->
 		<script src="/js/morris/raphael.min.js"></script>
 		<script src="/js/morris/morris.min.js"></script>
-		<script src="/js/morris/morris-data.js"></script>
 
 
 		<!-- include summernote css/js -->
-		<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
+		<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote.min.css" integrity="sha384-4rKS0JSi0EkLi/0w4eqYVvfCzP9JJv6EVochgkFUUGusUbyU/Yc8ZbvTO8JwsYiV" crossorigin="anonymous" rel="stylesheet">
+		<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote.min.js" integrity="sha384-P/xUbGCYuaoeXvkk0bJlBa8ag1csGCLr1Z2LGD4SXKynQzTZIkWOaqYegoho3pIJ" crossorigin="anonymous"></script>
 
 		<script>
 			function ConfirmDelete()

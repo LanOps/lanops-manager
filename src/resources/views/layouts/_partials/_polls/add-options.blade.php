@@ -4,9 +4,9 @@
 	</div>
 </div>
 <button type="button" id="poll_options_add" class="btn btn-default btn-block">Extra Option</button> 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script type="text/javascript">
- 	$(document).ready(function() {
+	// jQuery is loaded at the end of the page layout, so wait for it rather than loading a second copy
+ 	document.addEventListener('DOMContentLoaded', function() {
 	    var max_fields = 20;
 	    var wrapper = $("#poll_options");
 	    var add_button = $("#poll_options_add");
