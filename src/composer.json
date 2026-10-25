@@ -11,7 +11,7 @@
         "ignited/laravel-omnipay": "^3.0",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "guzzlehttp/guzzle": "^7.0.1",
-        "intervention/image": "^3.7",
+        "intervention/image": "^4.4",
         "laravel/tinker": "^3.0",
         "omnipay/paypal": "^3.0",
         "cviebrock/eloquent-sluggable": "^13.0",
