@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class NewsExcerptTest extends TestCase
 {
-    public function test_excerpt_keeps_gaps_between_blocks_and_drops_leading_title(): void
+    public function testExcerptKeepsGapsBetweenBlocksAndDropsLeadingTitle(): void
     {
         $article = new NewsArticle();
         $article->title = 'GOTY PRIZE RAFFLE';
@@ -16,7 +16,7 @@ class NewsExcerptTest extends TestCase
         $this->assertSame('We are doing something special. Fish & chips after.', $article->getExcerpt());
     }
 
-    public function test_excerpt_is_cut_to_length(): void
+    public function testExcerptIsCutToLength(): void
     {
         $article = new NewsArticle();
         $article->title = 'News';
