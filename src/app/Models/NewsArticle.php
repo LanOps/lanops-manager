@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\NewsTag;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Cviebrock\EloquentSluggable\Sluggable;
 
 class NewsArticle extends Model
@@ -91,6 +92,26 @@ class NewsArticle extends Model
             }
         }
         return true;
+    }
+
+    /**
+     * Get a plain text excerpt of the article for news cards
+     * @param  Integer $length
+     * @return String
+     */
+    public function getExcerpt($length = 160)
+    {
+        // Keep a gap where block elements end, otherwise "<p>A</p><p>B</p>" becomes "AB"
+        $html = preg_replace('/<br\s*\/?>|<\/(p|div|h[1-6]|li|blockquote|tr)>/i', '$0 ', $this->article ?? '');
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = trim(preg_replace('/\s+/u', ' ', str_replace("\u{00a0}", ' ', $text)));
+
+        // Articles often open with their own title, which the card already shows
+        if ($this->title && mb_stripos($text, trim($this->title)) === 0) {
+            $text = ltrim(mb_substr($text, mb_strlen(trim($this->title))), " \t\n\r\0\x0B:-");
+        }
+
+        return Str::limit($text, $length);
     }
 
     /**

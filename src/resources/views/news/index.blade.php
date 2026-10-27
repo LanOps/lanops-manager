@@ -20,7 +20,7 @@
                                 <h4 class="news-card-title">
                                     <a href="/news/{{ $newsArticle->slug }}">{{ $newsArticle->title }}</a>
                                 </h4>
-                                <p class="news-card-excerpt">{{ substr(strip_tags($newsArticle->article), 0, 160) }}...</p>
+                                <p class="news-card-excerpt">{{ $newsArticle->getExcerpt() }}</p>
                                 @if ($newsArticle->tags->count())
                                     <div class="news-card-tags">
                                         @foreach ($newsArticle->tags as $tag)
