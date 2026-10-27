@@ -137,3 +137,14 @@ label:not(.form-check-label) {
 		'stylesheets/app/components/login',
 		'stylesheets/app/components/user-navigation',
 		'stylesheets/app/components/user-override';
+
+// Stripe card fields on the payment page sit in .form-control boxes; give them
+// the same focus and error outlines as normal inputs
+.form-control.StripeElement--focus {
+	border-color: $input-focus-border-color;
+	box-shadow: $input-focus-box-shadow;
+}
+
+.form-control.StripeElement--invalid {
+	border-color: var(--bs-form-invalid-border-color);
+}
