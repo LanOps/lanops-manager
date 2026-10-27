@@ -186,8 +186,8 @@ class EventParticipant extends Model implements HasMedia
     public function generateQRCode()
     {
         $qr = (string) QrCode::format('png')->size(300)->generate($this->getTicketUrl());
-        if ($this->hasMedia()) {
-            $this->clearMediaCollection();
+        if ($this->hasMedia('qr')) {
+            $this->clearMediaCollection('qr');
         }
         $randomNameSuffix = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(5/strlen($x)))), 1, 5);
         if (!$this->addMediaFromString($qr)->usingFileName($randomNameSuffix . 'qr.png')->toMediaCollection('qr')) {
