@@ -56,10 +56,10 @@
 										</a>
 									</td>
 									<td width="15%">
-										{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/timetables/' . $timetable->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-											{{ Form::hidden('_method', 'DELETE') }}
+										{{ html()->form('POST', url('/admin/events/' . $event->slug . '/timetables/' . $timetable->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+											@method('DELETE')
 											<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
-										{{ Form::close() }}
+										</form>
 									</td>
 								</tr>
 							@endforeach
@@ -77,7 +77,7 @@
 				<i class="fa fa-plus fa-fw"></i> Add New Timetable
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/timetables')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/timetables'))->open() }}
 					@if ($errors->any())
 					  	<div class="alert alert-danger">
 					        <ul>
@@ -88,11 +88,11 @@
 					  	</div>
 					@endif
 					<div class="form-group">
-						{{ Form::label('timetable_name','Name',array('id'=>'','class'=>'')) }}
-						{{ Form::text('name', NULL ,array('id'=>'timetable_name','class'=>'form-control')) }}
+						{{ html()->label('Name', 'timetable_name') }}
+						{{ html()->text('name')->id('timetable_name')->class('form-control') }}
 					</div> 
 					<button type="submit" class="btn btn-success btn-block">Submit</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	

@@ -1,6 +1,6 @@
 @extends ('layouts.admin-default')
 
-@section ('page_title', $venue->name)
+@section ('page_title', $venue->display_name)
 
 @section ('content')
 
@@ -26,7 +26,7 @@
 				<i class="fa fa-wrench fa-fw"></i> Settings
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/venues/' . $venue->slug, 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/venues/' . $venue->slug))->acceptsFiles()->open() }}
 					@if ($errors->any())
 					  	<div class="alert alert-danger">
 					        <ul>
@@ -37,36 +37,36 @@
 					  	</div>
 					@endif
 					<div class="form-group">
-						{{ Form::label('name','Venue Name',array('id'=>'','class'=>'')) }}
-						{{ Form::text('name', $venue->display_name,array('id'=>'name','class'=>'form-control')) }}
+						{{ html()->label('Venue Name', 'name') }}
+						{{ html()->text('name', $venue->display_name)->class('form-control') }}
 					</div>
 					<div class="row">
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_1','Address Line 1',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_1', $venue->address_1,array('id'=>'address_1','class'=>'form-control')) }}
+							{{ html()->label('Address Line 1', 'address_1') }}
+							{{ html()->text('address_1', $venue->address_1)->class('form-control') }}
 						</div>
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_2','Address Line 2',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_2', $venue->address_2,array('id'=>'address_2','class'=>'form-control')) }}
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_street','Address Street',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_street', $venue->address_street,array('id'=>'address_street','class'=>'form-control')) }}
-						</div>
-						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_city','Address City',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_city', $venue->address_city,array('id'=>'address_city','class'=>'form-control')) }}
+							{{ html()->label('Address Line 2', 'address_2') }}
+							{{ html()->text('address_2', $venue->address_2)->class('form-control') }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_postcode','Address Postcode',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_postcode', $venue->address_postcode,array('id'=>'address_postcode','class'=>'form-control')) }}
+							{{ html()->label('Address Street', 'address_street') }}
+							{{ html()->text('address_street', $venue->address_street)->class('form-control') }}
 						</div>
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_country','Address Country',array('id'=>'','class'=>'')) }}
+							{{ html()->label('Address City', 'address_city') }}
+							{{ html()->text('address_city', $venue->address_city)->class('form-control') }}
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-lg-6 col-sm-12 form-group">
+							{{ html()->label('Address Postcode', 'address_postcode') }}
+							{{ html()->text('address_postcode', $venue->address_postcode)->class('form-control') }}
+						</div>
+						<div class="col-lg-6 col-sm-12 form-group">
+							{{ html()->label('Address Country', 'address_country') }}
                             <select class="form-control @error('address_country') is-invalid @enderror" name="address_country" id="address_country" aria-describedby="address_country" value="{{ old('address_country', 'GB') }}">
                                 @foreach (Helpers::getSelectCountries() as $country)
                                     <option value="{{ $country }}" {{ ( $country == $venue->address_country) ? 'selected' : '' }}> 
@@ -77,12 +77,12 @@
 						</div>
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Submit</button>
-				{{ Form::close() }}
+				</form>
 				<hr>
-				{{ Form::open(array('url'=>'/admin/venues/' . $venue->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-					{{ Form::hidden('_method', 'DELETE') }}
+				{{ html()->form('POST', url('/admin/venues/' . $venue->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+					@method('DELETE')
 					<button type="submit" class="btn btn-danger btn-block">Delete</button>
-				{{ Form::close() }}
+				</form>
 			</div>  
 		</div>
 
@@ -94,13 +94,13 @@
 				<i class="fa fa-plus fa-fw"></i> Add Images
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/venues/' . $venue->slug, 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/venues/' . $venue->slug))->acceptsFiles()->open() }}
 					<div class="form-group">
-						{{ Form::label('images','Venue Images',array('id'=>'','class'=>'')) }}
-						{{ Form::file('images[]',array('id'=>'images[]','class'=>'form-control', 'multiple'=>'multiple')) }}
+						{{ html()->label('Venue Images', 'images') }}
+						{{ html()->file('images[]')->class('form-control')->multiple() }}
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Upload</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 
@@ -116,10 +116,10 @@
 						</div>
 						<div class="col-lg-12 col-sm-12">
 							<br>
-							{{ Form::open(array('url'=>'/admin/venues/' . $venue->slug . '/' . $image->id, 'onsubmit' => 'return ConfirmDelete()')) }}
-								{{ Form::hidden('_method', 'DELETE') }}
+							{{ html()->form('POST', url('/admin/venues/' . $venue->slug . '/' . $image->id))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+								@method('DELETE')
 								<button type="submit" class="btn btn-danger">Delete</button>
-							{{ Form::close() }}
+							</form>
 						</div>
 					</div>
 					<hr>

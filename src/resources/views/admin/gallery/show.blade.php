@@ -44,12 +44,12 @@
 									<td>
 										{{ $image->created_at }}
 									</td>
-									{{ Form::open(array('url'=>'/admin/gallery/' . $album->slug . '/' . $image->id, 'files' => true, 'onsubmit' => 'return ConfirmDelete()')) }}
-										{{ Form::hidden('_method', 'DELETE') }}
+									{{ html()->form('POST', url('/admin/gallery/' . $album->slug . '/' . $image->id))->acceptsFiles()->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+										@method('DELETE')
 										<td width="15%">
 											<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
 										</td>
-									{{ Form::close() }}
+									</form>
 								</tr>
 							@endforeach
 						</tbody>
@@ -67,14 +67,14 @@
 				<i class="fa fa-upload fa-fw"></i> Add Images
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/gallery/' . $album->slug . '/upload', 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/gallery/' . $album->slug . '/upload'))->acceptsFiles()->open() }}
 					{{ csrf_field() }}
 					<div class="form-group">
-						{{ Form::label('images','Select Images',array('id'=>'','class'=>'')) }}
-						{{ Form::file('images[]',array('id'=>'images','class'=>'form-control', 'multiple'=>true)) }}
+						{{ html()->label('Select Images', 'images') }}
+						{{ html()->file('images[]')->id('images')->class('form-control')->multiple() }}
 					</div>
 					<button type="submit" class="btn btn-primary btn-block">Upload</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 		<div class="panel panel-default">
@@ -83,7 +83,7 @@
 			</div>
 			<div class="panel-body">
 				<div class="list-group">
-					{{ Form::open(array('url'=>'/admin/gallery/' . $album->slug)) }}
+					{{ html()->form('POST', url('/admin/gallery/' . $album->slug))->open() }}
 						@if ($errors->any())
 						  	<div class="alert alert-danger">
 						        <ul>
@@ -94,53 +94,35 @@
 						  	</div>
 						@endif
 						<div class="form-group">
-							{{ Form::label('name','Album Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name',$album->name,array('id'=>'name','class'=>'form-control')) }}
+							{{ html()->label('Album Name', 'name') }}
+							{{ html()->text('name', $album->name)->class('form-control') }}
 						</div> 
 						<div class="form-group">
-							{{ Form::label('description','Description',array('id'=>'','class'=>'')) }}
-							{{ Form::textarea('description', $album->description,array('id'=>'description','class'=>'form-control', 'rows'=>'2')) }}
+							{{ html()->label('Description', 'description') }}
+							{{ html()->textarea('description', $album->description)->class('form-control')->rows('2') }}
 						</div>
 						<div class="row">
 							<div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('status','Status',array('id'=>'','class'=>'')) }}
+								{{ html()->label('Status', 'status') }}
 								{{ 
-									Form::select(
-										'status',
-										array(
+									html()->select('status', array(
 											'draft'=>'Draft',
 											'published'=>'Published',
-										),
-										strtolower($album->status),
-										array(
-											'id'=>'status',
-											'class'=>'form-control'
-										)
-									)
+										), strtolower($album->status))->class('form-control')
 								}}
 							</div>
 							 <div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('event_id','Event',array('id'=>'','class'=>'')) }}
-								{{ 
-									Form::select(
-										'event_id',
-										Helpers::getEventNames('DESC', 0),
-										strtolower($album->event_id),
-										array(
-											'id'=>'event_id',
-											'class'=>'form-control'
-										)
-									)
-								}}
+								{{ html()->label('Event', 'event_id') }}
+								{{ html()->select('event_id', Helpers::getEventNames('DESC', 0), strtolower($album->event_id))->class('form-control') }}
 							</div>
 						</div>
 						<button type="submit" class="btn btn-success btn-block">Submit</button>
-					{{ Form::close() }}
+					</form>
 					<hr>
-					{{ Form::open(array('url'=>'/admin/gallery/' . $album->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-						{{ Form::hidden('_method', 'DELETE') }}
+					{{ html()->form('POST', url('/admin/gallery/' . $album->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+						@method('DELETE')
 						<button type="submit" class="btn btn-danger btn-block">Delete</button>
-					{{ Form::close() }}
+					</form>
 				</div>
 			</div>
 		</div>

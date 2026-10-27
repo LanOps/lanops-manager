@@ -50,10 +50,10 @@
 										</a>
 									</td>
 									<td width="15%">
-										{{ Form::open(array('url'=>'/admin/gallery/' . $album->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-											{{ Form::hidden('_method', 'DELETE') }}
+										{{ html()->form('POST', url('/admin/gallery/' . $album->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+											@method('DELETE')
 											<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
-										{{ Form::close() }}
+										</form>
 									</td>
 								</tr>
 							@endforeach
@@ -71,7 +71,7 @@
 			</div>
 			<div class="panel-body">
 				<div class="list-group">
-					{{ Form::open(array('url'=>'/admin/gallery/', 'files' => true )) }}
+					{{ html()->form('POST', url('/admin/gallery/'))->acceptsFiles()->open() }}
 						@if ($errors->any())
 						  	<div class="alert alert-danger">
 						        <ul>
@@ -82,15 +82,15 @@
 						  	</div>
 						@endif
 						<div class="form-group">
-							{{ Form::label('name','Album Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name',NULL,array('id'=>'name','class'=>'form-control')) }}
+							{{ html()->label('Album Name', 'name') }}
+							{{ html()->text('name')->class('form-control') }}
 						</div> 
 						<div class="form-group">
-							{{ Form::label('description','Description',array('id'=>'','class'=>'')) }}
-							{{ Form::textarea('description', NULL,array('id'=>'description','class'=>'form-control', 'rows'=>'2')) }}
+							{{ html()->label('Description', 'description') }}
+							{{ html()->textarea('description')->class('form-control')->rows('2') }}
 						</div>
 						<button type="submit" class="btn btn-success btn-block">Submit</button>
-					{{ Form::close() }}
+					</form>
 				</div>
 			</div>
 		</div>

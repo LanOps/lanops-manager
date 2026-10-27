@@ -57,10 +57,10 @@
 									</a>
 								</td>
 								<td width="15%">
-									{{ Form::open(array('url'=>'/admin/tournaments/' . $tournament->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-										{{ Form::hidden('_method', 'DELETE') }}
+									{{ html()->form('POST', url('/admin/tournaments/' . $tournament->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+										@method('DELETE')
 										<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
-									{{ Form::close() }}
+									</form>
 								</td>
 							</tr>
 						@endforeach
@@ -76,31 +76,21 @@
 				<i class="fa fa-plus fa-fw"></i> Create Tournament
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/tournaments/', 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/tournaments/'))->acceptsFiles()->open() }}
 					<div class="form-group">
-						{{ Form::label('name','Name',array('id'=>'','class'=>'')) }}
-						{{ Form::text('name', NULL ,array('id'=>'name','class'=>'form-control')) }}
+						{{ html()->label('Name', 'name') }}
+						{{ html()->text('name')->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('team_size','Team Size (0 is no Teams)',array('id'=>'','class'=>'')) }}
-						{{ Form::text('team_size', 0 ,array('id'=>'name','class'=>'form-control')) }}
+						{{ html()->label('Team Size (0 is no Teams)', 'team_size') }}
+						{{ html()->text('team_size', 0)->id('name')->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('event_id','Link to Event',array('id'=>'','class'=>'')) }}
-						{{ 
-							Form::select(
-								'event_id',
-								Helpers::getEventNames('DESC', 0, true),
-								'',
-								array(
-									'id'=>'event_id',
-									'class'=>'form-control'
-								)
-							)
-						}}
+						{{ html()->label('Link to Event', 'event_id') }}
+						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), '')->class('form-control') }}
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Submit</button> 
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	</div>

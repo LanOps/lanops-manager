@@ -132,10 +132,10 @@
 									</a>
 								</td>
 								<td width="15%">
-									{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/tickets/' . $ticket->id, 'onsubmit' => 'return ConfirmDelete()')) }}
-										{{ Form::hidden('_method', 'DELETE') }}
+									{{ html()->form('POST', url('/admin/events/' . $event->slug . '/tickets/' . $ticket->id))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+										@method('DELETE')
 										<button type="submit" class="btn btn-danger btn-sm btn-block" data-confirm="Are you sure to delete this Ticket?">Delete</button>
-									{{ Form::close() }}
+									</form>
 								</td>
 							</tr>
 						@endforeach
@@ -176,18 +176,18 @@
 									{{ $user->getStaffTickets($event->id)->count() }}
 								</td>
 								<td width="15%">
-									{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/freebies/gift')) }}
+									{{ html()->form('POST', url('/admin/events/' . $event->slug . '/freebies/gift'))->open() }}
 										{{ csrf_field() }}
 										<input type="hidden" name="user_id" value="{{ $user->id }}" />
 										<button type="submit" name="action" class="btn btn-success btn-sm btn-block">Free Ticket</button>
-									{{ Form::close() }}
+									</form>
 								</td>
 								<td width="15%">
-									{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/freebies/admin')) }}
+									{{ html()->form('POST', url('/admin/events/' . $event->slug . '/freebies/admin'))->open() }}
 										{{ csrf_field() }}
 										<input type="hidden" name="user_id" value="{{ $user->id }}" />
 										<button type="submit" name="action" class="btn btn-success btn-sm btn-block">Admin Ticket</button>
-									{{ Form::close() }}
+									</form>
 								</td>
 							</tr>
 						@endforeach
@@ -203,9 +203,9 @@
 				<i class="fa fa-plus fa-fw"></i> Add Ticket
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/tickets')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/tickets'))->open() }}
 					@include('layouts._partials._admin._event._tickets.form', ['empty' => true])
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 

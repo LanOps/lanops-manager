@@ -37,26 +37,26 @@
 						</ul>
 					</div>
 				@endif
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug, 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug))->acceptsFiles()->open() }}
 					<div class="row">
 						<div class="col-md-6 col-sm-12">
 							<div class="form-group">
-								{{ Form::label('event_name','Name',array('id'=>'','class'=>'')) }}
-								{{ Form::text('event_name',$event->display_name,array('id'=>'event_name','class'=>'form-control')) }}
+								{{ html()->label('Name', 'event_name') }}
+								{{ html()->text('event_name', $event->display_name)->class('form-control') }}
 							</div>
 							<div class="row">
 								<div class="col-md-6 col-xs-12">
 									<div class="row">
 										<div class="col-md-6 col-xs-12">
 											<div class="form-group">
-												{{ Form::label('capacity','Capacity',array('id'=>'','class'=>'')) }}
-												{{ Form::text('capacity',$event->capacity,array('id'=>'capacity','class'=>'form-control')) }}
+												{{ html()->label('Capacity', 'capacity') }}
+												{{ html()->text('capacity', $event->capacity)->class('form-control') }}
 											</div>
 										</div>
 										<div class="col-md-6 col-xs-12">
 											<div class="form-group">
-												{{ Form::label('seating_cap','Seating',array('id'=>'','class'=>'')) }}
-												{{ Form::text('seating_cap',$event->getSeatingCapacity(),array('id'=>'seating_cap','class'=>'form-control', 'disabled'=>'true')) }}
+												{{ html()->label('Seating', 'seating_cap') }}
+												{{ html()->text('seating_cap', $event->getSeatingCapacity())->class('form-control')->disabled() }}
 											</div>
 										</div>
 									</div>
@@ -65,39 +65,21 @@
 									<div class="row">
 										<div class="col-md-6 col-xs-12">
 											<div class="form-group">
-												{{ Form::label('event_status','Status',array('id'=>'','class'=>'')) }}
+												{{ html()->label('Status', 'event_status') }}
 												{{ 
-													Form::select(
-														'status',
-														array(
+													html()->select('status', array(
 															'draft'=>'Draft',
 															'preview'=>'Preview',
 															'published'=>'Published',
 															'private' => 'Private'
-														),
-														strtolower($event->status),
-														array(
-															'id'=>'status',
-															'class'=>'form-control'
-														)
-													)
+														), strtolower($event->status))->class('form-control')
 												}}
 											</div>
 										</div>
 										<div class="col-md-6 col-xs-12">
 											<div class="form-group">
-												{{ Form::label('event_type','Type',array('id'=>'','class'=>'')) }}
-												{{ 
-													Form::select(
-														'type',
-														App\Models\Event::getTypeArray(),
-														$event->type,
-														array(
-															'id'=>'type',
-															'class'=>'form-control'
-														)
-													)
-												}}
+												{{ html()->label('Type', 'event_type') }}
+												{{ html()->select('type', App\Models\Event::getTypeArray(), $event->type)->class('form-control') }}
 											</div>
 										</div>
 									</div>
@@ -108,22 +90,22 @@
 							<div class="row">
 								<div class="col-md-6 col-sm-12">
 									<div class="form-group">
-										{{ Form::label('start_date','Start Date',array('id'=>'','class'=>'')) }}
-										{{ Form::text('start_date', date('m/d/Y', strtotime($event->start)),array('id'=>'start_date','class'=>'form-control')) }}
+										{{ html()->label('Start Date', 'start_date') }}
+										{{ html()->text('start_date', date('m/d/Y', strtotime($event->start)))->class('form-control') }}
 									</div>
 									<div class="form-group">
-										{{ Form::label('end_date','End Date',array('id'=>'','class'=>'')) }}
-										{{ Form::text('end_date', date('m/d/Y', strtotime($event->end)),array('id'=>'end_date','class'=>'form-control')) }}
+										{{ html()->label('End Date', 'end_date') }}
+										{{ html()->text('end_date', date('m/d/Y', strtotime($event->end)))->class('form-control') }}
 									</div>
 								</div>
 								<div class="col-md-6 col-sm-12">
 									<div class="form-group">
-										{{ Form::label('start_time','Start Time',array('id'=>'','class'=>'')) }}
-										{{ Form::text('start_time', date('H:i', strtotime($event->start)),array('id'=>'start_time','class'=>'form-control')) }}
+										{{ html()->label('Start Time', 'start_time') }}
+										{{ html()->text('start_time', date('H:i', strtotime($event->start)))->class('form-control') }}
 									</div>
 									<div class="form-group">
-										{{ Form::label('end_time','End Time',array('id'=>'','class'=>'')) }}
-										{{ Form::text('end_time', date('H:i', strtotime($event->end)),array('id'=>'end_time','class'=>'form-control')) }}
+										{{ html()->label('End Time', 'end_time') }}
+										{{ html()->text('end_time', date('H:i', strtotime($event->end)))->class('form-control') }}
 									</div>
 								</div>
 							</div>
@@ -149,17 +131,17 @@
 					<div class="row">
 						<div class="col-xs-12">
 							<div class="form-group">
-								{{ Form::label('desc_short','Short Description',array('id'=>'','class'=>'')) }}
-								{{ Form::textarea('desc_short', $event->desc_short,array('id'=>'desc_short','class'=>'form-control wysiwyg-editor')) }}
+								{{ html()->label('Short Description', 'desc_short') }}
+								{{ html()->textarea('desc_short', $event->desc_short)->class('form-control wysiwyg-editor')->rows('10') }}
 							</div>
 							<div class="form-group">
-								{{ Form::label('desc_long','Long Description',array('id'=>'','class'=>'')) }}
-								{{ Form::textarea('desc_long',$event->desc_long,array('id'=>'desc_long','class'=>'form-control wysiwyg-editor', 'rows' => '4')) }}
+								{{ html()->label('Long Description', 'desc_long') }}
+								{{ html()->textarea('desc_long', $event->desc_long)->class('form-control wysiwyg-editor')->rows('4') }}
 							</div>
 						</div>
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Submit</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 
@@ -176,42 +158,42 @@
 								<h4 class="panel-title">
 									<a data-toggle="collapse" data-parent="#accordion" href="#collaspe-{{ $section->id }}" aria-expanded="false" class="collapsed">{{ $section->title }}</a>
 									<div class="pull-right">
-										{{ Form::open(array('url' => '/admin/information/' . $section->id)) }}
-											{{ Form::hidden('_method', 'DELETE') }}
-											{{ Form::submit('Delete', array('class' => 'btn btn-danger btn-xs pull-right', 'style' => 'margin-top:-2px;')) }}
-										{{ Form::close() }}
+										{{ html()->form('POST', url('/admin/information/' . $section->id))->open() }}
+											@method('DELETE')
+											{{ html()->input('submit')->value('Delete')->class('btn btn-danger btn-xs pull-right')->attribute('style', 'margin-top:-2px;') }}
+										</form>
 									</div>
 								</h4>
 							</div>
 							<div id="collaspe-{{ $section->id }}" class="panel-collapse collapse" aria-expanded="false" style="height: 0px;">
 								<div class="panel-body">
-									{{ Form::open(array('url'=>'/admin/information/' . $section->id, 'files' => 'true')) }}
+									{{ html()->form('POST', url('/admin/information/' . $section->id))->acceptsFiles()->open() }}
 										<div class="row">
 											<div class="col-md-6 col-sm-12">
 												<div class="form-group">
-													{{ Form::label('title','Title',array('id'=>'','class'=>'')) }}
-													{{ Form::text('title', $section->title,array('id'=>'title','class'=>'form-control')) }}
+													{{ html()->label('Title', 'title') }}
+													{{ html()->text('title', $section->title)->class('form-control') }}
 												</div>
 											</div>
 											<div class="col-md-6 col-sm-12">
 												<div class="form-group">
-													{{ Form::label('image','Image',array('id'=>'','class'=>'')) }}
-													{{ Form::file('image',array('id'=>'image','class'=>'form-control')) }}
+													{{ html()->label('Image', 'image') }}
+													{{ html()->file('image')->class('form-control') }}
 												</div>
 											</div>
 											<div class="form-group col-lg-6 col-sm-12">
-												{{ Form::label('order','Order',array('id'=>'')) }}
-												{{ Form::number('order', $section->order, array('id'=>'order', 'name' => 'order', 'class'=>'form-control')) }}
+												{{ html()->label('Order', 'order') }}
+												{{ html()->number('order', $section->order)->class('form-control') }}
 											</div>
 										</div>
 										<div class="form-group">
-											{{ Form::label('text','Text',array('id'=>'','class'=>'')) }}
-											{{ Form::textarea('text', $section->text,array('id'=>'text','class'=>'form-control wysiwyg-editor', 'rows' => '4')) }}
+											{{ html()->label('Text', 'text') }}
+											{{ html()->textarea('text', $section->text)->class('form-control wysiwyg-editor')->rows('4') }}
 										</div>
 										@if($section->hasMedia())
 											<div class="row">
 												<div class="form-group col-lg-6">
-													{{ Form::label('preview','Image Preview',array('id'=>'','class'=>'')) }}
+													{{ html()->label('Image Preview', 'preview') }}
 													<center>
 														<img class="img-responsive img-thumbnail" src="{{ $section->getFirstMediaUrl() }}" />
 													</center>
@@ -219,7 +201,7 @@
 											</div>
 										@endif
 										<button type="submit" class="btn btn-success btn-block">Update</button>
-									{{ Form::close() }}
+									</form>
 								</div>
 							</div>
 						</div>
@@ -335,10 +317,10 @@
 				<i class="fa fa-wrench fa-fw"></i> Danger Zone
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-					{{ Form::hidden('_method', 'DELETE') }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+					@method('DELETE')
 					<button type="submit" class="btn btn-danger btn-block">Delete</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 
@@ -347,10 +329,10 @@
 				<i class="fa fa-wrench fa-fw"></i> Duplicate Event TEST
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/duplicate')) }}
-					{{ Form::hidden('_method', 'POST') }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/duplicate'))->open() }}
+					@method('POST')
 					<button type="submit" class="btn btn-danger btn-block">Duplicate</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 
@@ -367,9 +349,9 @@
 				<h4 class="modal-title" id="addTicketModalLabel">Add Ticket</h4>
 			</div>
 			<div class="modal-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/tickets')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/tickets'))->open() }}
 					@include('layouts._partials._admin._event._tickets.form', ['empty' => true])
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	</div>
@@ -393,7 +375,7 @@
 							</ul>
 						</div>
 					@endif
-					{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/discord/link', 'files' => 'true')) }}
+					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/discord/link'))->acceptsFiles()->open() }}
 						Are you Sure you want to Link this Event to Discord? It will do the following:
 						<ul>
 							<li>Create New Scheduled Event</li>
@@ -402,7 +384,7 @@
 							<li>Announce New Attendees</li>
 						</ul>
 						<button type="submit" class="btn btn-default btn-block">Submit</button>
-					{{ Form::close() }}
+					</form>
 				</div>
 			</div>
 		</div>
@@ -425,14 +407,14 @@
 							</ul>
 						</div>
 					@endif
-					{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/discord/unlink', 'files' => 'true')) }}
+					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/discord/unlink'))->acceptsFiles()->open() }}
 						Are you Sure you want to Unlink this Event from Discord? It will do the following (this is done Automatically after each event):
 						<ul>
 							<li>Stop the Bot Watching this Event</li>
 							<li>Remove the Event Role</li>
 						</ul>
 						<button type="submit" class="btn btn-default btn-block">Submit</button>
-					{{ Form::close() }}
+					</form>
 				</div>
 			</div>
 		</div>
@@ -479,27 +461,27 @@
 				<h4 class="modal-title" id="addEventInformationModal">Add Event Information</h4>
 			</div>
 			<div class="modal-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/information', 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/information'))->acceptsFiles()->open() }}
 					<div class="row">
 						<div class="col-md-6 col-sm-12">
 							<div class="form-group">
-								{{ Form::label('title','Title',array('id'=>'','class'=>'')) }}
-								{{ Form::text('title',NULL,array('id'=>'title','class'=>'form-control')) }}
+								{{ html()->label('Title', 'title') }}
+								{{ html()->text('title')->class('form-control') }}
 							</div>
 						</div>
 						<div class="col-md-6 col-sm-12">
 							<div class="form-group">
-								{{ Form::label('image','Image',array('id'=>'','class'=>'')) }}
-								{{ Form::file('image',array('id'=>'image','class'=>'form-control')) }}
+								{{ html()->label('Image', 'image') }}
+								{{ html()->file('image')->class('form-control') }}
 							</div>
 						</div>
 					</div>
 					<div class="form-group">
-						{{ Form::label('text','Text',array('id'=>'','class'=>'')) }}
-						{{ Form::textarea('text', NULL,array('id'=>'text','class'=>'form-control', 'rows' => '4')) }}
+						{{ html()->label('Text', 'text') }}
+						{{ html()->textarea('text')->class('form-control')->rows('4') }}
 					</div>
 					<button type="submit" class="btn btn-default">Submit</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	</div>

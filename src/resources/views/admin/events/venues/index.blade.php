@@ -51,10 +51,10 @@
 										<a href="/admin/venues/{{ $venue->slug }}"><button type="button" class="btn btn-primary btn-sm btn-block">Edit</button></a>
 									</td>
 									<td width="15%">
-										{{ Form::open(array('url'=>'/admin/venues/' . $venue->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-											{{ Form::hidden('_method', 'DELETE') }}
+										{{ html()->form('POST', url('/admin/venues/' . $venue->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+											@method('DELETE')
 											<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
-										{{ Form::close() }}
+										</form>
 									</td>
 								</tr>
 							@endforeach
@@ -72,7 +72,7 @@
 				<i class="fa fa-plus fa-fw"></i> Add Venue
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/venues', 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/venues'))->acceptsFiles()->open() }}
 					@if ($errors->any())
 					  	<div class="alert alert-danger">
 					        <ul>
@@ -83,34 +83,34 @@
 					  	</div>
 					@endif
 					<div class="form-group">
-						{{ Form::label('name','Venue Name',array('id'=>'','class'=>'')) }}
-						{{ Form::text('name', '',array('id'=>'name','class'=>'form-control')) }}
+						{{ html()->label('Venue Name', 'name') }}
+						{{ html()->text('name', '')->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('address_1','Address Line 1',array('id'=>'','class'=>'')) }}
-						{{ Form::text('address_1', '',array('id'=>'address_1','class'=>'form-control')) }}
+						{{ html()->label('Address Line 1', 'address_1') }}
+						{{ html()->text('address_1', '')->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('address_2','Address Line 2',array('id'=>'','class'=>'')) }}
-						{{ Form::text('address_2', '',array('id'=>'address_2','class'=>'form-control')) }}
+						{{ html()->label('Address Line 2', 'address_2') }}
+						{{ html()->text('address_2', '')->class('form-control') }}
 					</div>
 					<div class="row">
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_street','Address Street',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_street', '',array('id'=>'address_street','class'=>'form-control')) }}
+							{{ html()->label('Address Street', 'address_street') }}
+							{{ html()->text('address_street', '')->class('form-control') }}
 						</div>
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_city','Address City',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_city', '',array('id'=>'address_city','class'=>'form-control')) }}
+							{{ html()->label('Address City', 'address_city') }}
+							{{ html()->text('address_city', '')->class('form-control') }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_postcode','Address Postcode',array('id'=>'','class'=>'')) }}
-							{{ Form::text('address_postcode', '',array('id'=>'address_postcode','class'=>'form-control')) }}
+							{{ html()->label('Address Postcode', 'address_postcode') }}
+							{{ html()->text('address_postcode', '')->class('form-control') }}
 						</div>
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('address_country','Address Country',array('id'=>'','class'=>'')) }}
+							{{ html()->label('Address Country', 'address_country') }}
                             <select class="form-control @error('address_country') is-invalid @enderror" name="address_country" id="address_country" aria-describedby="address_country" value="{{ old('address_country', 'GB') }}">
                                 @foreach (Helpers::getSelectCountries() as $country)
                                     <option value="{{ $country }}" {{ ( $country == old('address_country', 'United Kingdom')) ? 'selected' : '' }}> 
@@ -121,11 +121,11 @@
 						</div>
 					</div>
 					<div class="form-group">
-						{{ Form::label('images','Venue Images',array('id'=>'','class'=>'')) }}
-						{{ Form::file('images[]',array('id'=>'images[]','class'=>'form-control', 'multiple'=>'multiple')) }}
+						{{ html()->label('Venue Images', 'images') }}
+						{{ html()->file('images[]')->class('form-control')->multiple() }}
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Submit</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 

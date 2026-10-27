@@ -56,6 +56,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // html() escapes textarea contents, as laravelcollective/html did
+        $this->app->singleton(\Spatie\Html\Html::class, \App\Libraries\Html::class);
+
         // debugbar is a dev dependency, so it is not installed in the production image
         if (config('app.debug') === true && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
             $this->app->register(\Barryvdh\Debugbar\ServiceProvider::class);
