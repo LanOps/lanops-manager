@@ -73,7 +73,7 @@
 				<i class="fa fa-plus fa-fw"></i> Add New Slot
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/timetables/' . $timetable->slug . '/data')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/timetables/' . $timetable->slug . '/data'))->open() }}
 					@if ($errors->any())
 					  	<div class="alert alert-danger">
 					        <ul>
@@ -85,20 +85,20 @@
 					@endif
 					<div class="row">
 						<div class="form-group col-lg-6">
-							{{ Form::label('name','Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name', NULL ,array('id'=>'name','class'=>'form-control')) }}
+							{{ html()->label('Name', 'name') }}
+							{{ html()->text('name')->class('form-control') }}
 						</div> 
 						 <div class="form-group col-lg-6">
-							{{ Form::label('start_time','Start',array('id'=>'','class'=>'')) }}
-							{{ Form::select('start_time', $timetable->getAvailableTimes(), null, array('id'=>'start_time','class'=>'form-control')) }}
+							{{ html()->label('Start', 'start_time') }}
+							{{ html()->select('start_time', $timetable->getAvailableTimes())->class('form-control') }}
 						</div>
 						<div class="form-group col-lg-12">
-							{{ Form::label('desc','Description',array('id'=>'','class'=>'')) }}
-							{{ Form::text('desc', NULL ,array('id'=>'desc','class'=>'form-control')) }}
+							{{ html()->label('Description', 'desc') }}
+							{{ html()->text('desc')->class('form-control') }}
 						</div> 
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Submit</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 		<div class="panel panel-default">
@@ -106,7 +106,7 @@
 				<i class="fa fa-wrench fa-fw"></i> Settings
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/timetables/' . $timetable->slug)) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/timetables/' . $timetable->slug))->open() }}
 					@if ($errors->any())
 					  	<div class="alert alert-danger">
 					        <ul>
@@ -118,24 +118,16 @@
 					@endif
 					<div class="row">
 						<div class="form-group col-lg-6">
-							{{ Form::label('name','Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name', $timetable->name ,array('id'=>'name','class'=>'form-control')) }}
+							{{ html()->label('Name', 'name') }}
+							{{ html()->text('name', $timetable->name)->class('form-control') }}
 						</div>
 						<div class="form-group col-lg-6">
-							{{ Form::label('status','Status',array('id'=>'','class'=>'')) }}
+							{{ html()->label('Status', 'status') }}
 							{{ 
-								Form::select(
-									'status',
-									array(
+								html()->select('status', array(
 										'PUBLISHED'=>'Published',
 										'DRAFT'=>'Draft'
-									),
-									strtoupper($timetable->status),
-									array(
-										'id'=>'status',
-										'class'=>'form-control'
-									)
-								)
+									), strtoupper($timetable->status))->class('form-control')
 							}}
 						</div>
 					</div>
@@ -143,20 +135,20 @@
 						<div class="checkbox">
 							<label>
 								@if ($timetable->primary)
-									{{ Form::checkbox('primary', 1, true)}} Primary Timetable
+									{{ html()->checkbox('primary', true, 1)}} Primary Timetable
 								@else
-									{{ Form::checkbox('primary', 1)}} Primary Timetable
+									{{ html()->checkbox('primary', false, 1)}} Primary Timetable
 								@endif
 							</label>
 						</div>
 					</div>  
 					<button type="submit" class="btn btn-success btn-block">Submit</button>
-				{{ Form::close() }}
+				</form>
 				<hr>
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/timetables/' . $timetable->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-					{{ Form::hidden('_method', 'DELETE') }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/timetables/' . $timetable->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+					@method('DELETE')
 					<button type="submit" class="btn btn-danger btn-block">Delete</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	
@@ -173,23 +165,23 @@
 				<h4 class="modal-title" id="editTimeSlotModal">Edit Time Slot</h4>
 			</div>
 			<div class="modal-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/timetables/' . $timetable->slug . '/data', 'id'=>'editTimeSlotForm')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/timetables/' . $timetable->slug . '/data'))->id('editTimeSlotForm')->open() }}
 					<div class="row">
 						<div class="form-group col-lg-6">
-							{{ Form::label('name','Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name', NULL ,array('id'=>'editTimetableGame','class'=>'form-control')) }}
+							{{ html()->label('Name', 'name') }}
+							{{ html()->text('name')->id('editTimetableGame')->class('form-control') }}
 						</div> 
 						 <div class="form-group col-lg-6">
-							{{ Form::label('start_time','Start',array('id'=>'','class'=>'')) }}
-							{{ Form::select('start_time', $timetable->getAvailableTimes(), null, array('id'=>'editTimetableStart','class'=>'form-control')) }}
+							{{ html()->label('Start', 'start_time') }}
+							{{ html()->select('start_time', $timetable->getAvailableTimes())->id('editTimetableStart')->class('form-control') }}
 						</div>
 						<div class="form-group col-lg-12">
-							{{ Form::label('desc','Description',array('id'=>'','class'=>'')) }}
-							{{ Form::text('desc', NULL ,array('id'=>'editTimetableDesc','class'=>'form-control')) }}
+							{{ html()->label('Description', 'desc') }}
+							{{ html()->text('desc')->id('editTimetableDesc')->class('form-control') }}
 						</div> 
 					</div>
 					<button type="submit" class="btn btn-default">Submit</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	</div>

@@ -59,10 +59,10 @@
 										</a>
 									</td>
 									<td width="15%">
-										{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-											{{ Form::hidden('_method', 'DELETE') }}
+										{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+											@method('DELETE')
 											<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
-										{{ Form::close() }}
+										</form>
 									</td>
 								</tr>
 							@endforeach
@@ -81,7 +81,7 @@
 				<i class="fa fa-plus fa-fw"></i> Add New Seating Plan
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/seating', 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating'))->acceptsFiles()->open() }}
 					@if ($errors->any())
 						<div class="alert alert-danger">
 							<ul>
@@ -92,30 +92,30 @@
 						</div>
 					@endif
 					<div class="form-group">
-						{{ Form::label('name','Name',array('id'=>'','class'=>'')) }}
-						{{ Form::text('name', NULL ,array('id'=>'name','class'=>'form-control')) }}
+						{{ html()->label('Name', 'name') }}
+						{{ html()->text('name')->class('form-control') }}
 					</div>
 					<div class="form-group">
-							{{ Form::label('name_short','Short Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name_short', NULL,array('id'=>'name_short','class'=>'form-control')) }}
+							{{ html()->label('Short Name', 'name_short') }}
+							{{ html()->text('name_short')->class('form-control') }}
 							<small>For display on Attendance Lists</small>
 						</div>
 					<div class="row">
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('columns','Columns',array('id'=>'','class'=>'')) }}
-							{{ Form::text('columns', NULL ,array('id'=>'columns','class'=>'form-control')) }}
+							{{ html()->label('Columns', 'columns') }}
+							{{ html()->text('columns')->class('form-control') }}
 						</div> 
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('rows','Rows',array('id'=>'','class'=>'')) }}
-							{{ Form::text('rows', NULL ,array('id'=>'rows','class'=>'form-control')) }}
+							{{ html()->label('Rows', 'rows') }}
+							{{ html()->text('rows')->class('form-control') }}
 						</div>
 					</div>
 					<div class="form-group">
-						{{ Form::label('image','Seating Plan Image',array('id'=>'','class'=>'')) }}
-						{{ Form::file('image',array('id'=>'image','class'=>'form-control')) }}
+						{{ html()->label('Seating Plan Image', 'image') }}
+						{{ html()->file('image')->class('form-control') }}
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Submit</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	
