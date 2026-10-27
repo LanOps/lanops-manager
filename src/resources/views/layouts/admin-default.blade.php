@@ -17,28 +17,23 @@
 
 		<link rel="icon" type="image/png" sizes="32x32" href="{{ config('app.favicon') }}">
 		
-		<!-- Admin CSS -->
-		@vite(['resources/assets/sass/admin.scss'])
+		@include ('layouts._partials.color-mode-head')
 
-		<!-- Custom Fonts -->
-		<link href="/fonts/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+		<!-- Admin CSS and JS (Bootstrap 5, Font Awesome) -->
+		@vite(['resources/assets/sass/admin.scss', 'resources/js/admin.js'])
 
 		<!-- Jquery Core JavaScript -->
 		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.2/dist/themes/smoothness/jquery-ui.min.css" integrity="sha384-e4Bm/JKXqLbEnnDNLZIbB0u9VBy3H9D+TNdLb22ybxTLsmtWgRhQ3/BKEgJ13zU2" crossorigin="anonymous">
 		<script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.2/dist/jquery-ui.min.js" integrity="sha384-tBcEcHGtNy7/Mx08+YxuvQ6v6s0N2jgehtFiT+bLtGwTj/txXtB/L5GqXfggm5sS" crossorigin="anonymous"></script>
 
-		<!-- Bootstrap Core JavaScript -->
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-
 		<!-- Morris Charts JavaScript -->
 		<script src="/js/morris/raphael.min.js"></script>
 		<script src="/js/morris/morris.min.js"></script>
 
-
 		<!-- include summernote css/js -->
-		<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote.min.css" integrity="sha384-4rKS0JSi0EkLi/0w4eqYVvfCzP9JJv6EVochgkFUUGusUbyU/Yc8ZbvTO8JwsYiV" crossorigin="anonymous" rel="stylesheet">
-		<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote.min.js" integrity="sha384-P/xUbGCYuaoeXvkk0bJlBa8ag1csGCLr1Z2LGD4SXKynQzTZIkWOaqYegoho3pIJ" crossorigin="anonymous"></script>
+		<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" integrity="sha384-NCIOkH1RWTLh0uk0cWmHMJbcBZE8aFTbBNELvTaRgLwGsGIgaacBRlWynjlAt69p" crossorigin="anonymous" rel="stylesheet">
+		<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js" integrity="sha384-FycAzMryzUZA6EwTBPuugMzUKzpNjcXJhQvibi8ej/+2/imEZ6kTAsxHGtrNn8Py" crossorigin="anonymous"></script>
 
 		<script>
 			function ConfirmDelete()
@@ -65,32 +60,27 @@
 		</script>
 
 	</head>
-	<body>
-		<div id="wrapper">
-			@include ('layouts._partials._admin.navigation')
-			<div id="page-wrapper">
-				<div class="container-fluid">
-					<div class='row'>
-						@foreach (['danger', 'warning', 'success', 'info'] as $msg)
-							@if (Session::has('alert-' . $msg))
-								<p class="alert alert-{{ $msg }}">
-									<b>{{ Session::get('alert-' . $msg) }}</b> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-								</p>
-							@endif
-						@endforeach
-						@if ($errors->any())
-							<div class="alert alert-danger">
-								<ul>
-									@foreach ($errors->all() as $error)
-										<li>{{ $error }}</li>
-									@endforeach
-								</ul>
-							</div>
-						@endif
+	<body class="admin">
+		@include ('layouts._partials._admin.navigation')
+		<main class="admin-main">
+			@foreach (['danger', 'warning', 'success', 'info'] as $msg)
+				@if (Session::has('alert-' . $msg))
+					<div class="alert alert-{{ $msg }} alert-dismissible">
+						<b>{{ Session::get('alert-' . $msg) }}</b>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 					</div>
-					@yield('content')
+				@endif
+			@endforeach
+			@if ($errors->any())
+				<div class="alert alert-danger">
+					<ul class="mb-0">
+						@foreach ($errors->all() as $error)
+							<li>{{ $error }}</li>
+						@endforeach
+					</ul>
 				</div>
-			</div>    
-		</div>
+			@endif
+			@yield('content')
+		</main>
 	</body>
 </html>

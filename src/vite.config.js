@@ -23,6 +23,7 @@ export default defineConfig({
         laravel([
             'resources/assets/sass/app.scss',
             'resources/assets/sass/admin.scss',
+            'resources/js/admin.js',
         ]),
         // react(),
         // vue({

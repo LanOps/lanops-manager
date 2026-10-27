@@ -1,4 +1,95 @@
-@import 'stylesheets/admin/bootstrap';
+@import 'bs5/base';
 
-@import 'stylesheets/admin/sb-admin',
-		'stylesheets/admin/modules/morris';
+// Admin layout: dark top bar, sidebar on the left (an offcanvas menu below lg)
+$admin-sidebar-width: 225px;
+
+body.admin {
+	padding-top: 56px;
+}
+
+.admin-topbar {
+	height: 56px;
+}
+
+.admin-topbar .navbar-brand,
+.admin-topbar .nav-link {
+	color: var(--lanops-header-color);
+}
+
+.admin-topbar .navbar-brand:hover,
+.admin-topbar .nav-link:hover,
+.admin-topbar .nav-link:focus {
+	color: #fff;
+}
+
+.admin-sidebar .nav-link {
+	color: var(--lanops-header-color);
+	padding: 0.6rem 1rem;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+	color: #fff;
+	background-color: #000;
+}
+
+.admin-sidebar .nav-link .fa-fw {
+	margin-right: 0.35rem;
+}
+
+.admin-sidebar .nav-second-level .nav-link {
+	padding: 0.4rem 1rem 0.4rem 2.6rem;
+	font-size: 0.875rem;
+}
+
+@include media-breakpoint-up(lg) {
+	.admin-sidebar {
+		position: fixed;
+		top: 56px;
+		bottom: 0;
+		left: 0;
+		width: $admin-sidebar-width;
+		overflow-y: auto;
+	}
+
+	.admin-main {
+		margin-left: $admin-sidebar-width;
+	}
+}
+
+.admin-main {
+	padding: 1rem;
+}
+
+// Big numbers on the dashboard stat cards
+.huge {
+	font-size: 50px;
+	line-height: normal;
+}
+
+// Morris chart hover box
+.morris-hover {
+	position: absolute;
+	z-index: 1000;
+}
+
+.morris-hover.morris-default-style {
+	border-radius: 10px;
+	padding: 6px;
+	color: var(--bs-body-color);
+	background: rgba(var(--bs-body-bg-rgb), 0.85);
+	border: solid 2px var(--bs-border-color);
+	font-family: sans-serif;
+	font-size: 12px;
+	text-align: center;
+}
+
+.morris-hover.morris-default-style .morris-hover-row-label {
+	font-weight: bold;
+	margin: 0.25em 0;
+}
+
+.morris-hover.morris-default-style .morris-hover-point {
+	white-space: nowrap;
+	margin: 0.1em 0;
+}
