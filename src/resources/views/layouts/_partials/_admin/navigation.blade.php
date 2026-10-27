@@ -1,4 +1,4 @@
-<nav class="navbar fixed-top lanops-header admin-topbar px-3" data-bs-theme="dark">
+<nav class="navbar fixed-top lanops-header admin-topbar px-3">
 	<div class="d-flex align-items-center">
 		<button class="btn btn-link nav-link d-lg-none me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#admin-sidebar" aria-controls="admin-sidebar" aria-label="Toggle navigation">
 			<i class="fa fa-bars"></i>
@@ -23,7 +23,7 @@
 	</ul>
 </nav>
 <!-- Sidebar: fixed on large screens, an offcanvas menu on small ones -->
-<div class="offcanvas-lg offcanvas-start lanops-header admin-sidebar" tabindex="-1" id="admin-sidebar" aria-labelledby="admin-sidebar-label" data-bs-theme="dark">
+<div class="offcanvas-lg offcanvas-start lanops-header admin-sidebar" tabindex="-1" id="admin-sidebar" aria-labelledby="admin-sidebar-label">
 	<div class="offcanvas-header">
 		<h5 class="offcanvas-title" id="admin-sidebar-label">{{ config('app.name') }} Admin</h5>
 		<button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#admin-sidebar" aria-label="Close"></button>

@@ -10,9 +10,13 @@ $paragraph-margin-bottom: 10px;
 @import 'bs5/base';
 
 // Colours for the light surfaces in the LanOps components; dark mode swaps them.
-// The dark sections (header, hero, event and news banners, footer) stay dark in both modes.
+// The header and footer follow the colour mode; the hero, event and news banners stay dark.
 :root,
 [data-bs-theme='light'] {
+	--lanops-chrome-bg: #fff;
+	--lanops-chrome-alt-bg: #f5f5f5;
+	--lanops-chrome-color: #{$lanops-charcoal};
+	--lanops-chrome-border: #e2e2e2;
 	--lanops-surface: #fff;
 	--lanops-surface-alt: #f5f5f5;
 	--lanops-highlight: #fdf3e6;
@@ -21,6 +25,10 @@ $paragraph-margin-bottom: 10px;
 }
 
 [data-bs-theme='dark'] {
+	--lanops-chrome-bg: #{$lanops-charcoal};
+	--lanops-chrome-alt-bg: #{$lanops-charcoal};
+	--lanops-chrome-color: #fff;
+	--lanops-chrome-border: transparent;
 	--lanops-surface: #2b3035;
 	--lanops-surface-alt: #1a1d20;
 	--lanops-highlight: #3b2f1d;
@@ -34,6 +42,11 @@ $paragraph-margin-bottom: 10px;
 	display: block;
 	max-width: 100%;
 	height: auto;
+}
+
+.custom-header {
+	background-color: var(--lanops-chrome-bg);
+	box-shadow: 0 1px 0 var(--lanops-chrome-border);
 }
 
 .custom-header .navbar-toggler {

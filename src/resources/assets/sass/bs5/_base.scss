@@ -3,15 +3,22 @@
 @import 'variables';
 @import 'bootstrap/scss/bootstrap';
 
-// The header and footer stay dark in both colour modes so the logo looks the same
+// Admin topbar and sidebar colours: light in light mode, charcoal in dark mode
 :root,
-[data-bs-theme='light'],
-[data-bs-theme='dark'] {
-	--lanops-header-bg: #{$lanops-charcoal};
-	--lanops-header-color: #{$lanops-header-text};
+[data-bs-theme='light'] {
+	--lanops-header-bg: #fff;
+	--lanops-header-color: #555;
+	--lanops-header-hover-color: #{$lanops-charcoal};
+	--lanops-header-active-bg: #f0f0f0;
+	--lanops-header-border: #e2e2e2;
 }
 
 [data-bs-theme='dark'] {
+	--lanops-header-bg: #{$lanops-charcoal};
+	--lanops-header-color: #{$lanops-header-text};
+	--lanops-header-hover-color: #fff;
+	--lanops-header-active-bg: #000;
+	--lanops-header-border: transparent;
 	--bs-link-color: #{$lanops-orange};
 	--bs-link-color-rgb: #{to-rgb($lanops-orange)};
 	--bs-link-hover-color: #{lighten($lanops-orange, 10%)};
@@ -34,11 +41,12 @@
 }
 
 // Colour mode toggle (see resources/js/color-mode.js): show the icon for the current mode
-.color-mode-icon-dark,
-[data-bs-theme='dark'] .color-mode-icon-light {
+// (scoped to the toggle so Font Awesome's .fa display rule can't win)
+.color-mode-toggle .color-mode-icon-dark,
+[data-bs-theme='dark'] .color-mode-toggle .color-mode-icon-light {
 	display: none;
 }
 
-[data-bs-theme='dark'] .color-mode-icon-dark {
+[data-bs-theme='dark'] .color-mode-toggle .color-mode-icon-dark {
 	display: inline-block;
 }

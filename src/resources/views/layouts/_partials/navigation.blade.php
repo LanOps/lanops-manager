@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-md fixed-top lanops-header custom-header" data-bs-theme="dark">
+<nav class="navbar navbar-expand-md fixed-top custom-header">
 	<div class="container">
 		<a class="navbar-brand" href="/"><img src="/images/logo_header.png" width="200" height="29" alt="{{ config('app.name') }} logo header"/></a>
 		<button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#topbar-navigation" aria-controls="topbar-navigation" aria-expanded="false" aria-label="Toggle navigation">
