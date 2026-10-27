@@ -71,29 +71,4 @@ class SteamController extends Controller
         Session::flash('alert-danger', 'Steam login failed. Please try again.');
         return Redirect('/login');
     }
-
-    /**
-     * Update user details.
-     * @param  Request $request
-     * @param  User    $user
-     * @return Redirect
-     */
-    public function update(Request $request, User $user)
-    {
-        $this->validate($request, [
-                'fistname'  => 'string',
-                'surname'   => 'string',
-                'username'  => 'unique:users,username',
-        ]);
-        $user->firstname = $request->firstname;
-        $user->surname = $request->surname;
-        $user->username = $request->username;
-        $user->username_nice = strtolower(str_replace(' ', '-', $request->username));
-        if ($user->save()) {
-            return Redirect('/account');
-        }
-        Auth::logout();
-        Session::flash('alert-danger', 'Something went wrong. Please Try again later!');
-        return Redirect('/');
-    }
 }

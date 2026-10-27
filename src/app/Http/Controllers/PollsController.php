@@ -50,6 +50,9 @@ class PollsController extends Controller
      */
     public function vote(Poll $poll, PollOption $option)
     {
+        if ($option->poll_id != $poll->id) {
+            abort(404);
+        }
         if ($poll->hasEnded()) {
             Session::flash('alert-danger', 'Poll has ended');
             return Redirect::back();
@@ -80,6 +83,9 @@ class PollsController extends Controller
      */
     public function abstain(Poll $poll, PollOption $option)
     {
+        if ($option->poll_id != $poll->id) {
+            abort(404);
+        }
         if ($poll->hasEnded()) {
             Session::flash('alert-danger', 'Poll has ended');
             return Redirect::back();

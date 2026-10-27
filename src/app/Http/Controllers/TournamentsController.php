@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Session;
+use Illuminate\Support\Facades\Hash;
 
 use App\Models\Tournament;
 use App\Models\TournamentParticipant;
@@ -44,13 +45,22 @@ class TournamentsController extends Controller
      */
     public function register(Tournament $tournament, Request $request)
     {
-        $rules = [];
-        $messages = [];
-        if (isset($request->event_id) && $request->event_id != 0) {
-            $rules['tournament_team_id'] = 'exists:tournament_teams,id';
-            $messages['tournament_team_id'] = 'Tournament Team does not exist';
+        $team = null;
+        if ($tournament->hasTeams() && $request->filled('tournament_team_id')) {
+            $team = $tournament->teams()->whereKey($request->tournament_team_id)->first();
+            if (!$team) {
+                Session::flash('alert-danger', 'Tournament Team does not exist');
+                return Redirect::back();
+            }
+            if (!$team->checkPassword($request->team_password)) {
+                Session::flash('alert-danger', 'Team password is incorrect.');
+                return Redirect::back();
+            }
+            if ($team->getParticipantCount() >= $tournament->team_size) {
+                Session::flash('alert-danger', 'That team is full.');
+                return Redirect::back();
+            }
         }
-        $this->validate($request, $rules, $messages);
 
         if ($tournament->status != 'OPEN') {
             Session::flash('alert-danger', 'Signups not permitted at this time.');
@@ -70,10 +80,7 @@ class TournamentsController extends Controller
         $tournamentParticipant                  = new TournamentParticipant();
         $tournamentParticipant->user_id         = Auth::id();
         $tournamentParticipant->tournament_id   = $tournament->id;
-        $tournamentParticipant->tournament_team_id = null;
-        if ($tournament->hasTeams() && isset($request->tournament_team_id) && $request->tournament_team_id != null) {
-            $tournamentParticipant->tournament_team_id = $request->tournament_team_id;
-        }
+        $tournamentParticipant->tournament_team_id = $team ? $team->id : null;
         if (!$tournamentParticipant->save()) {
             Session::flash('alert-danger', 'Cannot add participant. Please try again.');
             return Redirect::back();
@@ -122,7 +129,7 @@ class TournamentsController extends Controller
         $tournamentTeam->name           = $request->team_name;
         $tournamentTeam->password       = null;
         if ($request->team_password != "") {
-            $tournamentTeam->password = $request->team_password;
+            $tournamentTeam->password = Hash::make($request->team_password);
         }
         if (!$tournamentTeam->save()) {
             Session::flash('alert-danger', 'Cannot add Team. Please try again.');

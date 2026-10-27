@@ -141,10 +141,11 @@ class GalleryController extends Controller
     public function uploadImage(GalleryAlbum $album, Request $request)
     {
         $rules = [
-            'image.*'   => 'image',
+            'images.*'  => 'image|mimes:jpeg,png,gif,webp',
         ];
         $messages = [
-            'image.*.image' => 'Venue Image must be of Image type',
+            'images.*.image' => 'Gallery Image must be of Image type',
+            'images.*.mimes' => 'Gallery Image must be a JPEG, PNG, GIF or WebP',
         ];
         $this->validate($request, $rules, $messages);
 

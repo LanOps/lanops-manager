@@ -3,9 +3,9 @@
 		<div class="alert alert-warning">
 			This comment has not been approved yet. Only Admins can see it.
 			<span class="float-end">
-				<a href="/admin/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/approve">Approve</a> / 
-				<a href="/admin/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/reject">Reject</a> / 
-				<a href="/admin/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</a>
+				<x-action-button action="/admin/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/approve">Approve</x-action-button> / 
+				<x-action-button action="/admin/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/reject">Reject</x-action-button> / 
+				<x-action-button action="/admin/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</x-action-button>
 			</span>
 		</div>
 	@endif
@@ -13,8 +13,8 @@
 		<div class="alert alert-danger">
 			This comment has been Rejected! Only Admins can see it.
 			<span class="float-end">
-				<a href="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/approve">Approve</a> / 
-				<a href="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</a>
+				<x-action-button action="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/approve">Approve</x-action-button> / 
+				<x-action-button action="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</x-action-button>
 			</span>
 		</div>
 	@endif
@@ -31,7 +31,7 @@
 	<div class="alert alert-danger">
 		This comment Rejected by Admins.
 		<span class="float-end">
-			<a href="/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</a>
+			<x-action-button action="/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</x-action-button>
 		</span>
 	</div>
 @endif
@@ -39,7 +39,7 @@
 	<div class="alert alert-warning">
 		This comment hasn't been reviewed by Admins yet.
 		<span class="float-end">
-			<a href="/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</a>
+			<x-action-button action="/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete</x-action-button>
 		</span>
 	</div>
 @endif

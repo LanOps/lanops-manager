@@ -51,8 +51,8 @@
 								{{ $comment->comment }}
 								<span class="float-end">
 									<small>{{ $comment->user->username }} </small>
-									<a href="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/approve">Approve</a> / 
-									<a href="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/reject">Reject</a>
+									<x-action-button action="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/approve">Approve</x-action-button> / 
+									<x-action-button action="/admin/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/reject">Reject</x-action-button>
 								</span>
 							</div>
 						@endif
@@ -68,8 +68,8 @@
 						<div class="alert alert-danger">
 							{{ $report->newsComment->comment }} - Reported by: {{ $report->user->username }}
 							<span class="float-end">
-								<a href="/admin/news/{{ $report->newsComment->newsArticle->slug }}/comments/{{ $report->newsComment->id }}/reports/{{ $report->id }}/delete">Ignore</a> / 
-								<a href="/admin/news/{{ $report->newsComment->newsArticle->slug }}/comments/{{ $report->newsComment->id }}/delete">Delete</a>
+								<x-action-button action="/admin/news/{{ $report->newsComment->newsArticle->slug }}/comments/{{ $report->newsComment->id }}/reports/{{ $report->id }}/delete">Ignore</x-action-button> / 
+								<x-action-button action="/admin/news/{{ $report->newsComment->newsArticle->slug }}/comments/{{ $report->newsComment->id }}/delete">Delete</x-action-button>
 							</span>
 						</div>
 					@endforeach

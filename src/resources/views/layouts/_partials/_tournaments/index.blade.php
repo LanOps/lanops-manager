@@ -26,11 +26,11 @@
                     <div class="row">
                         <div class="col-12 col-md-6 mb-3 @error('team_name') @enderror">
                             {{ html()->label('Team Name', 'team_name') }}
-                            <input id="team_name" type="team_name" class="form-control" name="team_name" required>
+                            <input id="team_name" type="text" class="form-control" name="team_name" required>
                         </div>
                         <div class="col-12 col-md-6 mb-3 @error('team_password') @enderror">
                             {{ html()->label('Team Password', 'team_password') }}
-                            <input id="team_password" type="team_password" class="form-control" name="team_password">
+                            <input id="team_password" type="password" class="form-control" name="team_password">
                         </div>
                     </div>
                     <button type="submit" class="btn btn-success btn-sm w-100">Register Team</button>
@@ -65,6 +65,9 @@
                                         (($tournament->hasEvent() && $tournament->event->getEventParticipant()) || !$tournament->hasEvent()))
                                         {{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/register'))->open() }}
 					                        {{ html()->hidden('tournament_team_id', $team->id) }}
+                                            @if ($team->password)
+                                                <input type="password" class="form-control form-control-sm mb-2" name="team_password" placeholder="Team password" aria-label="Team password" required>
+                                            @endif
                                             <button type="submit" class="btn btn-success btn-sm w-100">Join Team</button>
                                         </form>
                                     @endif

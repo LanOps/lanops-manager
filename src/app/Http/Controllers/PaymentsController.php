@@ -428,10 +428,7 @@ class PaymentsController extends Controller
      */
     private function checkParams($paymentGateway, $basket)
     {
-        $acceptedPaymentGateways = [];
-        foreach (config('laravel-omnipay.gateways') as $key => $acceptedPaymentGateway) {
-            array_push($acceptedPaymentGateways, $key);
-        }
+        $acceptedPaymentGateways = config('laravel-omnipay.gateways.available_payment_gateways') ?: [];
         if (in_array(strtolower($paymentGateway), $acceptedPaymentGateways)) {
             $paymentGateway = strtolower($paymentGateway);
         } else {
