@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md fixed-top lanops-header custom-header" data-bs-theme="dark">
 	<div class="container">
-		<a class="navbar-brand" href="/"><img src="/images/logo_header.png" width="171" height="24" alt="{{ config('app.name') }} logo header"/></a>
+		<a class="navbar-brand" href="/"><img src="/images/logo_header.png" width="200" height="29" alt="{{ config('app.name') }} logo header"/></a>
 		<button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#topbar-navigation" aria-controls="topbar-navigation" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
