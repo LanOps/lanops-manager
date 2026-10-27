@@ -26,21 +26,20 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrap();
 
-        if (env('STRIPE_SECRET_KEY') != '' && env('STRIPE_PUBLIC_KEY') != '') {
-            @\Config::set('laravel-omnipay.gateways.available_payment_gateways', ['stripe']);
+        // Read the keys through config, so this still works once config is cached
+        $availablePaymentGateways = [];
+        if (config('laravel-omnipay.gateways.stripe.credentials.secret') != '' &&
+            config('laravel-omnipay.gateways.stripe.credentials.public') != ''
+        ) {
+            $availablePaymentGateways[] = 'stripe';
         }
-        
-        if (env('PAYPAL_USERNAME') != '' && env('PAYPAL_PASSWORD') != '' && env('PAYPAL_SIGNATURE') != '') {
-            @\Config::set(
-                'laravel-omnipay.gateways.available_payment_gateways',
-                array_merge(
-                    config(
-                        'laravel-omnipay.gateways.available_payment_gateways'
-                    ),
-                    ['paypal_express']
-                )
-            );
+        if (config('laravel-omnipay.gateways.paypal_express.credentials.username') != '' &&
+            config('laravel-omnipay.gateways.paypal_express.credentials.password') != '' &&
+            config('laravel-omnipay.gateways.paypal_express.credentials.signature') != ''
+        ) {
+            $availablePaymentGateways[] = 'paypal_express';
         }
+        \Config::set('laravel-omnipay.gateways.available_payment_gateways', $availablePaymentGateways);
 
         seo()
             ->site(config('app.name'))

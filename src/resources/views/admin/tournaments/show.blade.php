@@ -43,11 +43,11 @@
 							<div class="row">
 								<div class="col-12 col-md-6 mb-3 @error('team_name') @enderror">
 									{{ html()->label('Team Name', 'team_name') }}
-									<input id="team_name" type="team_name" class="form-control" name="team_name" required>
+									<input id="team_name" type="text" class="form-control" name="team_name" required>
 								</div>
 								<div class="col-12 col-md-6 mb-3 @error('team_password') @enderror">
 									{{ html()->label('Team Password', 'team_password') }}
-									<input id="team_password" type="team_password" class="form-control" name="team_password">
+									<input id="team_password" type="password" class="form-control" name="team_password">
 								</div>
 							</div>
 							<button type="submit" class="btn btn-success btn-sm w-100">Register Team</button>

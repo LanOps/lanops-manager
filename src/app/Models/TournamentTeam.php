@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 
 class TournamentTeam extends Model
 {
@@ -43,5 +44,25 @@ class TournamentTeam extends Model
     public function getParticipantCount()
     {
         return $this->participants()->count();
+    }
+
+    /**
+     * Check a password for joining this team. Teams made before passwords
+     * were hashed still have theirs in plain text.
+     * @param  string|null $password
+     * @return Boolean
+     */
+    public function checkPassword($password)
+    {
+        if ($this->password == null) {
+            return true;
+        }
+        if (!is_string($password) || $password === '') {
+            return false;
+        }
+        if (password_get_info($this->password)['algo'] === null) {
+            return hash_equals($this->password, $password);
+        }
+        return Hash::check($password, $this->password);
     }
 }

@@ -62,14 +62,14 @@
                                 <div class="news-comment-actions">
                                     <span class="news-comment-date">{{ date('M j, Y', strtotime($comment->created_at)) }}</span>
                                     @if (Auth::user() && Auth::id() == $comment->user_id)
-                                        <a href="" onclick="editComment('{{ $comment->comment }}', '{{ $comment->id }}')" data-bs-toggle="modal" data-bs-target="#editCommentModal" class="news-comment-action">Edit</a>
+                                        <a href="" onclick="editComment(@js($comment->comment), @js($comment->id))" data-bs-toggle="modal" data-bs-target="#editCommentModal" class="news-comment-action">Edit</a>
                                     @endif
                                     @if (Auth::user() && (Auth::user()->getAdmin() || $comment->user_id == Auth::id()))
                                         @php $postUrl = Auth::user()->getAdmin() ? '/admin' : ''; @endphp
-                                        <a href="{{ $postUrl }}/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete" class="news-comment-action news-comment-action--danger">Delete</a>
+                                        <x-action-button action="{{ $postUrl }}/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete" class="btn btn-link p-0 align-baseline news-comment-action news-comment-action--danger">Delete</x-action-button>
                                     @endif
                                     @if ($comment->approved && $comment->reviewed && Auth::user() && !$comment->reports->pluck('user_id')->contains(Auth::id()) && $comment->user_id != Auth::id())
-                                        <a href="/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/report" class="news-comment-action">Report</a>
+                                        <x-action-button action="/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/report" class="btn btn-link p-0 align-baseline news-comment-action">Report</x-action-button>
                                     @endif
                                     @if (Auth::user() && $comment->reports->pluck('user_id')->contains(Auth::id()))
                                         <span class="news-comment-reported">You reported this comment</span>

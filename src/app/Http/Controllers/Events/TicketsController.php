@@ -30,6 +30,10 @@ class TicketsController extends Controller
             Session::flash('alert-danger', 'User not found.');
             return Redirect::to('/events/' . $ticket->event->slug);
         }
+        // PRIVATE events are hidden from non-admins (see Event::boot), so their tickets can't be bought
+        if (!$ticket->event) {
+            abort(404);
+        }
         if ($ticket->event->status != 'PUBLISHED' && $ticket->event->status != 'PRIVATE') {
             Session::flash(
                 'alert-danger',

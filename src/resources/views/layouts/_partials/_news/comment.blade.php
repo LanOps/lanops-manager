@@ -7,7 +7,7 @@
 		<p>{{ $comment->comment }}</p>
 		<span class="text-muted"><small>Posted on: {{ $comment->created_at }}</small></span>
 		@if (Auth::user() && Auth::id() == $comment->user_id) 
-			<a href="" onclick="editComment('{{ $comment->comment }}', '{{ $comment->id }}')" data-bs-toggle="modal" data-bs-target="#editCommentModal">Edit Comment</a> /
+			<a href="" onclick="editComment(@js($comment->comment), @js($comment->id))" data-bs-toggle="modal" data-bs-target="#editCommentModal">Edit Comment</a> /
 		@endif
 		@if (Auth::user() && (Auth::user()->getAdmin() || $comment->user_id == Auth::id()))
 			@php
@@ -18,18 +18,14 @@
 					$postUrl = "/admin";
 				@endphp
 			@endif
-			<a href="{{ $postUrl }}/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">
-				Delete Comment
-			</a>
+			<x-action-button action="{{ $postUrl }}/news/{{ $comment->newsArticle->slug }}/comments/{{ $comment->id }}/delete">Delete Comment</x-action-button>
 		@endif
 		@if ($comment->approved && $comment->reviewed)
 			@if (Auth::user() && !$comment->reports->pluck('user_id')->contains(Auth::id()) && $comment->user_id != Auth::id())
 				@if ((Auth::user() && (Auth::user()->getAdmin() || $comment->user_id == Auth::id())) || (Auth::user() && Auth::id() == $comment->user_id)) 
 					/
 				@endif
-				<a href="/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/report">
-					Report Comment
-				</a>
+				<x-action-button action="/news/{{ $newsArticle->slug }}/comments/{{ $comment->id }}/report">Report Comment</x-action-button>
 			@endif
 		@endif
 	</div>

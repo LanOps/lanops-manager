@@ -14,13 +14,9 @@
 						@if (!$poll->hasEnded() && Auth::user())
 							<td width="10%">
 								@if (Auth::user() && !$option->hasVoted())
-									<a href="/polls/{{ $poll->slug }}/options/{{ $option->id }}/vote">
-										<button type="button" class="btn btn-success btn-sm w-100">Vote</button>
-									</a>
+									<x-action-button action="/polls/{{ $poll->slug }}/options/{{ $option->id }}/vote" class="btn btn-success btn-sm w-100">Vote</x-action-button>
 								@elseif (Auth::user() && $option->hasVoted())
-									<a href="/polls/{{ $poll->slug }}/options/{{ $option->id }}/abstain">
-										<button type="button" class="btn btn-danger btn-sm w-100">Remove</button>
-									</a>
+									<x-action-button action="/polls/{{ $poll->slug }}/options/{{ $option->id }}/abstain" class="btn btn-danger btn-sm w-100">Remove</x-action-button>
 								@endif
 							</td>
 						@endif
@@ -34,9 +30,7 @@
 				@foreach ($poll->options as $option)
 					@if ($option->hasVoted())
 						<p>
-							<a href="/polls/{{ $poll->slug }}/options/{{ $option->id }}/abstain">
-								<button type="button" class="btn-close" aria-label="Remove vote"></button>
-							</a>
+							<x-action-button action="/polls/{{ $poll->slug }}/options/{{ $option->id }}/abstain" class="btn-close" aria-label="Remove vote"></x-action-button>
 							{{ $option->name }}
 						</p>
 					@endif

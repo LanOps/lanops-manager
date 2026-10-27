@@ -53,7 +53,7 @@ class VenuesController extends Controller
             'address_city'      => 'required',
             'address_postcode'  => 'required',
             'address_country'   => 'required',
-            'image.*'           => 'image',
+            'images.*'          => 'image|mimes:jpeg,png,gif,webp',
         ];
         $messages = [
             'name.required'             => 'Venue Name is Required',
@@ -62,7 +62,8 @@ class VenuesController extends Controller
             'address_city.required'     => 'City name is Required',
             'address_postcode.required' => 'Postcode is Required',
             'address_country.required'  => 'Country is Required',
-            'image.*.image'             => 'Venue Image must be of Image type',
+            'images.*.image'            => 'Venue Image must be of Image type',
+            'images.*.mimes'            => 'Venue Image must be a JPEG, PNG, GIF or WebP',
         ];
         $this->validate($request, $rules, $messages);
 
@@ -104,9 +105,11 @@ class VenuesController extends Controller
             return Redirect::back();
         }
 
-        if ($request->file('images') !== null && !$venue->addMediaFromRequest('images')->toMediaCollection()) {
-            Session::flash('alert-danger', 'Cannot save Venue Image!');
-            return Redirect::back();
+        if ($request->file('images') !== null) {
+            // The form sends images[] (several files), which addMediaFromRequest cannot take
+            $venue->addMultipleMediaFromRequest(['images'])->each(function ($fileAdder) {
+                $fileAdder->toMediaCollection();
+            });
         }
 
         Session::flash('alert-success', 'Successfully saved venue!');
@@ -128,7 +131,7 @@ class VenuesController extends Controller
             'address_city'      => 'filled',
             'address_postcode'  => 'filled',
             'address_country'   => 'filled',
-            'image.*'           => 'image',
+            'images.*'          => 'image|mimes:jpeg,png,gif,webp',
         ];
         $messages = [
             'name.filled'               => 'Venue Name cannot be empty',
@@ -137,7 +140,8 @@ class VenuesController extends Controller
             'address_city.filled'       => 'City name cannot be empty',
             'address_postcode.filled'   => 'Postcode cannot be empty',
             'address_country.filled'    => 'Country cannot be empty',
-            'image.*.image'             => 'Venue Image must be of Image type',
+            'images.*.image'            => 'Venue Image must be of Image type',
+            'images.*.mimes'            => 'Venue Image must be a JPEG, PNG, GIF or WebP',
         ];
         $this->validate($request, $rules, $messages);
 
@@ -193,9 +197,11 @@ class VenuesController extends Controller
             return Redirect::back();
         }
         
-        if ($request->file('images') !== null && !$venue->addMediaFromRequest('images')->toMediaCollection()) {
-            Session::flash('alert-danger', 'Cannot save Venue Image!');
-            return Redirect::back();
+        if ($request->file('images') !== null) {
+            // The form sends images[] (several files), which addMediaFromRequest cannot take
+            $venue->addMultipleMediaFromRequest(['images'])->each(function ($fileAdder) {
+                $fileAdder->toMediaCollection();
+            });
         }
 
         Session::flash('alert-success', 'Successfully updated Venue!');

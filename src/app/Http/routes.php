@@ -62,8 +62,8 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/news/{newsArticle}', 'NewsController@show');
     Route::post('/news/{newsArticle}/comments', 'NewsController@storeComment');
     Route::post('/news/{newsArticle}/comments/{newsComment}', 'NewsController@editComment');
-    Route::get('/news/{newsArticle}/comments/{newsComment}/report', 'NewsController@reportComment');
-    Route::get('/news/{newsArticle}/comments/{newsComment}/delete', 'NewsController@destroyComment');
+    Route::post('/news/{newsArticle}/comments/{newsComment}/report', 'NewsController@reportComment');
+    Route::post('/news/{newsArticle}/comments/{newsComment}/delete', 'NewsController@destroyComment');
     Route::get('/news/tags/{newsTag}', 'NewsController@showTag');
 
     /**
@@ -138,8 +138,8 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/polls/{poll}', 'PollsController@show');
     Route::group(['middleware' => ['auth', 'banned', 'verified']], function () {
         Route::post('/polls/{poll}/options', 'PollsController@storeOption');
-        Route::get('/polls/{poll}/options/{option}/vote', 'PollsController@vote');
-        Route::get('/polls/{poll}/options/{option}/abstain', 'PollsController@abstain');
+        Route::post('/polls/{poll}/options/{option}/vote', 'PollsController@vote');
+        Route::post('/polls/{poll}/options/{option}/abstain', 'PollsController@abstain');
     });
 
     /**
@@ -258,7 +258,7 @@ Route::group(['middleware' => ['web', 'admin']], function () {
     Route::get('/admin/gallery/{album}', 'Admin\GalleryController@show');
     Route::post('/admin/gallery/{album}', 'Admin\GalleryController@update');
     Route::delete('/admin/gallery/{album}', 'Admin\GalleryController@destroy');
-    Route::get('/admin/gallery/{album}/ingest', 'Admin\GalleryController@ingestImages');
+    Route::post('/admin/gallery/{album}/ingest', 'Admin\GalleryController@ingestImages');
     Route::post('/admin/gallery/{album}/upload', 'Admin\GalleryController@uploadImage');
     Route::delete('/admin/gallery/{album}/{image}', 'Admin\GalleryController@destroyImage');
 
@@ -282,10 +282,10 @@ Route::group(['middleware' => ['web', 'admin']], function () {
     Route::get('/admin/news/{newsArticle}', 'Admin\NewsController@show');
     Route::post('/admin/news/{newsArticle}', 'Admin\NewsController@update');
     Route::delete('/admin/news/{newsArticle}', 'Admin\NewsController@destroy');
-    Route::get('/admin/news/{newsArticle}/comments/{newsComment}/delete', 'Admin\NewsController@destroyComment');
-    Route::get('/admin/news/{newsArticle}/comments/{newsComment}/approve', 'Admin\NewsController@approveComment');
-    Route::get('/admin/news/{newsArticle}/comments/{newsComment}/reject', 'Admin\NewsController@rejectComment');
-    Route::get(
+    Route::post('/admin/news/{newsArticle}/comments/{newsComment}/delete', 'Admin\NewsController@destroyComment');
+    Route::post('/admin/news/{newsArticle}/comments/{newsComment}/approve', 'Admin\NewsController@approveComment');
+    Route::post('/admin/news/{newsArticle}/comments/{newsComment}/reject', 'Admin\NewsController@rejectComment');
+    Route::post(
         '/admin/news/{newsArticle}/comments/{newsComment}/reports/{newsCommentReport}/delete',
         'Admin\NewsController@destroyReport'
     );
