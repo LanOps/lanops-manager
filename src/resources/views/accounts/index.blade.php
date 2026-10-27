@@ -22,7 +22,7 @@
 						{{ html()->form('POST', url('/account/'))->open() }}
 							<div class="row" style="display: flex; align-items: center;">
 								<div class="col-md-2 col-sm-12">
-									<x-avatar :user="$user" class="img-fluid img-thumbnail" />
+									<x-avatar :member="$user" class="img-fluid img-thumbnail" />
 								</div> 
 								<div class="col-md-10 col-sm-12">
 					                <div class="row">
@@ -106,7 +106,7 @@
 										</a>
 									@else
 										<div class="col-12 col-md-2">
-											<x-avatar :user="$user" :src="'https://cdn.discordapp.com/avatars/' . $user->discord_id . '/' . $user->getFormattedDiscordAvatar()" alt="{{ $user->username }}'s Discord Avatar" class="img-fluid img-thumbnail" />
+											<x-avatar :member="$user" :src="'https://cdn.discordapp.com/avatars/' . $user->discord_id . '/' . $user->getFormattedDiscordAvatar()" alt="{{ $user->username }}'s Discord Avatar" class="img-fluid img-thumbnail" />
 										</div>
 										<div class="col-12 col-md-10">
 											{{ html()->form('POST', url('/account/discord/unlink'))->open() }}

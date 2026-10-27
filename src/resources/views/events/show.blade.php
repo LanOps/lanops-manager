@@ -425,7 +425,7 @@
 					@foreach ($event->eventParticipants as $participant)
 					<tr>
 						<td>
-							<x-avatar :user="$participant->user" class="img-fluid rounded img-small" style="max-width: 30%;" />
+							<x-avatar :member="$participant->user" class="img-fluid rounded img-small" style="max-width: 30%;" />
 						</td>
 						<td>
 							{{ $participant->user->username }}
