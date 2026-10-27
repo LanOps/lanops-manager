@@ -66,6 +66,18 @@ $paragraph-margin-bottom: 10px;
 	}
 }
 
+// Plain pages (a .container straight inside <main>) keep a gap above the stats band,
+// however they end: a button, a paragraph or a card. Full-width sections bring their own padding.
+.page-content > .container {
+	padding-bottom: 30px;
+
+	> :last-child,
+	> .row:last-child > [class*='col'] > :last-child,
+	> form:last-child > .row:last-child > [class*='col'] > :last-child {
+		margin-bottom: 0;
+	}
+}
+
 // Bootstrap 3 spacing the page layouts rely on
 h1, h2, h3 {
 	margin-top: 20px;
