@@ -3,7 +3,7 @@ $font-size-base: 0.875rem;
 
 @import 'bs5/base';
 
-// Admin layout: dark top bar, sidebar on the left (an offcanvas menu below lg)
+// Admin layout: top bar, sidebar on the left (an offcanvas menu below lg)
 $admin-sidebar-width: 225px;
 
 body.admin {
@@ -12,6 +12,7 @@ body.admin {
 
 .admin-topbar {
 	height: 56px;
+	box-shadow: 0 1px 0 var(--lanops-header-border);
 }
 
 .admin-topbar .navbar-brand,
@@ -22,7 +23,7 @@ body.admin {
 .admin-topbar .navbar-brand:hover,
 .admin-topbar .nav-link:hover,
 .admin-topbar .nav-link:focus {
-	color: #fff;
+	color: var(--lanops-header-hover-color);
 }
 
 .admin-sidebar .nav-link {
@@ -32,8 +33,8 @@ body.admin {
 
 .admin-sidebar .nav-link:hover,
 .admin-sidebar .nav-link.active {
-	color: #fff;
-	background-color: #000;
+	color: var(--lanops-header-hover-color);
+	background-color: var(--lanops-header-active-bg);
 }
 
 .admin-sidebar .nav-link .fa-fw {
@@ -53,6 +54,7 @@ body.admin {
 		left: 0;
 		width: $admin-sidebar-width;
 		overflow-y: auto;
+		border-right: 1px solid var(--lanops-header-border);
 	}
 
 	.admin-main {
