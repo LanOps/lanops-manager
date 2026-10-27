@@ -28,8 +28,12 @@ $paragraph-margin-bottom: 10px;
 	--lanops-muted-strong: #b0b7be;
 }
 
+// logo_header.png is logo_main.png cropped to the artwork and pre-scaled to 3x, so
+// the browser only shrinks it a little and the edges stay smooth
 .custom-header .navbar-brand img {
-	max-width: 200px;
+	display: block;
+	max-width: 100%;
+	height: auto;
 }
 
 .custom-header .navbar-toggler {
