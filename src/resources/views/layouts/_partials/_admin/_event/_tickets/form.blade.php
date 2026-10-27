@@ -8,16 +8,16 @@
   	</div>
 @endif
 <div class="row">
-	<div class="form-group col-sm-6 col-xs-12">
+	<div class="mb-3 col-sm-6 col-12">
 		{{ html()->label('Ticket Name', 'name') }}
 		{{ 
 			html()->text('name', (@$empty ? null : @$ticket->name))->class('form-control')
 		}}
 	</div> 
-	<div class="form-group col-sm-6 col-xs-12">
+	<div class="mb-3 col-sm-6 col-12">
 		{{ html()->label('Ticket Price', 'price') }}
 		<div class="input-group">
-			<div class="input-group-addon">{{ config('app.currency_symbol') }}</div>
+			<div class="input-group-text">{{ config('app.currency_symbol') }}</div>
 				@if (isset($priceLock) && $priceLock)
 					{{ 
 						html()->text('price', (@$empty ? null : @$ticket->price))->class('form-control')->disabled()
@@ -27,31 +27,31 @@
 						html()->text('price', (@$empty ? null : @$ticket->price))->class('form-control')
 					}}
 				@endif
-			<div class="input-group-addon">.00</div>
+			<div class="input-group-text">.00</div>
 		</div>
 	</div>
 
 </div>
 <div class="row">
 
-	<div class="form-group col-md-6 col-sm-6 col-xs-12">
+	<div class="mb-3 col-md-6 col-sm-6 col-12">
 		{{ html()->label('Quantity', 'quantity') }}
 		{{ 
 			html()->text('quantity', (@$empty ? null : @$ticket->quantity))->class('form-control')
 		}}
 		<small>If unlimited, leave blank</small>
 	</div>  
-	<div class="form-group col-md-6 col-sm-6 col-xs-12">
+	<div class="mb-3 col-md-6 col-sm-6 col-12">
 		{{ html()->label('Ticket Type', 'type') }}
-		{{ html()->select('type', array('participant' => 'Participant', 'spectator' => 'Spectator'), @$ticket->type)->class('form-control') }}
+		{{ html()->select('type', array('participant' => 'Participant', 'spectator' => 'Spectator'), @$ticket->type)->class('form-select') }}
 	</div> 
-	<div class="form-group col-xs-12">
-		<div class="checkbox">
-			<label>
+	<div class="mb-3 col-12">
+		<div class="form-check">
+			<label class="form-check-label">
 				@if (@$ticket->seatable || @$empty)
-					{{ html()->checkbox('seatable', true, 1) }}
+					{{ html()->checkbox('seatable', true, 1)->class('form-check-input') }}
 				@else
-					{{ html()->checkbox('seatable', false, 1) }}
+					{{ html()->checkbox('seatable', false, 1)->class('form-check-input') }}
 				@endif
 				<strong>Seatable</strong>
 			</label>
@@ -62,7 +62,7 @@
 <hr>
 <h3>Purchase Period</h3>
 <div class="row">
-	<div class="form-group col-sm-6 col-xs-12">
+	<div class="mb-3 col-sm-6 col-12">
 		{{ html()->label('Start Date', 'sale_start_date') }}
 		@if (@$empty)
 			{{ html()->text('sale_start_date')->class('form-control') 
@@ -73,7 +73,7 @@
 		@endif
 		<small>If no start leave blank</small>
 	</div> 
-	<div class="form-group col-sm-6 col-xs-12">
+	<div class="mb-3 col-sm-6 col-12">
 		{{ html()->label('Start Time', 'sale_start_time') }}
 		@if (@$empty)
 			{{ 
@@ -86,7 +86,7 @@
 		@endif
 		<small>If no start leave blank</small>
 	</div>
-	<div class="form-group col-sm-6 col-xs-12">
+	<div class="mb-3 col-sm-6 col-12">
 		{{ html()->label('End Date', 'sale_end_date') }}
 		@if(@$empty)
 			{{ 
@@ -99,7 +99,7 @@
 		@endif
 		<small>If no end leave blank</small>
 	</div> 
-	<div class="form-group col-sm-6 col-xs-12">
+	<div class="mb-3 col-sm-6 col-12">
 		{{ html()->label('End Time', 'sale_end_time') }}
 		@if (@$empty)
 			{{ 
@@ -115,7 +115,7 @@
 
 </div>
 <hr>
-<button type="submit" class="btn btn-default btn-success btn-block">Submit</button>
+<button type="submit" class="btn btn-outline-secondary btn-success w-100">Submit</button>
 
 <!-- JavaScript-->
 <script type="text/javascript">

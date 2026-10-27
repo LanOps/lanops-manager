@@ -6,12 +6,12 @@
 
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">Gallery - {{ $album->name }}</h3>
+		<h3 class="pb-2 mb-3 border-bottom">Gallery - {{ $album->name }}</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/gallery">Gallery</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				{{ $album->name }}
 			</li>
 		</ol> 
@@ -21,11 +21,11 @@
 <div class="row">
 	<div class="col-lg-8">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-image fa-fw"></i> Images
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="dataTable_wrapper">
 					<table width="100%" class="table table-striped table-hover" id="dataTables-example">
 						<thead>
@@ -38,8 +38,8 @@
 						<tbody>
 							@foreach ($images as $image)
 								<tr>
-									<td class=" col-xs-3">
-										<img class="img-responsive img-thumbnail" src="{{ $image->getUrl('optimized') }}">
+									<td class="col-3">
+										<img class="img-fluid img-thumbnail" src="{{ $image->getUrl('optimized') }}">
 									</td>
 									<td>
 										{{ $image->created_at }}
@@ -47,7 +47,7 @@
 									{{ html()->form('POST', url('/admin/gallery/' . $album->slug . '/' . $image->id))->acceptsFiles()->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
 										@method('DELETE')
 										<td width="15%">
-											<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
+											<button type="submit" class="btn btn-danger btn-sm w-100">Delete</button>
 										</td>
 									</form>
 								</tr>
@@ -62,26 +62,26 @@
 	</div>
 	<div class="col-lg-4">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-upload fa-fw"></i> Add Images
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				{{ html()->form('POST', url('/admin/gallery/' . $album->slug . '/upload'))->acceptsFiles()->open() }}
 					{{ csrf_field() }}
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Select Images', 'images') }}
 						{{ html()->file('images[]')->id('images')->class('form-control')->multiple() }}
 					</div>
-					<button type="submit" class="btn btn-primary btn-block">Upload</button>
+					<button type="submit" class="btn btn-primary w-100">Upload</button>
 				</form>
 			</div>
 		</div>
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-wrench fa-fw"></i> Settings
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="list-group">
 					{{ html()->form('POST', url('/admin/gallery/' . $album->slug))->open() }}
 						@if ($errors->any())
@@ -93,16 +93,16 @@
 						        </ul>
 						  	</div>
 						@endif
-						<div class="form-group">
+						<div class="mb-3">
 							{{ html()->label('Album Name', 'name') }}
 							{{ html()->text('name', $album->name)->class('form-control') }}
 						</div> 
-						<div class="form-group">
+						<div class="mb-3">
 							{{ html()->label('Description', 'description') }}
 							{{ html()->textarea('description', $album->description)->class('form-control')->rows('2') }}
 						</div>
 						<div class="row">
-							<div class="col-lg-6 col-sm-12 form-group">
+							<div class="col-lg-6 col-sm-12 mb-3">
 								{{ html()->label('Status', 'status') }}
 								{{ 
 									html()->select('status', array(
@@ -111,17 +111,17 @@
 										), strtolower($album->status))->class('form-control')
 								}}
 							</div>
-							 <div class="col-lg-6 col-sm-12 form-group">
+							 <div class="col-lg-6 col-sm-12 mb-3">
 								{{ html()->label('Event', 'event_id') }}
-								{{ html()->select('event_id', Helpers::getEventNames('DESC', 0), strtolower($album->event_id))->class('form-control') }}
+								{{ html()->select('event_id', Helpers::getEventNames('DESC', 0), strtolower($album->event_id))->class('form-select') }}
 							</div>
 						</div>
-						<button type="submit" class="btn btn-success btn-block">Submit</button>
+						<button type="submit" class="btn btn-success w-100">Submit</button>
 					</form>
 					<hr>
 					{{ html()->form('POST', url('/admin/gallery/' . $album->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
 						@method('DELETE')
-						<button type="submit" class="btn btn-danger btn-block">Delete</button>
+						<button type="submit" class="btn btn-danger w-100">Delete</button>
 					</form>
 				</div>
 			</div>

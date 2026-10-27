@@ -5,9 +5,9 @@
 @section ('content')
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">Tournaments</h3>
+		<h3 class="pb-2 mb-3 border-bottom">Tournaments</h3>
 		<ol class="breadcrumb">
-			<li class="active">
+			<li class="breadcrumb-item active">
 				Tournaments
 			</li>
 		</ol> 
@@ -15,12 +15,12 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-12 col-sm-8">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-12 col-sm-8">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-users fa-fw"></i> Tournaments
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<table width="100%" class="table table-striped table-hover">
 					<thead>
 						<tr>
@@ -53,13 +53,13 @@
 								<td>{{ $tournament->status }}</td>
 								<td width="15%">
 									<a href="/admin/tournaments/{{ $tournament->slug }}">
-										<button type="button" class="btn btn-primary btn-sm btn-block">Edit</button>
+										<button type="button" class="btn btn-primary btn-sm w-100">Edit</button>
 									</a>
 								</td>
 								<td width="15%">
 									{{ html()->form('POST', url('/admin/tournaments/' . $tournament->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
 										@method('DELETE')
-										<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
+										<button type="submit" class="btn btn-danger btn-sm w-100">Delete</button>
 									</form>
 								</td>
 							</tr>
@@ -70,26 +70,26 @@
 			</div>  
 		</div>
 	</div>
-	<div class="col-xs-12 col-sm-4">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-12 col-sm-4">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-plus fa-fw"></i> Create Tournament
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				{{ html()->form('POST', url('/admin/tournaments/'))->acceptsFiles()->open() }}
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Name', 'name') }}
 						{{ html()->text('name')->class('form-control') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Team Size (0 is no Teams)', 'team_size') }}
 						{{ html()->text('team_size', 0)->id('name')->class('form-control') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Link to Event', 'event_id') }}
-						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), '')->class('form-control') }}
+						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), '')->class('form-select') }}
 					</div>
-					<button type="submit" class="btn btn-success btn-block">Submit</button> 
+					<button type="submit" class="btn btn-success w-100">Submit</button> 
 				</form>
 			</div>
 		</div>

@@ -6,17 +6,17 @@
 
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">
+		<h3 class="pb-2 mb-3 border-bottom">
 			Polls - {{ $poll->name }}
 			@if ($poll->hasEnded())
 				<small> - Ended</small>
 			@endif
 		</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/polls/">Polls</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				{{ $poll->name }}
 			</li>
 		</ol> 
@@ -24,12 +24,12 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-12 col-sm-8">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-12 col-sm-8">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-users fa-fw"></i> Options
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<table width="100%" class="table table-striped table-hover" id="dataTables-example">
 					<thead>
 						<tr>
@@ -55,7 +55,7 @@
 										@if ($option->getTotalVotes() <= 0)
 											{{ html()->form('POST', url('/admin/polls/' . $poll->slug . '/options/' . $option->id))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
 												@method('DELETE')
-												<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
+												<button type="submit" class="btn btn-danger btn-sm w-100">Delete</button>
 											</form>
 										@endif
 									</td>
@@ -67,27 +67,27 @@
 			</div>  
 		</div>
 	</div>
-	<div class="col-xs-12 col-sm-4">
+	<div class="col-12 col-sm-4">
 		
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-pencil fa-fw"></i> Edit {{ $poll->name }}
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 					{{ html()->label('Poll Link:', 'name') }}
 				<a href="{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/polls/{{ $poll->slug }}">
 					{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/polls/{{ $poll->slug }}
 				</a>
 				{{ html()->form('POST', url('/admin/polls/' . $poll->slug))->acceptsFiles()->open() }}
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Name', 'name') }}
 						{{ html()->text('name', $poll->name)->class('form-control') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Description', 'description') }}
 						{{ html()->textarea('description', $poll->description)->class('form-control')->rows('3') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Status', 'status') }}
 						{{ 
 							html()->select('status', array(
@@ -97,44 +97,44 @@
 								), strtolower($poll->status))->class('form-control')
 						}}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Link to Event', 'event_id') }}
-						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), $poll->event_id)->class('form-control') }}
+						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), $poll->event_id)->class('form-select') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Allow User to Add Options', 'allow_options_users') }} @if ($poll->allow_options_user) True @else False @endif
 						<br>
 						{{ html()->label('Allow User to Select Multiple Options', 'allow_options_multi') }} @if ($poll->allow_options_multi) True @else False @endif
 					</div>
-					<div class="form-group">
-						<button type="submit" class="btn btn-success btn-block">Submit</button> 
+					<div class="mb-3">
+						<button type="submit" class="btn btn-success w-100">Submit</button> 
 					</div>
 				</form>
 				@if (!$poll->hasEnded())
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->form('POST', url('/admin/polls/' . $poll->slug . '/end'))->open() }}
-							<button type="submit" class="btn btn-primary btn-block">End Poll</button>
+							<button type="submit" class="btn btn-primary w-100">End Poll</button>
 						</form>
 					</div>
 				@endif
 				<hr>
 				{{ html()->form('POST', url('/admin/polls/' . $poll->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
 					@method('DELETE')
-					<button type="submit" class="btn btn-danger btn-block">Delete</button>
+					<button type="submit" class="btn btn-danger w-100">Delete</button>
 				</form>
 			</div>
 		</div>
 		@if (!$poll->hasEnded())
-			<div class="panel panel-default">
-				<div class="panel-heading">
+			<div class="card">
+				<div class="card-header">
 					<i class="fa fa-plus fa-fw"></i> Add Options
 				</div>
-				<div class="panel-body">
+				<div class="card-body">
 					{{ html()->form('POST', url('/admin/polls/' . $poll->slug . '/options'))->acceptsFiles()->open() }}
-						<div class="form-group">
+						<div class="mb-3">
 							@include ('layouts._partials._polls.add-options')
 						</div>
-						<button type="submit" class="btn btn-default btn-block">Submit</button> 
+						<button type="submit" class="btn btn-outline-secondary w-100">Submit</button> 
 					</form>
 				</div>
 			</div>

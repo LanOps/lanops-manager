@@ -4,18 +4,18 @@
 
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">Events - {{ $event->display_name }} - Participant - {{ $participant->user->username }}</h3>
+		<h3 class="pb-2 mb-3 border-bottom">Events - {{ $event->display_name }} - Participant - {{ $participant->user->username }}</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/">Events</a>
 			</li>
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/{{ $event->slug }}">{{ $event->display_name }}</a> 
 			</li>
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/{{ $event->slug }}/participants">Participants</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				{{ $participant->user->username }}
 			</li>
 		</ol>
@@ -27,11 +27,11 @@
 <div class="row">
 	<div class="col-lg-8">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				Edit Participant
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				@if (!empty($_POST))
 					Successfully Posted
 				@endif
@@ -83,11 +83,11 @@
 	</div>
 	<div class="col-lg-4">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				More Editing
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				@if ($participant->signed_in)
 					<h4>User is signed in at present at the event</h4>
 				@endif
@@ -107,29 +107,29 @@
 				@endif
 				@if ($participant->purchase)
 					<hr>
-					<div class="form-group">
-						<a href="/admin/purchases/{{ $participant->purchase->id }}"><button class="btn btn-block btn-success">Purchase Info</button></a>
+					<div class="mb-3">
+						<a href="/admin/purchases/{{ $participant->purchase->id }}"><button class="btn w-100 btn-success">Purchase Info</button></a>
 					</div>
 				@endif
 				@if (!$participant->signed_in)
 					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/participants/' . $participant->id . '/transfer'))->open() }}
-						<div class="form-group">
+						<div class="mb-3">
 							{{ html()->label('Transfer to event', 'event_id') }}
-							{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), '')->class('form-control') }}
+							{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), '')->class('form-select') }}
 						</div>
-						<div class="form-group">
-							<button type="submit" class="btn btn-success btn-block">Transfer</button>
+						<div class="mb-3">
+							<button type="submit" class="btn btn-success w-100">Transfer</button>
 						</div>
 					</form>
 					<hr>
 					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/participants/' . $participant->id . '/signin'))->open() }}
-						<div class="form-group">
-							<button type="submit" class="btn btn-success btn-block">Sign in</button>
+						<div class="mb-3">
+							<button type="submit" class="btn btn-success w-100">Sign in</button>
 						</div>
 					</form>
 					<hr>
-					<div class="form-group">
-						<button type="submit" class="btn btn-danger btn-block" disabled>Refund - <small>Coming soon</small></button>
+					<div class="mb-3">
+						<button type="submit" class="btn btn-danger w-100" disabled>Refund - <small>Coming soon</small></button>
 					</div>
 				@endif
 			</div>
