@@ -23,8 +23,8 @@ class MediaTest extends TestCase
 
     public function testGalleryListsAlbumsNewestEventFirst()
     {
-        $older = $this->createEventWithTicket(['status' => 'PUBLISHED', 'start' => '2020-01-01 10:00:00', 'end' => '2020-01-02 18:00:00'])->event;
-        $newer = $this->createEventWithTicket(['status' => 'PUBLISHED', 'start' => '2030-01-01 10:00:00', 'end' => '2030-01-02 18:00:00'])->event;
+        $older = $this->createEventWithTicket(['nice_name' => 'gallery-older', 'status' => 'PUBLISHED', 'start' => '2020-01-01 10:00:00', 'end' => '2020-01-02 18:00:00'])->event;
+        $newer = $this->createEventWithTicket(['nice_name' => 'gallery-newer', 'status' => 'PUBLISHED', 'start' => '2030-01-01 10:00:00', 'end' => '2030-01-02 18:00:00'])->event;
 
         GalleryAlbum::forceCreate(['name' => 'Album Older', 'slug' => 'album-older', 'status' => 'PUBLISHED', 'event_id' => $older->id]);
         GalleryAlbum::forceCreate(['name' => 'Album Newer', 'slug' => 'album-newer', 'status' => 'PUBLISHED', 'event_id' => $newer->id]);
