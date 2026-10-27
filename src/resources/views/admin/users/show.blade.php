@@ -5,12 +5,12 @@
 @section ('content')
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">{{ $userShow->username }}</h3>
+		<h3 class="pb-2 mb-3 border-bottom">{{ $userShow->username }}</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/users/">Users</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				{{ $userShow->username }}
 			</li>
 		</ol> 
@@ -19,19 +19,19 @@
 
 <div class="row">
 	<div class="col-sm-12 col-lg-10">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-users fa-fw"></i> User
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				@if ($userShow->banned)
 					<div class="alert alert-danger">This User has been banned!</div>
 				@endif
-				<div class="media">
-  					<div class="media-left">
-						<img class="media-object" src="{{ $userShow->avatar }}">
+				<div class="d-flex">
+  					<div class="flex-shrink-0 me-3">
+						<img class="" src="{{ $userShow->avatar }}">
 			  		</div>
-  					<div class="media-body">
+  					<div class="flex-grow-1">
 						<ul class="list-group">
 							<li class="list-group-item">Username: {{ $userShow->username }}</li>
 							@if ($steamProfile = Helpers::getSteamProfile($userShow->steamid)) <li class="list-group-item">Steam: {{ $steamProfile["name"] }}</li> @endif
@@ -49,11 +49,11 @@
   				</div>
 			</div>  
 		</div>
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">Purchases</h3>
+		<div class="card">
+			<div class="card-header">
+				<h3 class="card-title">Purchases</h3>
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				@if (count($userShow->purchases))
 					<table class="table table-striped">
 						<thead>
@@ -108,7 +108,7 @@
 									</td>
 									<td>
 										<a href="/admin/purchases/{{ $purchase->id }}">
-											<button class="btn btn-sm btn-block btn-success">View</button>
+											<button class="btn btn-sm w-100 btn-success">View</button>
 										</a>
 									</td>
 								</tr>
@@ -123,31 +123,31 @@
 		</div>
 	</div>
 	<div class="col-sm-12 col-lg-2">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-users fa-fw"></i> Options
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="row">
-					<div class="col-xs-12 col-sm-12">
+					<div class="col-12 col-sm-12">
 						@if ($userShow->admin)
 							{{ html()->form('POST', url('/admin/users/' . $userShow->id . '/admin'))->open() }}
 								@method('DELETE')
-								<button type="submit" class="btn btn-block btn-info">Remove Admin</button>
+								<button type="submit" class="btn w-100 btn-info">Remove Admin</button>
 							</form>
 						@else
 							{{ html()->form('POST', url('/admin/users/' . $userShow->id . '/admin'))->open() }}
-								<button type="submit" class="btn btn-block btn-success">Make Admin</button>
+								<button type="submit" class="btn w-100 btn-success">Make Admin</button>
 							</form>
 						@endif
 						<small>This will add or remove access to this admin panel. This means they can access everything! BE CAREFUL!</small>
 					</div>
 					@if ($userShow->email != null && $userShow->password != null)
-						<div class="col-xs-12 col-sm-12">
+						<div class="col-12 col-sm-12">
 							{{ html()->form('POST', url('/login/forgot'))->open() }}
 	                            @csrf
 								<input type="hidden" name="email" value="{{ $userShow->email }}">
-								<button type="submit" class="btn btn-block btn-success">Reset Password</button>
+								<button type="submit" class="btn w-100 btn-success">Reset Password</button>
 							</form>
 							<small>This will reset the users password and sent a verification link to their email. If they are using a 3rd party Login this will do nothing.</small>
 						</div>
@@ -157,23 +157,23 @@
 				<h4>Change Username</h4>
 				<hr>
 				{{ html()->form('POST', url('/admin/users/' . $userShow->id))->open() }}
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->text('username', '')->class('form-control') }}
 					</div>
-					<button type="submit" class="btn btn-success btn-block">Submit</button>
+					<button type="submit" class="btn btn-success w-100">Submit</button>
 				</form>
 				<br>
 				<h4>Danger Zone</h4>
 				<hr>
 				<div class="row">
-					<div class="col-xs-12 col-sm-12">
+					<div class="col-12 col-sm-12">
 						@if (!$userShow->banned)
 							{{ html()->form('POST', url('/admin/users/' . $userShow->id . '/ban'))->open() }}
-								<button type="submit" class="btn btn-block btn-danger">Ban</button>
+								<button type="submit" class="btn w-100 btn-danger">Ban</button>
 							</form>
 						@else
 							{{ html()->form('POST', url('/admin/users/' . $userShow->id . '/unban'))->open() }}
-								<button type="submit" class="btn btn-block btn-success">Un-Ban</button>
+								<button type="submit" class="btn w-100 btn-success">Un-Ban</button>
 							</form>
 						@endif
 					</div>

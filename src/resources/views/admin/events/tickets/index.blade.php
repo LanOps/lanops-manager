@@ -6,15 +6,15 @@
 
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">Tickets</h3>
+		<h3 class="pb-2 mb-3 border-bottom">Tickets</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/">Events</a>
 			</li>
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/{{ $event->slug }}">{{ $event->display_name }}</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				Tickets
 			</li>
 		</ol>
@@ -26,16 +26,16 @@
 <div class="row">
 	<div class="col-lg-8">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<i class="fa fa-bar-chart-o fa-fw"></i> Ticket Breakdown
+		<div class="card">
+			<div class="card-header">
+				<i class="fa fa-chart-column fa-fw"></i> Ticket Breakdown
 			</div>
-			<div class="panel-body">
-				<div class="col-sm-6 col-xs-12">
+			<div class="card-body">
+				<div class="col-sm-6 col-12">
 					<h4>Purchase Breakdown</h4>
 					<div id="ticket-purchase-breakdown"></div>
 				</div>
-				<div class="col-sm-6 col-xs-12">
+				<div class="col-sm-6 col-12">
 					<h4>Income Breakdown</h4>
 					<div id="ticket-income-breakdown"></div>
 				</div>
@@ -63,11 +63,11 @@
 				labels: ['Pounds']
 			});
 		</script>
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-ticket fa-fw"></i> Tickets
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<table width="100%" class="table table-striped table-hover" id="dataTables-example">
 					<thead>
 						<tr>
@@ -128,13 +128,13 @@
 								</td>
 								<td width="15%">
 									<a href="/admin/events/{{ $event->slug }}/tickets/{{ $ticket->id }}">
-										<button type="button" class="btn btn-primary btn-sm btn-block">Edit</button>
+										<button type="button" class="btn btn-primary btn-sm w-100">Edit</button>
 									</a>
 								</td>
 								<td width="15%">
 									{{ html()->form('POST', url('/admin/events/' . $event->slug . '/tickets/' . $ticket->id))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
 										@method('DELETE')
-										<button type="submit" class="btn btn-danger btn-sm btn-block" data-confirm="Are you sure to delete this Ticket?">Delete</button>
+										<button type="submit" class="btn btn-danger btn-sm w-100" data-confirm="Are you sure to delete this Ticket?">Delete</button>
 									</form>
 								</td>
 							</tr>
@@ -144,12 +144,12 @@
 			</div>
 		</div>
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-gift fa-fw"></i> Freebies
 				<a name="freebies"></a>
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<table width="100%" class="table table-striped table-hover" id="dataTables-example">
 					<thead>
 						<tr>
@@ -179,14 +179,14 @@
 									{{ html()->form('POST', url('/admin/events/' . $event->slug . '/freebies/gift'))->open() }}
 										{{ csrf_field() }}
 										<input type="hidden" name="user_id" value="{{ $user->id }}" />
-										<button type="submit" name="action" class="btn btn-success btn-sm btn-block">Free Ticket</button>
+										<button type="submit" name="action" class="btn btn-success btn-sm w-100">Free Ticket</button>
 									</form>
 								</td>
 								<td width="15%">
 									{{ html()->form('POST', url('/admin/events/' . $event->slug . '/freebies/admin'))->open() }}
 										{{ csrf_field() }}
 										<input type="hidden" name="user_id" value="{{ $user->id }}" />
-										<button type="submit" name="action" class="btn btn-success btn-sm btn-block">Admin Ticket</button>
+										<button type="submit" name="action" class="btn btn-success btn-sm w-100">Admin Ticket</button>
 									</form>
 								</td>
 							</tr>
@@ -198,11 +198,11 @@
 	</div>
 	<div class="col-lg-4">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-plus fa-fw"></i> Add Ticket
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/tickets'))->open() }}
 					@include('layouts._partials._admin._event._tickets.form', ['empty' => true])
 				</form>

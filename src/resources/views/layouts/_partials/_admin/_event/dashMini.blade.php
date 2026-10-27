@@ -1,34 +1,34 @@
 <div class="row">
 
-	<div class="col-lg-2 col-md-6 col-xs-12">
+	<div class="col-lg-2 col-md-6 col-12">
 		@if ($event->status == 'PUBLISHED')
 			@php 
-				$eventStatusColor = 'green'; 
-				$eventStatusIcon = 'fa-check-circle-o';
+				$eventStatusColor = 'success'; 
+				$eventStatusIcon = 'fa-circle-check';
 			@endphp
 		@elseif ($event->status == 'DRAFT')
 			@php 
-				$eventStatusColor = 'red';
-				$eventStatusIcon = 'fa-times-circle-o';
+				$eventStatusColor = 'danger';
+				$eventStatusIcon = 'fa-circle-xmark';
 			@endphp
 		@elseif ($event->status == 'PREVIEW' || $event->status == 'PRIVATE')
 			@php 
-				$eventStatusColor = 'yellow'; 
+				$eventStatusColor = 'warning'; 
 				$eventStatusIcon = 'fa-ban';
 			@endphp
 		@else
 			@php
-				$eventStatusColor = 'green';
-				$eventStatusIcon = 'fa-question-circle ';
+				$eventStatusColor = 'success';
+				$eventStatusIcon = 'fa-circle-question ';
 			@endphp
 		@endif
-		<div class="panel panel-{{ $eventStatusColor }}">
-			<div class="panel-heading">
+		<div class="card border-{{ $eventStatusColor }}">
+			<div class="card-header text-bg-{{ $eventStatusColor }}">
 				<div class="row">
-					<div class="col-xs-3">
+					<div class="col-3">
 						<i class="fa {{ $eventStatusIcon }} fa-5x"></i>
 					</div>
-					<div class="col-xs-9 text-right">
+					<div class="col-9 text-end">
 						<div class="huge">
 							@if ($event->status == 'PUBLISHED')
 								<small>Live</small>
@@ -47,97 +47,97 @@
 				</div>
 			</div>
 			<a href="/admin/events/{{ $event->slug }}">
-				<div class="panel-footer">
-					<span class="pull-left">View Event Page</span>
-					<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+				<div class="card-footer">
+					<span class="float-start">View Event Page</span>
+					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
 					<div class="clearfix"></div>
 				</div>
 			</a>
 		</div>
 	</div>
-	<div class="col-lg-2 col-md-6 col-xs-12">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-lg-2 col-md-6 col-12">
+		<div class="card">
+			<div class="card-header">
 				<div class="row">
-					<div class="col-xs-3">
+					<div class="col-3">
 						<i class="fa fa-wheelchair fa-5x"></i>
 					</div>
-					<div class="col-xs-9 text-right">
+					<div class="col-9 text-end">
 						<div class="huge">{{ $event->getSeatedCount() }}</div>
 						<div>Seated Participants</div>
 					</div>
 				</div>
 			</div>
 			<a href="/admin/events/{{ $event->slug }}/seating">
-				<div class="panel-footer">
-					<span class="pull-left">View Seating Plans</span>
-					<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+				<div class="card-footer">
+					<span class="float-start">View Seating Plans</span>
+					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
 					<div class="clearfix"></div>
 				</div>
 			</a>
 		</div>
 	</div>
-	<div class="col-lg-2 col-md-6 col-xs-12">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-lg-2 col-md-6 col-12">
+		<div class="card">
+			<div class="card-header">
 				<div class="row">
-					<div class="col-xs-3">
+					<div class="col-3">
 						<i class="fa fa-user fa-5x"></i>
 					</div>
-					<div class="col-xs-9 text-right">
+					<div class="col-9 text-end">
 						<div class="huge">{{ $event->eventParticipants->count() }}</div>
 						<div>Attendees</div>
 					</div>
 				</div>
 			</div>
 			<a href="/admin/events/{{ $event->slug }}/participants">
-				<div class="panel-footer">
-					<span class="pull-left">View Attendees</span>
-					<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+				<div class="card-footer">
+					<span class="float-start">View Attendees</span>
+					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
 					<div class="clearfix"></div>
 				</div>
 			</a>
 		</div>
 	</div>
-	<div class="col-lg-2 col-md-6 col-xs-12">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-lg-2 col-md-6 col-12">
+		<div class="card">
+			<div class="card-header">
 				<div class="row">
-					<div class="col-xs-3">
+					<div class="col-3">
 						<i class="fa fa-ticket fa-5x"></i>
 					</div>
-					<div class="col-xs-9 text-right">
+					<div class="col-9 text-end">
 						<div class="huge">{{ config('app.currency_symbol') }}{{ $event->getTicketSalesCount() }}</div>
 						<div>Ticket Sales</div>
 					</div>
 				</div>
 			</div>
 			<a href="/admin/events/{{ $event->slug }}/tickets">
-				<div class="panel-footer">
-					<span class="pull-left">View Tickets</span>
-					<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+				<div class="card-footer">
+					<span class="float-start">View Tickets</span>
+					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
 					<div class="clearfix"></div>
 				</div>
 			</a>
 		</div>
 	</div>
-	<div class="col-lg-2 col-md-6 col-xs-12">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-lg-2 col-md-6 col-12">
+		<div class="card">
+			<div class="card-header">
 				<div class="row">
-					<div class="col-xs-3">
+					<div class="col-3">
 						<i class="fa fa-calendar fa-5x"></i>
 					</div>
-					<div class="col-xs-9 text-right">
+					<div class="col-9 text-end">
 						<div class="huge">{{ $event->getTimetableDataCount() }}</div>
 						<div>Scheduled Slots</div>
 					</div>
 				</div>
 			</div>
 			<a href="/admin/events/{{ $event->slug }}/timetables">
-				<div class="panel-footer">
-					<span class="pull-left">View Timetables</span>
-					<span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+				<div class="card-footer">
+					<span class="float-start">View Timetables</span>
+					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
 					<div class="clearfix"></div>
 				</div>
 			</a>

@@ -6,17 +6,17 @@
 
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">
+		<h3 class="pb-2 mb-3 border-bottom">
 			Tournament - {{ $tournament->name }}
 			@if ($tournament->isComplete())
 				<small> - Ended</small>
 			@endif
 		</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/tournaments/">Tournaments</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				{{ $tournament->name }}
 			</li>
 		</ol> 
@@ -24,37 +24,37 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-12 col-sm-8">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-12 col-sm-8">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-users fa-fw"></i> Participants
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				{{-- @if (
 					($tournament->hasEvent() && $tournament->event->getEventParticipant()) ||
 					(!$tournament->hasEvent())
 					)
 					@if (Auth::user() && !$tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen() && !$tournament->hasTeams())
 						{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/register'))->open() }}
-							<button type="submit" class="btn btn-success btn-sm btn-block">Signup</button>
+							<button type="submit" class="btn btn-success btn-sm w-100">Signup</button>
 						</form>
 					@elseif (Auth::user() && !$tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen() && $tournament->hasTeams())
 						{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/registerTeam'))->open() }}
 							<div class="row">
-								<div class="col-xs-12 col-md-6 form-group @error('team_name') has-error @enderror">
+								<div class="col-12 col-md-6 mb-3 @error('team_name') @enderror">
 									{{ html()->label('Team Name', 'team_name') }}
 									<input id="team_name" type="team_name" class="form-control" name="team_name" required>
 								</div>
-								<div class="col-xs-12 col-md-6 form-group @error('team_password') has-error @enderror">
+								<div class="col-12 col-md-6 mb-3 @error('team_password') @enderror">
 									{{ html()->label('Team Password', 'team_password') }}
 									<input id="team_password" type="team_password" class="form-control" name="team_password">
 								</div>
 							</div>
-							<button type="submit" class="btn btn-success btn-sm btn-block">Register Team</button>
+							<button type="submit" class="btn btn-success btn-sm w-100">Register Team</button>
 						</form>
 					@elseif (Auth::user() && $tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen())
 						{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/unregister'))->open() }}
-							<button type="submit" class="btn btn-danger btn-sm btn-block">Remove Signup</button>
+							<button type="submit" class="btn btn-danger btn-sm w-100">Remove Signup</button>
 						</form>
 					@endif
 				@endif --}}
@@ -82,7 +82,7 @@
 												(($tournament->hasEvent() && $tournament->event->getEventParticipant()) || !$tournament->hasEvent()))
 												{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/register'))->open() }}
 													{{ html()->hidden('tournament_team_id', $team->id) }}
-													<button type="submit" class="btn btn-success btn-sm btn-block">Join Team</button>
+													<button type="submit" class="btn btn-success btn-sm w-100">Join Team</button>
 												</form>
 											@endif --}}
 										</td>
@@ -106,7 +106,7 @@
 						@if ($tournament->participants)
 							@foreach ($tournament->participants as $participant)
 								<tr class="table-row odd gradeX">
-									<td width="30%"><img class="img-responsive img-rounded" src="{{ $participant->user->avatar }}"/></td>
+									<td width="30%"><img class="img-fluid rounded" src="{{ $participant->user->avatar }}"/></td>
 									<td>
 										{{ $participant->user->username }}
 										@if ($steamProfile = Helpers::getSteamProfile($participant->user->steamid))
@@ -124,42 +124,42 @@
 			</div>  
 		</div>
 	</div>
-	<div class="col-xs-12 col-sm-4">
+	<div class="col-12 col-sm-4">
 		
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-pencil fa-fw"></i> Edit {{ $tournament->name }}
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				{{ html()->label('Tournament Signup Link:', 'name') }}
 				<a href="{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/tournaments/{{ $tournament->slug }}">
 					{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/tournaments/{{ $tournament->slug }}
 				</a>
 				{{ html()->form('POST', url('/admin/tournaments/' . $tournament->slug))->acceptsFiles()->open() }}
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Name', 'name') }}
 						{{ html()->text('name', $tournament->name)->class('form-control') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Status', 'status') }}
-						{{ html()->select('status', App\Models\Tournament::getStatusArray(), $tournament->status)->class('form-control') }}
+						{{ html()->select('status', App\Models\Tournament::getStatusArray(), $tournament->status)->class('form-select') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Team Size (0 is no Teams)', 'team_size') }}
 						{{ html()->text('team_size', $tournament->team_size)->id('name')->class('form-control') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Link to Event', 'event_id') }}
-						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), $tournament->event_id)->class('form-control') }}
+						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), $tournament->event_id)->class('form-select') }}
 					</div>
-					<div class="form-group">
-						<button type="submit" class="btn btn-success btn-block">Submit</button> 
+					<div class="mb-3">
+						<button type="submit" class="btn btn-success w-100">Submit</button> 
 					</div>
 				</form>
 				<hr>
 				{{ html()->form('POST', url('/admin/tournaments/' . $tournament->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
 					@method('DELETE')
-					<button type="submit" class="btn btn-danger btn-block">Delete</button>
+					<button type="submit" class="btn btn-danger w-100">Delete</button>
 				</form>
 			</div>
 		</div>

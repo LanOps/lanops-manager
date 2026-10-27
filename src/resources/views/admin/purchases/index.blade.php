@@ -5,9 +5,9 @@
 @section ('content')
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">Purchases</h3>
+		<h3 class="pb-2 mb-3 border-bottom">Purchases</h3>
 		<ol class="breadcrumb">
-			<li class="active">
+			<li class="breadcrumb-item active">
 				Purchases
 			</li>
 		</ol> 
@@ -15,12 +15,12 @@
 </div>
 
 <div class="row">
-	<div class="col-xs-12 col-sm-12">
-		<div class="panel panel-default">
-			<div class="panel-heading">
+	<div class="col-12 col-sm-12">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-credit-card fa-fw"></i> Purchases
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<table width="100%" class="table table-striped table-hover">
 					<thead>
 						<tr>
@@ -77,7 +77,7 @@
 								<td>{{ $purchase->created_at }}</td>
 								<td>
 									<a href="/admin/purchases/{{ $purchase->id }}">
-										<button class="btn btn-block btn-success btn-sm">
+										<button class="btn w-100 btn-success btn-sm">
 											View
 										</button>
 									</a>

@@ -6,18 +6,18 @@
 
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">Tickets - {{ $ticket->name }}</h3>
+		<h3 class="pb-2 mb-3 border-bottom">Tickets - {{ $ticket->name }}</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/">Events</a>
 			</li>
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/{{ $event->slug }}">{{ $event->display_name }}</a>
 			</li>
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/{{ $event->slug }}/tickets">Tickets</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				{{ $ticket->name }}
 			</li>
 		</ol>
@@ -29,11 +29,11 @@
 <div class="row">
 	<div class="col-lg-6">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-pencil fa-fw"></i> Edit
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/tickets/' . $ticket->id))->open() }}
 					@if (isset($ticket) && !$ticket->participants->isEmpty()) @php $priceLock = true; @endphp @endif
 
@@ -45,11 +45,11 @@
 	</div>
 	<div class="col-lg-6">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<i class="fa fa-bar-chart-o fa-fw"></i> Statistics
+		<div class="card">
+			<div class="card-header">
+				<i class="fa fa-chart-column fa-fw"></i> Statistics
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="list-group">
 					Chart me
 					<h4>Money Made</h4>
@@ -64,11 +64,11 @@
 			</div>
 		</div>
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-user fa-fw"></i> Purchases
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="list-group">
 					@foreach ($event->eventParticipants as $participant)
 						@if ($participant->ticket_id == $ticket->id)
@@ -77,7 +77,7 @@
 								@if ($steamProfile = Helpers::getSteamProfile($participant->user->steamid))
 									<br><span class="text-muted"><small>Steam: {{ $steamProfile["name"] }}</small></span>
 								@endif
-								<span class="pull-right text-muted small">
+								<span class="float-end text-muted small">
 									<em>
 										{{ date('d-m-Y H:i', strtotime($participant->created_at)) }}
 									</em>

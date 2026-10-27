@@ -6,18 +6,18 @@
 
 <div class="row">
 	<div class="col-lg-12">
-		<h3 class="page-header">Seating Plans - {{ $seatingPlan->name }}</h3>
+		<h3 class="pb-2 mb-3 border-bottom">Seating Plans - {{ $seatingPlan->name }}</h3>
 		<ol class="breadcrumb">
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/">Events</a>
 			</li>
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/{{ $event->slug }}">{{ $event->display_name }}</a> 
 			</li>
-			<li>
+			<li class="breadcrumb-item">
 				<a href="/admin/events/{{ $event->slug }}/seating">Seating Plans</a>
 			</li>
-			<li class="active">
+			<li class="breadcrumb-item active">
 				{{ $seatingPlan->name }}
 			</li>
 		</ol>
@@ -29,11 +29,11 @@
 <div class="row">
 	<div class="col-lg-8">
 		
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-desktop fa-fw"></i> Seating Plan Preview
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				<div class="table-responsive text-center">
 					<table class="table">
 						<thead>
@@ -48,7 +48,7 @@
 								<tr>
 									@foreach ($seatingPlan->getSeatsForColumn($c)->sortBy('seat') as $seat)
 										<td>
-											<button class="btn @if ($seat->disabled) btn-danger @elseif ($seat->eventParticipant) btn-success @else btn-primary @endif btn-sm"  onclick="editSeating('{{ $seat->seat }}', '{{ $seat->event_participant_id }}')" data-toggle="modal" data-target="#editSeatingModal">
+											<button class="btn @if ($seat->disabled) btn-danger @elseif ($seat->eventParticipant) btn-success @else btn-primary @endif btn-sm"  onclick="editSeating('{{ $seat->seat }}', '{{ $seat->event_participant_id }}')" data-bs-toggle="modal" data-bs-target="#editSeatingModal">
 												{{ $seat->seat }} - @if ($seat->eventParticipant) {{ $seat->eventParticipant->user->username }} @elseif ($seat->disabled) Disabled @else Empty @endif
 											</button>
 										</td>
@@ -61,11 +61,11 @@
 				</div>
 			</div>
 		</div>
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<i class="fa fa-th fa-fw"></i> Seating Plan
+		<div class="card">
+			<div class="card-header">
+				<i class="fa fa-table-cells fa-fw"></i> Seating Plan
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 			 	<div class="dataTable_wrapper">
 					<table width="100%" class="table table-striped table-hover" id="seating_table">
 						<thead>
@@ -106,7 +106,7 @@
 										@endif
 									</td>
 									<td width="10%">
-										<button type="button" class="btn btn-primary btn-sm btn-block" onclick="editSeating('{{ ucwords($seat->seat) }}', '{{ $seat->eventParticipant->id }}')" data-toggle="modal" data-target="#editSeatingModal">Edit</button>
+										<button type="button" class="btn btn-primary btn-sm w-100" onclick="editSeating('{{ ucwords($seat->seat) }}', '{{ $seat->eventParticipant->id }}')" data-bs-toggle="modal" data-bs-target="#editSeatingModal">Edit</button>
 									</td>
 								</tr>
 							@endforeach
@@ -120,11 +120,11 @@
 	</div>
 	<div class="col-lg-4">
 
-		<div class="panel panel-default">
-			<div class="panel-heading">
+		<div class="card">
+			<div class="card-header">
 				<i class="fa fa-wrench fa-fw"></i> Settings
 			</div>
-			<div class="panel-body">
+			<div class="card-body">
 				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug))->acceptsFiles()->open() }}
 					@if ($errors->any())
 						<div class="alert alert-danger">
@@ -136,11 +136,11 @@
 						</div>
 					@endif
 					<div class="row">
-						<div class="col-lg-12 col-sm-12 form-group">
+						<div class="col-lg-12 col-sm-12 mb-3">
 							{{ html()->label('Name', 'name') }}
 							{{ html()->text('name', $seatingPlan->name)->class('form-control') }}
 						</div>
-						<div class="col-lg-12 col-sm-12 form-group">
+						<div class="col-lg-12 col-sm-12 mb-3">
 							{{ html()->label('Short Name', 'name_short') }}
 							{{ html()->text('name_short', $seatingPlan->name_short)->class('form-control') }}
 							<small>For display on Attendance Lists</small>
@@ -148,7 +148,7 @@
 					</div>
 					<hr>
 					<div class="row">
-						<div class="col-lg-12 col-sm-12 form-group">
+						<div class="col-lg-12 col-sm-12 mb-3">
 								{{ html()->label('Status', 'event_status') }}
 								{{ 
 									html()->select('status', array(
@@ -160,35 +160,35 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-lg-6 col-sm-12 form-group">
+						<div class="col-lg-6 col-sm-12 mb-3">
 							{{ html()->label('Columns', 'columns') }}
 							{{ html()->text('columns', $seatingPlan->columns)->class('form-control') }}
 						</div> 
-						<div class="col-lg-6 col-sm-12 form-group">
+						<div class="col-lg-6 col-sm-12 mb-3">
 							{{ html()->label('Rows', 'rows') }}
 							{{ html()->text('rows', $seatingPlan->rows)->class('form-control') }}
 						</div>
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Seating Plan Image', 'image') }}
 						{{ html()->file('image')->class('form-control') }}
 					</div>
-					<div class="form-group"> 
-						<div class="checkbox"> 
-							<label> 
+					<div class="mb-3"> 
+						<div class="form-check"> 
+							<label class="form-check-label"> 
 								@if ($seatingPlan->locked) 
-									{{ html()->checkbox('locked', true, 1)}} Lock Seating 
+									{{ html()->checkbox('locked', true, 1)->class('form-check-input') }} Lock Seating 
 								@else 
-									{{ html()->checkbox('locked', false, 1)}} Lock Seating 
+									{{ html()->checkbox('locked', false, 1)->class('form-check-input') }} Lock Seating 
 								@endif 
 							</label> 
 						</div> 
 					</div>
-					<button type="submit" class="btn btn-success btn-block">Submit</button>
+					<button type="submit" class="btn btn-success w-100">Submit</button>
 					@if ($seatingPlan->hasMedia())
 						<hr>
 						<h4>Image Preview</h4>
-						<img src="{{ $seatingPlan->getFirstMediaUrl() }}" alt="{{ $seatingPlan->name }} Layout" class="img img-responsive" />
+						<img src="{{ $seatingPlan->getFirstMediaUrl() }}" alt="{{ $seatingPlan->name }} Layout" class="img img-fluid" />
 					@endif
 				</form>
 			</div>
@@ -202,38 +202,38 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 				<h4 class="modal-title" id="editSeatingModalLabel">Edit Seating</h4>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
 				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat'))->open() }}
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Seat Number', 'seat_number_modal') }}
 						{{ html()->text('seat_number_modal')->class('form-control') }}
 					</div>
-					<div class="form-group">
+					<div class="mb-3">
 						{{ html()->label('Participant', 'participant_select_modal') }}
-						{{ html()->select('participant_select_modal', $event->getParticipants())->class('form-control') }}
+						{{ html()->select('participant_select_modal', $event->getParticipants())->class('form-select') }}
 					</div> 
 					{{ html()->hidden('participant_id_modal')->class('form-control') }}
 					{{ html()->hidden('event_id_modal')->class('form-control') }}
 					
 					<a href="" id="participant_link">
-						<button type="button" class="btn btn-default btn-block">Go to Participant</button>
+						<button type="button" class="btn btn-outline-secondary w-100">Go to Participant</button>
 					</a>
 					<br>
-					<button type="submit" class="btn btn-success btn-block">Save Changes</button>
+					<button type="submit" class="btn btn-success w-100">Save Changes</button>
 				</form>
 				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat'))->id('clear_seat_form')->open() }}
 					<hr>
 					@method('DELETE')
 					{{ html()->hidden('seat_number_clear') }}
-					<button type="submit" class="btn btn-danger btn-block">Clear Seat</button>
+					<button type="submit" class="btn btn-danger w-100">Clear Seat</button>
 				</form>
 				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat/disable'))->id('disable_seat_form')->open() }}
 					<hr>
 					{{ html()->hidden('seat_number_disable') }}
-					<button type="submit" class="btn btn-danger btn-block">Enable/Disable Seat</button>
+					<button type="submit" class="btn btn-danger w-100">Enable/Disable Seat</button>
 				</form>
 
 			</div>

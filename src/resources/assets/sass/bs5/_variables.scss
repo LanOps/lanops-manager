@@ -1,0 +1,22 @@
+// LanOps brand colours for the Bootstrap 5 theme, carried over from the
+// Bootstrap 3 user variables (app/modules/_user-variables.scss)
+$lanops-orange: #ffa500;
+$lanops-charcoal: #333;
+$lanops-header-text: #9d9d9d;
+
+// Bootstrap variable overrides (applied before Bootstrap's own defaults)
+$primary: $lanops-orange;
+$body-color: $lanops-charcoal;
+$link-color: $lanops-orange;
+$link-hover-color: darken($lanops-orange, 15%);
+
+// The site has always used white text on orange buttons; Bootstrap's default
+// contrast ratio (4.5) would switch it to black, so lower it to keep the look
+$min-contrast-ratio: 1.9;
+
+// Bootstrap 3 links were not underlined until hovered
+$link-decoration: none;
+$link-hover-decoration: underline;
+
+$enable-shadows: false;
+$enable-gradients: false;
