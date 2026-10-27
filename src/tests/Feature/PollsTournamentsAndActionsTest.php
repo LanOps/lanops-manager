@@ -113,6 +113,23 @@ class PollsTournamentsAndActionsTest extends TestCase
         $this->assertNull(NewsComment::find($comment->id));
     }
 
+    public function testAuthorCanDeleteTheirCommentWhileItAwaitsApproval()
+    {
+        $author = $this->createUser();
+        $article = factory(NewsArticle::class)->create();
+        $comment = NewsComment::create(['comment' => 'Hi', 'news_feed_id' => $article->id, 'user_id' => $author->id]);
+        $base = '/news/' . $article->slug . '/comments/' . $comment->id;
+
+        $this->actingAs($this->createUser())->post($base . '/delete')->assertNotFound();
+        $this->assertNotNull(NewsComment::withoutGlobalScopes()->find($comment->id));
+
+        $this->actingAs($author)
+            ->get('/news/' . $article->slug)
+            ->assertSee("This comment hasn't been reviewed by Admins yet.", false);
+        $this->actingAs($author)->post($base . '/delete')->assertSessionHas('alert-success', 'Comment Deleted!');
+        $this->assertNull(NewsComment::withoutGlobalScopes()->find($comment->id));
+    }
+
     public function testCommentWithQuotesCannotBreakOutOfTheEditLink()
     {
         $author = $this->createUser();
