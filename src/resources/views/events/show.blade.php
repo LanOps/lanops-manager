@@ -43,34 +43,28 @@
 
 {{-- In-page Navigation --}}
 <div class="event-detail-nav-wrap text-center">
-	<nav class="navbar navbar-default navbar-events" style="z-index: 1; margin-bottom: 0;">
+	<nav class="navbar navbar-expand-sm navbar-events">
 		<div class="container-fluid">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-			</div>
-			<div id="navbar" class="navbar-collapse collapse" style="text-align:center;">
-				<ul class="nav navbar-nav" style="display: inline-block; float: none;">
-					<li style="font-size:15px; font-weight:bold;"><a href="#event">Event Information</a></li>
+			<button type="button" class="navbar-toggler mx-auto my-2" data-bs-toggle="collapse" data-bs-target="#navbar" aria-expanded="false" aria-controls="navbar" aria-label="Toggle page navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div id="navbar" class="collapse navbar-collapse justify-content-center">
+				<ul class="navbar-nav">
+					<li class="nav-item"><a class="nav-link" href="#event">Event Information</a></li>
 					@if (!$event->seatingPlans->isEmpty())
-						<li style="font-size:15px; font-weight:bold;"><a href="#seating">Seating</a></li>
+						<li class="nav-item"><a class="nav-link" href="#seating">Seating</a></li>
 					@endif
-					<li style="font-size:15px; font-weight:bold;"><a href="#attendees">Attendees</a></li>
+					<li class="nav-item"><a class="nav-link" href="#attendees">Attendees</a></li>
 					@if (!$event->timetables->isEmpty())
-						<li style="font-size:15px; font-weight:bold;"><a href="#timetable">Timetable</a></li>
+						<li class="nav-item"><a class="nav-link" href="#timetable">Timetable</a></li>
 					@endif
-					<li style="font-size:15px; font-weight:bold;"><a href="#yourTickets">Your Tickets</a></li>
+					<li class="nav-item"><a class="nav-link" href="#yourTickets">Your Tickets</a></li>
 					@if (!$event->polls->isEmpty())
-						<li style="font-size:15px; font-weight:bold;"><a href="#polls">Have Your Say</a></li>
+						<li class="nav-item"><a class="nav-link" href="#polls">Have Your Say</a></li>
 					@endif
-
 				</ul>
-			</div><!--/.nav-collapse -->
-		</div><!--/.container-fluid -->
+			</div>
+		</div>
 	</nav>
 </div>
 
@@ -81,7 +75,7 @@
 		<a name="event"></a>
 		<h2 class="section-heading">Event Information</h2>
 		<div class="row">
-			<div class="col-xs-12 col-sm-5">
+			<div class="col-12 col-sm-5">
 				<dl class="event-detail-meta-list">
 					<dt>Start</dt>
 					<dd>{{ date('H:i, d M Y', strtotime($event->start)) }}</dd>
@@ -89,7 +83,7 @@
 					<dd>{{ date('H:i, d M Y', strtotime($event->end)) }}</dd>
 				</dl>
 			</div>
-			<div class="col-xs-12 col-sm-7">
+			<div class="col-12 col-sm-7">
 				<div class="event-detail-prose">{!! $event->desc_long !!}</div>
 			</div>
 		</div>
@@ -101,7 +95,7 @@
 			<h2 class="section-heading">Purchase Tickets</h2>
 			<div class="row">
 				@foreach ($event->tickets as $ticket)
-					<div class="col-xs-12 col-sm-4">
+					<div class="col-12 col-sm-4">
 						<div class="ticket-card">
 							<h3 class="ticket-card-title">
 								{{$ticket->name}}
@@ -125,12 +119,12 @@
 										|| ($ticket->participants()->count() >= $ticket->quantity && $ticket->quantity != 0)
 										)
 										<div class="row">
-											<div class="form-group col-sm-6 col-xs-12">
+											<div class="mb-3 col-sm-6 col-12">
 												{{ html()->label('Quantity', 'quantity') }}
-												{{ html()->select('quantity', array(1 => 1))->class('form-control')->disabled() }}
+												{{ html()->select('quantity', array(1 => 1))->class('form-select')->disabled() }}
 											</div>
-											<div class="form-group col-sm-6 col-xs-12">
-												<button class="btn btn-md btn-default btn-block"  style="margin-top:25px" disabled >SOLD OUT!</button>
+											<div class="mb-3 col-sm-6 col-12">
+												<button class="btn btn-md btn-outline-secondary w-100"  style="margin-top:25px" disabled >SOLD OUT!</button>
 											</div>
 										</div>
 									@elseif($ticket->sale_start && $ticket->sale_start >= date('Y-m-d H:i:s'))
@@ -146,13 +140,13 @@
 										</h5>
 									@else
 										<div class="row">
-											<div class="form-group col-sm-6 col-xs-12">
+											<div class="mb-3 col-sm-6 col-12">
 												{{ html()->label('Quantity', 'quantity') }}
-												{{ html()->select('quantity', array(1 => 1, 2 => 2))->class('form-control') }}
+												{{ html()->select('quantity', array(1 => 1, 2 => 2))->class('form-select') }}
 											</div>
-											<div class="form-group col-sm-6 col-xs-12">
+											<div class="mb-3 col-sm-6 col-12">
 												{{ html()->hidden('user_id', $user->id)->class('form-control') }}
-												<button class="btn btn-md btn-orange btn-block" style="margin-top:25px" >Buy</button>
+												<button class="btn btn-md btn-orange w-100" style="margin-top:25px" >Buy</button>
 											</div>
 										</div>
 									@endif
@@ -182,10 +176,10 @@
 			<div class="panel-group event-seating" id="accordion" role="tablist" aria-multiselectable="true">
 				@foreach ($event->seatingPlans as $seatingPlan)
 					@if ($seatingPlan->status != 'DRAFT')
-						<div class="panel panel-default">
-							<div class="panel-heading" role="tab" id="headingOne">
-								<h4 class="panel-title">
-									<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse_{{ $seatingPlan->slug }}" aria-expanded="true" aria-controls="collapse_{{ $seatingPlan->slug }}">
+						<div class="card">
+							<div class="card-header" role="tab" id="headingOne">
+								<h4 class="card-title">
+									<a class="collapsed" role="button" data-bs-toggle="collapse" data-bs-parent="#accordion" href="#collapse_{{ $seatingPlan->slug }}" aria-expanded="true" aria-controls="collapse_{{ $seatingPlan->slug }}">
 										{{ $seatingPlan->name }} <small>- {{ $seatingPlan->getCapacity() - $seatingPlan->getSeatedCount() }} / {{ $seatingPlan->getCapacity() }} Seats Remaining</small>
 										@if ($seatingPlan->status != 'PUBLISHED')
 											<small> - {{ $seatingPlan->status }}</small>
@@ -193,17 +187,17 @@
 									</a>
 								</h4>
 							</div>
-							<div id="collapse_{{ $seatingPlan->slug }}" class="panel-collapse collapse @if ($loop->first) in @endif" role="tabpanel" aria-labelledby="collaspe_{{ $seatingPlan->slug }}">
-								<div class="panel-body">
+							<div id="collapse_{{ $seatingPlan->slug }}" class="collapse @if ($loop->first) show @endif" role="tabpanel" aria-labelledby="collaspe_{{ $seatingPlan->slug }}">
+								<div class="card-body">
 									@include ('layouts._partials._seating.plan', ['horizontal' => false])
 									<hr>
 									<div class="row" style="display: flex; align-items: center;">
-										<div class="col-xs-12 col-md-8">
+										<div class="col-12 col-md-8">
 											@if ($seatingPlan->hasMedia())
-												<img class="img-responsive" alt="{{ $seatingPlan->name }}" src="{{$seatingPlan->getFirstMediaUrl()}}"/>
+												<img class="img-fluid" alt="{{ $seatingPlan->name }}" src="{{$seatingPlan->getFirstMediaUrl()}}"/>
 											@endif
 										</div>
-										<div class="col-xs-12 col-md-4">
+										<div class="col-12 col-md-4">
 											<h5>Your Seats</h5>
 											@if ($user && !$user->eventParticipation->isEmpty())
 												@foreach ($user->eventParticipation as $participant)
@@ -214,7 +208,7 @@
 															{{ html()->hidden('participant_id', $participant->id)->class('form-control') }}
 															{{ html()->hidden('seat_number', $participant->seat->seat)->class('form-control') }}
 															<h5>
-																<button class="btn btn-success btn-block">
+																<button class="btn btn-success w-100">
 																{{ $participant->seat->seat }} - Remove
 																</button>
 															</h5>
@@ -276,19 +270,19 @@
 				<div class="row event-info-row">
 					@if ($x % 2 == 0)
 						@if ($section->hasMedia())
-							<div class="col-sm-4 visible-xs">
+							<div class="col-sm-4 d-sm-none">
 								<h4 class="event-detail-subheading">{{$section->title}}</h4>
 								<center>
-									<img class="img-responsive img-rounded" alt="{{ $section->title }}" src="{{ $section->getFirstMediaUrl() }}" />
+									<img class="img-fluid rounded" alt="{{ $section->title }}" src="{{ $section->getFirstMediaUrl() }}" />
 								</center>
 							</div>
 							<div class="col-sm-8">
-								<h4 class="event-detail-subheading hidden-xs">{{$section->title}}</h4>
+								<h4 class="event-detail-subheading d-none d-sm-block">{{$section->title}}</h4>
 								<div class="event-detail-prose">{!! $section->text !!}</div>
 							</div>
-							<div class="col-sm-4 hidden-xs">
+							<div class="col-sm-4 d-none d-sm-block">
 									<center>
-										<img class="img-responsive img-rounded" alt="{{ $section->title }}" src="{{ $section->getFirstMediaUrl() }}" />
+										<img class="img-fluid rounded" alt="{{ $section->title }}" src="{{ $section->getFirstMediaUrl() }}" />
 									</center>
 							</div>
 						@else
@@ -300,13 +294,13 @@
 					@else
 						@if ($section->hasMedia())
 							<div class="col-sm-4">
-								<h4 class="event-detail-subheading visible-xs">{{$section->title}}</h4>
+								<h4 class="event-detail-subheading d-sm-none">{{$section->title}}</h4>
 								<center>
-									<img class="img-responsive img-rounded" alt="{{ $section->title }}" src="{{ $section->getFirstMediaUrl() }}" />
+									<img class="img-fluid rounded" alt="{{ $section->title }}" src="{{ $section->getFirstMediaUrl() }}" />
 								</center>
 							</div>
 							<div class="col-sm-8">
-								<h4 class="event-detail-subheading hidden-xs">{{$section->title}}</h4>
+								<h4 class="event-detail-subheading d-none d-sm-block">{{$section->title}}</h4>
 								<div class="event-detail-prose">{!! $section->text !!}</div>
 							</div>
 						@else
@@ -431,7 +425,7 @@
 					@foreach ($event->eventParticipants as $participant)
 					<tr>
 						<td>
-							<img class="img-responsive img-rounded img-small" style="max-width: 30%;" alt="{{ $participant->user->username}}'s Avatar" src="{{ $participant->user->avatar }}">
+							<img class="img-fluid rounded img-small" style="max-width: 30%;" alt="{{ $participant->user->username}}'s Avatar" src="{{ $participant->user->avatar }}">
 						</td>
 						<td>
 							{{ $participant->user->username }}

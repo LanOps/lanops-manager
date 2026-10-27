@@ -93,7 +93,7 @@
 <div class="featured-events section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h2 class="section-heading">Upcoming Events</h2>
             </div>
         </div>
@@ -108,7 +108,7 @@
                 $lanRemaining = max($lanCapacity - $lanFilled, 0);
                 $lanPct      = $lanCapacity > 0 ? round(($lanFilled / $lanCapacity) * 100) : 0;
             @endphp
-            <div class="col-xs-12 {{ $nextEventTabletop ? 'col-md-6' : '' }}">
+            <div class="col-12 {{ $nextEventTabletop ? 'col-md-6' : '' }}">
                 <div class="event-card">
                     <div class="event-card-header">
                         <span class="event-card-badge">LAN</span>
@@ -143,7 +143,7 @@
                         </div>
                     </div>
                     <div class="event-card-footer">
-                        <a href="/events/{{ $nextEventLan->slug }}" class="btn btn-default btn-sm">Details</a>
+                        <a href="/events/{{ $nextEventLan->slug }}" class="btn btn-outline-secondary btn-sm">Details</a>
                         <a href="/events/{{ $nextEventLan->slug }}#tickets" class="btn btn-orange btn-sm">Book Now</a>
                     </div>
                 </div>
@@ -159,7 +159,7 @@
                 $ttRemaining = max($ttCapacity - $ttFilled, 0);
                 $ttPct       = $ttCapacity > 0 ? round(($ttFilled / $ttCapacity) * 100) : 0;
             @endphp
-            <div class="col-xs-12 {{ $nextEventLan ? 'col-md-6' : '' }}">
+            <div class="col-12 {{ $nextEventLan ? 'col-md-6' : '' }}">
                 <div class="event-card">
                     <div class="event-card-header">
                         <span class="event-card-badge event-card-badge--alt">TABLETOP</span>
@@ -194,7 +194,7 @@
                         </div>
                     </div>
                     <div class="event-card-footer">
-                        <a href="/events/{{ $nextEventTabletop->slug }}" class="btn btn-default btn-sm">Details</a>
+                        <a href="/events/{{ $nextEventTabletop->slug }}" class="btn btn-outline-secondary btn-sm">Details</a>
                         <a href="/events/{{ $nextEventTabletop->slug }}#tickets" class="btn btn-orange btn-sm">Book Now</a>
                     </div>
                 </div>
@@ -228,12 +228,12 @@
 <div class="about-calendar-section section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12 col-md-7">
+            <div class="col-12 col-md-7">
                 <h2 class="section-heading">About {{ config('app.name') }}</h2>
                 @include ('layouts._partials._about.short')
-                <a href="/about" class="btn btn-default" style="margin-top:10px;">Learn More</a>
+                <a href="/about" class="btn btn-outline-secondary" style="margin-top:10px;">Learn More</a>
             </div>
-            <div class="col-xs-12 col-md-5">
+            <div class="col-12 col-md-5">
                 <h2 class="section-heading" style="margin-top:30px;">Event Calendar</h2>
                 @php $futureEvents = $events->filter(fn($e) => $e->start > \Carbon\Carbon::today()); @endphp
                 @if ($futureEvents->count() > 0)
@@ -243,7 +243,7 @@
                                 <a href="/events/{{ $calEvent->slug }}" class="cal-name">
                                     {{ $calEvent->display_name }}
                                     @if ($calEvent->status !== 'PUBLISHED')
-                                        <span class="label label-default" style="font-size:10px;">{{ $calEvent->status }}</span>
+                                        <span class="badge text-bg-secondary" style="font-size:10px;">{{ $calEvent->status }}</span>
                                     @endif
                                 </a>
                                 <span class="cal-date">
@@ -264,14 +264,14 @@
 <div class="news-grid-section section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h2 class="section-heading">Latest News</h2>
             </div>
         </div>
         @if (!$newsArticles->isEmpty())
             <div class="row">
                 @foreach ($newsArticles as $newsArticle)
-                    <div class="col-xs-12 col-sm-6 col-lg-3">
+                    <div class="col-12 col-sm-6 col-lg-3">
                         <div class="news-card">
                             <div class="news-card-body">
                                 <h4 class="news-card-title">
@@ -288,8 +288,8 @@
                 @endforeach
             </div>
             <div class="row">
-                <div class="col-xs-12 text-center" style="margin-top:20px;">
-                    <a href="/news" class="btn btn-default">All News</a>
+                <div class="col-12 text-center" style="margin-top:20px;">
+                    <a href="/news" class="btn btn-outline-secondary">All News</a>
                 </div>
             </div>
         @else

@@ -12,7 +12,7 @@
         </h1> 
     </div>
     <div class="row">
-        <div class="col-xs-12 col-md-8">
+        <div class="col-12 col-md-8">
            We couldn't find the page you was looking for.
         </div>
     </div>  

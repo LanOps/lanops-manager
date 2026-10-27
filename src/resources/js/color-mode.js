@@ -19,6 +19,11 @@ function applyMode(mode) {
 }
 
 export function initColorMode() {
+    // Pages like the big screen pin their own mode
+    if (document.documentElement.dataset.colorMode === 'fixed') {
+        return;
+    }
+
     applyMode(storedMode() || systemMode());
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {

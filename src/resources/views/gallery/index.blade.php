@@ -7,7 +7,7 @@
 <div class="gallery-section section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h1 class="section-heading">Gallery</h1>
             </div>
         </div>
@@ -16,7 +16,7 @@
         @else
             <div class="row">
                 @foreach ($albums as $album)
-                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+                    <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="gallery-card">
                             <a href="/gallery/{{ $album->slug }}" class="gallery-card-img">
                                 <img src="{{ $album->getAlbumCoverImageUrl() }}" alt="{{ $album->name }}">

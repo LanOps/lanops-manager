@@ -1,28 +1,29 @@
-<nav class="navbar navbar-default navbar-inverse navbar-fixed-top custom-header">
+<nav class="navbar navbar-expand-md fixed-top lanops-header custom-header" data-bs-theme="dark">
 	<div class="container">
-		<!-- Brand and toggle get grouped for better mobile display -->
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#topbar-navigation" aria-expanded="false">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" href="/"><img class="img-responsive" style="width:200px; height: auto; margin-top:-46px;" src="{{ config('app.logo') }}" alt="{{ config('app.name') }} logo header"/></a>
-		</div>
+		<a class="navbar-brand" href="/"><img class="img-fluid" style="width:200px; height: auto; margin-top:-46px; margin-bottom:-46px;" src="{{ config('app.logo') }}" alt="{{ config('app.name') }} logo header"/></a>
+		<button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#topbar-navigation" aria-controls="topbar-navigation" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
 
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" id="topbar-navigation">
-			<ul class="nav navbar-nav navbar-right">
+			<ul class="navbar-nav ms-auto">
 				@include ('layouts._partials.events-navigation')
 
-				<li><a href="/gallery">Gallery</a></li>
+				<li class="nav-item"><a class="nav-link" href="/gallery">Gallery</a></li>
 				@if (Auth::check())
 					@include ('layouts._partials.user-navigation')
 				@else
-					<li><a href="/login">Login</a></li>
+					<li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
 				@endif
+				<li class="nav-item">
+					<button type="button" class="btn btn-link nav-link color-mode-toggle" data-color-mode-toggle title="Switch light/dark mode" aria-label="Switch light/dark mode">
+						<svg class="color-mode-icon-light" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/></svg>
+						<svg class="color-mode-icon-dark" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>
+						<span class="d-md-none ms-1">Light/dark mode</span>
+					</button>
+				</li>
 			</ul>
 		</div><!-- /.navbar-collapse -->
-	</div><!-- /.container-fluid -->
+	</div>
 </nav>

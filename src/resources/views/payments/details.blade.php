@@ -11,16 +11,16 @@
 		</h1> 
 	</div>
 	<div class="row">
-		<div class="col-xs-12 col-md-8">
+		<div class="col-12 col-md-8">
 			@if ($paymentGateway == 'stripe')
 				
 				{{ html()->form('POST', url('/payment/post'))->id('payment-form')->open() }}
 					<div class="row">
-						<div class="form-group col-sm-6 col-xs-12">
+						<div class="mb-3 col-sm-6 col-12">
 							{{ html()->label('First Name *', 'card_first_name') }}
 							{{ html()->text('card_first_name', '')->class('form-control') }}
 						</div> 
-						<div class="form-group col-sm-6 col-xs-12">
+						<div class="mb-3 col-sm-6 col-12">
 							{{ html()->label('Last Name *', 'card_last_name') }}
 							{{ html()->text('card_last_name', '')->class('form-control') }}
 						</div>
@@ -30,25 +30,25 @@
 			  		<div id="card-errors" role="alert"></div>
 					<p><small>* Required Fields</small></p>
 					{{ html()->hidden('gateway', $paymentGateway) }}
-					<button type="button" id="checkout_btn" class="btn btn-primary btn-block">Confirm Order</button>
+					<button type="button" id="checkout_btn" class="btn btn-primary w-100">Confirm Order</button>
 				</form>
 			@endif
 		</div>
-		<div class="col-xs-12 col-md-4">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">Order Details</h3>
+		<div class="col-12 col-md-4">
+			<div class="card">
+				<div class="card-header">
+					<h3 class="card-title">Order Details</h3>
 				</div>
-				<div class="panel-body">
+				<div class="card-body">
 					@include ('layouts._partials._checkout.basket')
 				</div>
 			</div>
 			@if ($delivery && $deliveryDetails)
-				<div class="panel panel-default">
-					<div class="panel-heading">
-						<h3 class="panel-title">Delivery Details</h3>
+				<div class="card">
+					<div class="card-header">
+						<h3 class="card-title">Delivery Details</h3>
 					</div>
-					<div class="panel-body">
+					<div class="card-body">
 						@if ($deliveryDetails && $deliveryDetails['type'] == 'shipping')
 							<address>
 								<strong>{{ $delivery['shipping_first_name']}} {{ $delivery['shipping_last_name'] }}</strong><br>

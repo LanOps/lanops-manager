@@ -24,8 +24,8 @@
                                             '{{ $seatingPlan->slug }}',
                                             '{{ $seat->seat }}'
                                         )"
-                                        data-toggle="modal"
-                                        data-target="#pickSeatModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#pickSeatModal"
                                     @endif
                                     >
                                     {{ $seat->seat }} - @if ($seat->eventParticipant) {{ $seat->eventParticipant->user->username }} @elseif ($seat->disabled) Disabled @else Empty @endif
@@ -52,8 +52,8 @@
                                             '{{ $seatingPlan->slug }}',
                                             '{{ $seat->seat }}'
                                         )"
-                                        data-toggle="modal"
-                                        data-target="#pickSeatModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#pickSeatModal"
                                     @endif
                                     >
                                     {{ $seat->seat }} - @if ($seat->eventParticipant) {{ $seat->eventParticipant->user->username }} @elseif ($seat->disabled) Disabled @else Empty @endif
@@ -77,15 +77,15 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="pickSeatModalLabel"></h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 @if (Auth::user())
                     {{ html()->form('POST', url('/events/' . $event->slug . '/seating/'))->id('pickSeatFormModal')->open() }}
                         <div class="modal-body">
-                            <div class="form-group">
+                            <div class="mb-3">
                                 <h4>Which ticket would you like to seat?</h4>
-                                {{ html()->select('participant_id', $user->getTickets($event->id))->id('format')->class('form-control') }}
+                                {{ html()->select('participant_id', $user->getTickets($event->id))->id('format')->class('form-select') }}
                                 <p>Are you sure you want this seat?</p>
                                 <p>You can remove it at anytime.</p>
                             </div>
@@ -94,7 +94,7 @@
                         {{ html()->hidden('seat')->id('seat_modal')->class('form-control') }}
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-success">Yes</button>
-                            <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
                         </div>
                     </form>
                 @endif

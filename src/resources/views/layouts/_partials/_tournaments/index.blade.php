@@ -1,5 +1,5 @@
-<div class="panel panel-default">
-    <div class="panel-heading">
+<div class="card">
+    <div class="card-header">
         <strong>{{ $tournament->name }}</strong>
         @if ($tournament->hasEvent())
             <strong> - {{ $tournament->event->display_name }}</strong>
@@ -9,9 +9,9 @@
         @endif
         <small> - {{ $tournament->status }}</small>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         @if ($tournament->hasEvent() && !$tournament->event->getEventParticipant())
-            <p class="bg-info padding">Event ticket required for this Tournament</p>
+            <p class="bg-info-subtle text-info-emphasis padding">Event ticket required for this Tournament</p>
         @endif
         @if (
             ($tournament->hasEvent() && $tournament->event->getEventParticipant()) ||
@@ -19,25 +19,25 @@
             )
             @if (Auth::user() && !$tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen() && !$tournament->hasTeams())
                 {{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/register'))->open() }}
-                    <button type="submit" class="btn btn-success btn-sm btn-block">Signup</button>
+                    <button type="submit" class="btn btn-success btn-sm w-100">Signup</button>
                 </form>
             @elseif (Auth::user() && !$tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen() && $tournament->hasTeams())
                 {{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/registerTeam'))->open() }}
                     <div class="row">
-                        <div class="col-xs-12 col-md-6 form-group @error('team_name') has-error @enderror">
+                        <div class="col-12 col-md-6 mb-3 @error('team_name') @enderror">
                             {{ html()->label('Team Name', 'team_name') }}
                             <input id="team_name" type="team_name" class="form-control" name="team_name" required>
                         </div>
-                        <div class="col-xs-12 col-md-6 form-group @error('team_password') has-error @enderror">
+                        <div class="col-12 col-md-6 mb-3 @error('team_password') @enderror">
                             {{ html()->label('Team Password', 'team_password') }}
                             <input id="team_password" type="team_password" class="form-control" name="team_password">
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-success btn-sm btn-block">Register Team</button>
+                    <button type="submit" class="btn btn-success btn-sm w-100">Register Team</button>
                 </form>
             @elseif (Auth::user() && $tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen())
                 {{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/unregister'))->open() }}
-                    <button type="submit" class="btn btn-danger btn-sm btn-block">Remove Signup</button>
+                    <button type="submit" class="btn btn-danger btn-sm w-100">Remove Signup</button>
                 </form>
             @endif
         @endif
@@ -65,7 +65,7 @@
                                         (($tournament->hasEvent() && $tournament->event->getEventParticipant()) || !$tournament->hasEvent()))
                                         {{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/register'))->open() }}
 					                        {{ html()->hidden('tournament_team_id', $team->id) }}
-                                            <button type="submit" class="btn btn-success btn-sm btn-block">Join Team</button>
+                                            <button type="submit" class="btn btn-success btn-sm w-100">Join Team</button>
                                         </form>
                                     @endif
                                 </td>

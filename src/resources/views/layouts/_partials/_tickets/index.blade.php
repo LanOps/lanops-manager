@@ -1,5 +1,5 @@
-<div class="panel panel-success">
-	<div class="panel-heading">
+<div class="card border-success">
+	<div class="card-header bg-success-subtle text-success-emphasis">
 		@if ($participant->ticket)
 			<strong>{{ $participant->ticket->name }}</strong>
 		@else
@@ -10,19 +10,19 @@
 			@endif
 		@endif
 		@if ($participant->gift == 1 && $participant->gift_accepted != 1)
-			<span class="label label-info label-block pull-right" style="margin-left: 3px; margin-top:2px;">This Ticket has been gifted!</span>
+			<span class="badge text-bg-info label-block float-end" style="margin-left: 3px; margin-top:2px;">This Ticket has been gifted!</span>
 		@endif
 		@if ($participant->ticket && !$participant->ticket->seatable)
-			<span class="label label-info label-block pull-right" style="margin-top:2px;">This Ticket is not eligable for a seat</span>
+			<span class="badge text-bg-info label-block float-end" style="margin-top:2px;">This Ticket is not eligable for a seat</span>
 		@endif
 		@if (\Carbon\Carbon::parse($participant->event->end)->isPast())
-			<span class="label label-info label-block pull-right" style="margin-top:2px;">PREVIOUS EVENT</span>
+			<span class="badge text-bg-info label-block float-end" style="margin-top:2px;">PREVIOUS EVENT</span>
 		@endif
 	</div>
-	<div class="panel-body">
+	<div class="card-body">
 		<div class="row" style="display: flex; align-items: center;">
 			@if (\Carbon\Carbon::parse($participant->event->end)->isPast())
-				<div class="col-md-12 col-sm-12 col-xs-12">
+				<div class="col-md-12 col-sm-12 col-12">
 					<div class="alert alert-success">
 						<strong>
 							Ticket already claimed at previous event!
@@ -30,14 +30,14 @@
 					</div>
 				</div>
 			@else
-				<div class="col-md-8 col-sm-8 col-xs-12">
+				<div class="col-md-8 col-sm-8 col-12">
 					<div class="alert alert-success">
 						<strong>
 							{{ $participant->event->display_name }} @if ($participant->ticket && $participant->ticket->seatable) - Seat: @if ($participant->seat) {{$participant->seat->seat}} <small>in {{$participant->seat->seatingPlan->name}}</small> @else Not Seated @endif @endif
 						</strong>
 					</div>
 					@if ($participant->gift != 1 && $participant->gift_accepted != 1)
-						<button class="btn btn-md btn-success btn-block" onclick="giftTicket('{{ $participant->id }}')" data-toggle="modal" data-target="#giftTicketModal">
+						<button class="btn btn-md btn-success w-100" onclick="giftTicket('{{ $participant->id }}')" data-bs-toggle="modal" data-bs-target="#giftTicketModal">
 							Gift Ticket
 						</button>
 					@endif
@@ -49,7 +49,7 @@
 							</strong>
 						</p>
 						{{ html()->form('POST', url('/gift/' . $participant->id . '/revoke'))->id('revokeGiftTicketForm')->open() }}
-							<button type="submit" class="btn btn-primary btn-md btn-block">Revoke Gift</button>
+							<button type="submit" class="btn btn-primary btn-md w-100">Revoke Gift</button>
 						</form>
 					@endif
 					@if ($participant->seat)
@@ -60,15 +60,15 @@
 							{{ html()->hidden('participant_id', $participant->id)->class('form-control') }} 
 							{{ html()->hidden('seat_number', $participant->seat->seat)->class('form-control') }} 
 							<h5>
-								<button class="btn btn-danger btn-block"> 
+								<button class="btn btn-danger w-100"> 
 									Remove Seating
 								</button>
 							</h5>
 						</form>
 					@endif
 				</div>
-				<div class="col-md-offset-2 col-md-2 col-sm-offset-2 col-sm-4 col-xs-12">
-					<img class="img img-responsive" src="{{ $participant->getFirstMediaUrl('qr') }}"/>
+				<div class="offset-md-2 col-md-2 offset-sm-2 col-sm-4 col-12">
+					<img class="img img-fluid" src="{{ $participant->getFirstMediaUrl('qr') }}"/>
 				</div>
 			@endif
 		</div>

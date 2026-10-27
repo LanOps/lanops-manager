@@ -23,6 +23,16 @@
 	color: var(--lanops-header-color);
 }
 
+// Bootstrap 3 panel titles were small; keep card titles in headers the same
+.card-header .card-title {
+	font-size: 1rem;
+	margin: 0;
+
+	> a {
+		color: inherit;
+	}
+}
+
 // Colour mode toggle (see resources/js/color-mode.js): show the icon for the current mode
 .color-mode-icon-dark,
 [data-bs-theme='dark'] .color-mode-icon-light {

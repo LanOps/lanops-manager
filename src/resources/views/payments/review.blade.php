@@ -11,7 +11,7 @@
 		</h1> 
 	</div>
 	<div class="row">
-		<div class="col-xs-12 col-md-8">
+		<div class="col-12 col-md-8">
 			@include ('layouts._partials._terms.purchase')
 			<hr>
 			@if (!$nextEventFlag)
@@ -24,15 +24,15 @@
 			</div>
 			{{ html()->form('POST', url('/payment/post'))->open() }}
 				{{ html()->hidden('gateway', $paymentGateway) }}
-				<button class="btn btn-primary btn-block">Continue</button>
+				<button class="btn btn-primary w-100">Continue</button>
 			</form>
 		</div>
-		<div class="col-xs-12 col-md-4">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">Order Details</h3>
+		<div class="col-12 col-md-4">
+			<div class="card">
+				<div class="card-header">
+					<h3 class="card-title">Order Details</h3>
 				</div>
-				<div class="panel-body">
+				<div class="card-body">
 					@include ('layouts._partials._checkout.basket')
 				</div>
 			</div>
