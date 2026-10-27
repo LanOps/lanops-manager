@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\NewsArticle;
 use App\Models\NewsTag;
+use App\Models\Tournament;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -74,6 +75,29 @@ class SmokeTest extends TestCase
         $this->get('/news/tags/' . $tag->fresh()->slug)
             ->assertOk()
             ->assertSee($article->title);
+    }
+
+    public function testTournamentPageRenders()
+    {
+        $tournament = new Tournament();
+        $tournament->name = 'CS2 5v5';
+        $tournament->team_size = 5;
+        $tournament->save();
+        $tournament->status = Tournament::$statusOpen;
+        $tournament->save();
+
+        $this->get('/tournaments/' . $tournament->fresh()->slug)
+            ->assertOk()
+            ->assertSee('CS2 5v5');
+    }
+
+    public function testDraftTournamentPageIsNotFound()
+    {
+        $tournament = new Tournament();
+        $tournament->name = 'Secret Cup';
+        $tournament->save();
+
+        $this->get('/tournaments/' . $tournament->fresh()->slug)->assertNotFound();
     }
 
     public function testRobotsTxtBlocksCrawlersOutsideProduction()

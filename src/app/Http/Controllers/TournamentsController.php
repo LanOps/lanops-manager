@@ -26,6 +26,17 @@ class TournamentsController extends Controller
     }
     
     /**
+     * Show Tournament
+     * @param  Tournament $tournament
+     * @return View
+     */
+    public function show(Tournament $tournament)
+    {
+        return view('tournaments.show')
+            ->withTournament($tournament);
+    }
+
+    /**
      * Register to Tournament
      * @param  Tournament       $tournament
      * @param  Request          $request
