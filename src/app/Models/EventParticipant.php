@@ -167,13 +167,25 @@ class EventParticipant extends Model implements HasMedia
     }
 
     /**
+     * Get the ticket retrieve URL encoded in the QR Code
+     * @return string
+     */
+    public function getTicketUrl()
+    {
+        $baseUrl = rtrim(config('app.url'), '/');
+        if (!preg_match('#^https?://#i', $baseUrl)) {
+            $baseUrl = 'https://' . $baseUrl;
+        }
+        return $baseUrl . '/tickets/retrieve/' . $this->id;
+    }
+
+    /**
      * Generate QR Code
      * @return boolean
      */
     public function generateQRCode()
     {
-        $ticketUrl = 'https://' . config('app.url') . '/tickets/retrieve/' . $this->id;
-        $qr = (string) QrCode::format('png')->size(300)->generate($ticketUrl);
+        $qr = (string) QrCode::format('png')->size(300)->generate($this->getTicketUrl());
         if ($this->hasMedia()) {
             $this->clearMediaCollection();
         }
