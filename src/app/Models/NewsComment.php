@@ -38,8 +38,12 @@ class NewsComment extends Model
             $admin = true;
         }
         if (!$admin) {
+            // Authors still see their own comments while they wait for approval,
+            // so they can edit or delete them
             static::addGlobalScope('approved', function (Builder $builder) {
-                $builder->where('approved', '!=', false);
+                $builder->where(function (Builder $query) {
+                    $query->where('approved', '!=', false)->orWhere('user_id', Auth::id());
+                });
             });
         }
     }
