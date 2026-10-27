@@ -19,11 +19,16 @@
 					<h5>Please be aware you are not purchasing tickets for our next event but instead a future event after that.</h5>
 				</div>
 			@endif
-			<div class="alert alert-warning">
-				<h5>By Clicking on Continue you are agreeing to the Terms and Conditions as set by {!! config('app.name') !!}</h5>
-			</div>
 			{{ html()->form('POST', url('/payment/post'))->open() }}
 				{{ html()->hidden('gateway', $paymentGateway) }}
+				<div class="alert alert-warning">
+					<div class="form-check mb-0">
+						{{ html()->checkbox('accept_terms', false, '1')->class('form-check-input')->required() }}
+						<label class="form-check-label fw-bold" for="accept_terms">
+							I have read and agree to the Terms and Conditions as set by {{ config('app.name') }}
+						</label>
+					</div>
+				</div>
 				<button class="btn btn-primary w-100">Continue</button>
 			</form>
 		</div>
