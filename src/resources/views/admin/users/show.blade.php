@@ -29,7 +29,7 @@
 				@endif
 				<div class="d-flex">
   					<div class="flex-shrink-0 me-3">
-						<img class="" src="{{ $userShow->avatar }}">
+						<x-avatar :user="$userShow" />
 			  		</div>
   					<div class="flex-grow-1">
 						<ul class="list-group">

@@ -236,6 +236,19 @@ class User extends Authenticatable implements MustVerifyEmail
         return $nextEvents;
     }
 
+    /**
+     * Get the avatar URL, or the default avatar when the user has none.
+     *
+     * @return string
+     */
+    public function getAvatarUrl()
+    {
+        if (trim((string) $this->avatar) === '') {
+            return asset('images/default-avatar.svg');
+        }
+        return $this->avatar;
+    }
+
     public function getFormattedDiscordAvatar()
     {
         if (substr($this->discord_avatar, 0, 2) == "a_") {
