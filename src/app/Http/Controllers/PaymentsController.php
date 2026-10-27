@@ -47,6 +47,8 @@ class PaymentsController extends Controller
         if (!$paymentGateway = $this->checkParams($paymentGateway, $basket = Session::get(config('app.basket_name')))) {
             return Redirect::back();
         }
+        // The terms have to be ticked again each time the review page is shown
+        Session::forget('payment_terms_accepted');
         $nextEventFlag = true;
         if (array_key_exists('tickets', $basket)) {
             foreach ($basket['tickets'] as $ticketId => $quantity) {
@@ -106,6 +108,14 @@ class PaymentsController extends Controller
     {
         if (!$paymentGateway = $this->checkParams($request->gateway, $basket = Session::get(config('app.basket_name')))) {
             return Redirect::back();
+        }
+        // The terms tick box on the review page must be ticked before any payment
+        if ($request->boolean('accept_terms')) {
+            Session::put('payment_terms_accepted', true);
+        }
+        if (!Session::get('payment_terms_accepted')) {
+            Session::flash('alert-danger', 'Please tick the box to agree to the Terms and Conditions');
+            return Redirect::to('/payment/review/' . $paymentGateway);
         }
         if (array_key_exists('tickets', $basket)) {
             foreach ($basket['tickets'] as $ticketId => $quantity) {
@@ -343,6 +353,7 @@ class PaymentsController extends Controller
         $basket = Helpers::formatBasket($basket, null, $purchase->referral_discount_total, true);
         Session::forget('params');
         Session::forget(config('app.basket_name'));
+        Session::forget('payment_terms_accepted');
         return view('payments.successful')
             ->withType($type)
             ->withBasket($basket)
@@ -359,6 +370,7 @@ class PaymentsController extends Controller
     {
         Session::forget('params');
         Session::forget(config('app.basket_name'));
+        Session::forget('payment_terms_accepted');
         return view('payments.failed');
     }
 
@@ -371,6 +383,7 @@ class PaymentsController extends Controller
     {
         Session::forget('params');
         Session::forget(config('app.basket_name'));
+        Session::forget('payment_terms_accepted');
         return view('payments.cancelled');
     }
 

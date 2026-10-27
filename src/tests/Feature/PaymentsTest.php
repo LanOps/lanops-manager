@@ -86,6 +86,14 @@ class PaymentsTest extends TestCase
         ];
     }
 
+    /**
+     * Session state after the buyer ticks the terms box on the review page.
+     */
+    protected function termsAccepted(): array
+    {
+        return ['payment_terms_accepted' => true];
+    }
+
     public function testCheckoutPagesRenderWithABasket()
     {
         $user = $this->createUser();
@@ -127,7 +135,7 @@ class PaymentsTest extends TestCase
         $this->fakeGateway($gateway);
 
         $response = $this->actingAs($user)
-            ->withSession($this->basketFor($ticket, 2))
+            ->withSession($this->basketFor($ticket, 2) + $this->termsAccepted())
             ->post('/payment/post', $this->cardDetails());
 
         $purchase = Purchase::first();
@@ -167,7 +175,7 @@ class PaymentsTest extends TestCase
         $this->fakeGateway($gateway);
 
         $this->actingAs($user)
-            ->withSession($this->basketFor($ticket))
+            ->withSession($this->basketFor($ticket) + $this->termsAccepted())
             ->post('/payment/post', $this->cardDetails())
             ->assertRedirect('/payment/failed');
 
@@ -185,7 +193,7 @@ class PaymentsTest extends TestCase
         $this->fakeGateway($gateway);
 
         $this->actingAs($user)
-            ->withSession($this->basketFor($ticket))
+            ->withSession($this->basketFor($ticket) + $this->termsAccepted())
             ->from('/payment/details/stripe')
             ->post('/payment/post', $this->cardDetails())
             ->assertRedirect('/payment/details/stripe')
@@ -238,13 +246,67 @@ class PaymentsTest extends TestCase
         $this->fakeGateway($gateway);
 
         $this->actingAs($user)
-            ->withSession($this->basketFor($ticket))
+            ->withSession($this->basketFor($ticket) + $this->termsAccepted())
             ->from('/payment/details/stripe')
             ->post('/payment/post', $this->cardDetails())
             ->assertRedirect('/payment/details/stripe')
             ->assertSessionHas('alert-danger', $ticket->event->display_name . ' has sold out!');
 
         $this->assertSame(0, Purchase::count());
+    }
+
+    public function testReviewPageNeedsTheTermsBoxTicked()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket();
+
+        $this->actingAs($user)
+            ->withSession($this->basketFor($ticket))
+            ->get('/payment/review/stripe')
+            ->assertOk()
+            ->assertSee('name="accept_terms"', false);
+
+        $this->actingAs($user)
+            ->withSession($this->basketFor($ticket))
+            ->post('/payment/post', ['gateway' => 'stripe'])
+            ->assertRedirect('/payment/review/stripe')
+            ->assertSessionHas('alert-danger')
+            ->assertSessionMissing('payment_terms_accepted');
+
+        $this->actingAs($user)
+            ->withSession($this->basketFor($ticket))
+            ->post('/payment/post', ['gateway' => 'stripe', 'accept_terms' => '1'])
+            ->assertRedirect('/payment/details/stripe')
+            ->assertSessionHas('payment_terms_accepted', true);
+    }
+
+    public function testCardPaymentWithoutAcceptedTermsIsNotCharged()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket();
+
+        $gateway = $this->stripeGateway();
+        $gateway->shouldNotReceive('purchase');
+        $this->fakeGateway($gateway);
+
+        $this->actingAs($user)
+            ->withSession($this->basketFor($ticket))
+            ->post('/payment/post', $this->cardDetails())
+            ->assertRedirect('/payment/review/stripe');
+
+        $this->assertSame(0, Purchase::count());
+    }
+
+    public function testShowingTheReviewPageClearsAcceptedTerms()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket();
+
+        $this->actingAs($user)
+            ->withSession($this->basketFor($ticket) + $this->termsAccepted())
+            ->get('/payment/review/stripe')
+            ->assertOk()
+            ->assertSessionMissing('payment_terms_accepted');
     }
 
     public function testCheckoutNeedsAVerifiedLogin()
