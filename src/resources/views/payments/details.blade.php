@@ -100,19 +100,31 @@
 		// Stripe draws the card fields in iframes, so copy the text colours from a normal
 		// Bootstrap input to make them match, in light and dark mode
 		const styleSource = document.getElementById('card_first_name');
+		// Stripe rejects some colour formats (such as rgb() with percentages, which the
+		// Bootstrap variables use), so let the browser turn them into plain rgb()
+		function resolveColor(value, fallback) {
+			const probe = document.createElement('span');
+			probe.style.display = 'none';
+			probe.style.color = fallback;
+			probe.style.color = value;
+			document.body.appendChild(probe);
+			const color = window.getComputedStyle(probe).color;
+			probe.remove();
+			return color;
+		}
 		function cardStyle() {
 			const computed = window.getComputedStyle(styleSource);
-			const placeholder = window.getComputedStyle(document.documentElement).getPropertyValue('--bs-secondary-color').trim();
+			const root = window.getComputedStyle(document.documentElement);
 			return {
 				base: {
-					color: computed.color,
+					color: resolveColor(computed.color, '#212529'),
 					fontFamily: computed.fontFamily,
 					fontSize: computed.fontSize,
 					lineHeight: computed.lineHeight,
-					'::placeholder': { color: placeholder || '#6c757d' },
+					'::placeholder': { color: resolveColor(root.getPropertyValue('--bs-secondary-color').trim(), '#6c757d') },
 				},
 				invalid: {
-					color: window.getComputedStyle(document.documentElement).getPropertyValue('--bs-form-invalid-color').trim() || '#dc3545',
+					color: resolveColor(root.getPropertyValue('--bs-form-invalid-color').trim(), '#dc3545'),
 				},
 			};
 		}
