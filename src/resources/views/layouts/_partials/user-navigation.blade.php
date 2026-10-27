@@ -1,11 +1,11 @@
-<li class="dropdown">
-	<a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ $user->username }}<span class="caret"></span></a>
-	<ul class="dropdown-menu">
+<li class="nav-item dropdown">
+	<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">{{ $user->username }}</a>
+	<ul class="dropdown-menu dropdown-menu-end">
 		@if ( $user->admin == 1 )
-			<li><a href="/admin">Admin</a></li>
+			<li><a class="dropdown-item" href="/admin">Admin</a></li>
 		@endif
-		<li><a href="/account">Profile</a></li>
-		<li role="separator" class="divider"></li>
-		<li><a href="/logout">Logout</a></li>
+		<li><a class="dropdown-item" href="/account">Profile</a></li>
+		<li><hr class="dropdown-divider"></li>
+		<li><a class="dropdown-item" href="/logout">Logout</a></li>
 	</ul>
 </li>

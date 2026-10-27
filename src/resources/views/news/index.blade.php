@@ -7,14 +7,14 @@
 <div class="news-grid-section section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h1 class="section-heading">News</h1>
             </div>
         </div>
         @if (!$newsArticles->isEmpty())
             <div class="row">
                 @foreach ($newsArticles as $newsArticle)
-                    <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="col-12 col-sm-6 col-md-4">
                         <div class="news-card">
                             <div class="news-card-body">
                                 <h4 class="news-card-title">
@@ -38,7 +38,7 @@
                 @endforeach
             </div>
             <div class="row">
-                <div class="col-xs-12">
+                <div class="col-12">
                     {{ $newsArticles->links() }}
                 </div>
             </div>

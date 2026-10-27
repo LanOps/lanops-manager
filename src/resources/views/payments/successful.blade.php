@@ -11,7 +11,7 @@
 		</h1> 
 	</div>
 	<div class="row">
-		<div class="col-xs-12 col-md-8">
+		<div class="col-12 col-md-8">
 			<h3>Your Tickets are now active</h3>
 			<h4>You may now go to the <a href="/events/{{ $purchase->participants[0]->event->slug }}/#seating">Events Page and Book a Seat!</a></h4>
 			<p><strong>Purchase ID:</strong> {{ $purchase->id }}</p>
@@ -25,9 +25,9 @@
 			<hr>
 			<div class="row">
 				@foreach ($purchase->participants as $participant)
-					<div class="col-lg-4 col-sm-6 col-xs-12 text-center">
-						<div class="panel panel-default">
-							<div class="panel-body">
+					<div class="col-lg-4 col-sm-6 col-12 text-center">
+						<div class="card">
+							<div class="card-body">
 								<h5>{{ $participant->event->display_name }}</h5>
 								<h5>{{ $participant->ticket->name }}</h5>
 								<p>QR Codes Generating</p>
@@ -37,12 +37,12 @@
 				@endforeach
 			</div>
 		</div>
-		<div class="col-xs-12 col-md-4">
-			<div class="panel panel-default">
-				<div class="panel-heading">
-					<h3 class="panel-title">Order Details</h3>
+		<div class="col-12 col-md-4">
+			<div class="card">
+				<div class="card-header">
+					<h3 class="card-title">Order Details</h3>
 				</div>
-				<div class="panel-body">
+				<div class="card-body">
 					<div class="table-responsive">
 						@include ('layouts._partials._checkout.basket')
 					</div>

@@ -3,7 +3,7 @@
  */
 .background-color
 {
-	background-color: $color_body_background;
+	background-color: var(--bs-body-bg);
 }
 
 // .custom-header
@@ -53,7 +53,7 @@
 }
 
 .border-between > [class*='col-']:before {
-	background: #e3e3e3;
+	background: var(--bs-border-color);
 	bottom: 0;
 	content: " ";
 	left: 0;

@@ -11,7 +11,7 @@
 		</h1> 
 	</div>  
 	<div class="row">
-		<div class="col-xs-12">
+		<div class="col-12">
 			<p>The payment has been Cancelled!</p>
 			<p>You have not being charged.</p>
 		</div>

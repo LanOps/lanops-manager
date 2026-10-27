@@ -24,6 +24,7 @@ export default defineConfig({
             'resources/assets/sass/app.scss',
             'resources/assets/sass/admin.scss',
             'resources/js/admin.js',
+            'resources/js/app.js',
         ]),
         // react(),
         // vue({

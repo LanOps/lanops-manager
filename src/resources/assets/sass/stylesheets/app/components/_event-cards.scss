@@ -3,12 +3,12 @@
  */
 
 .featured-events {
-    background: #f5f5f5;
+    background: var(--lanops-surface-alt);
 }
 
 .event-card {
-    background: #fff;
-    border: 1px solid #e2e2e2;
+    background: var(--lanops-surface);
+    border: 1px solid var(--bs-border-color);
     border-top: 4px solid $color_primary;
     margin-bottom: 24px;
     display: flex;
@@ -46,7 +46,7 @@
     margin: 0;
     font-size: 22px;
     font-weight: $font-bold;
-    color: $color_body_text;
+    color: var(--bs-body-color);
     line-height: 1.2;
 }
 
@@ -66,24 +66,24 @@
         font-weight: $font-bold;
         text-transform: uppercase;
         letter-spacing: 1px;
-        color: #999;
+        color: var(--lanops-muted);
         line-height: 1.8;
     }
 
     dd {
         margin-left: 60px;
         font-size: 14px;
-        color: $color_body_text;
+        color: var(--bs-body-color);
         line-height: 1.8;
     }
 }
 
 .event-card-desc {
     font-size: 14px;
-    color: #666;
+    color: var(--lanops-muted-strong);
     line-height: 1.6;
     margin-bottom: 16px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--bs-border-color);
     padding-top: 14px;
 }
 
@@ -93,7 +93,7 @@
 
 .capacity-bar {
     height: 4px;
-    background: #e8e8e8;
+    background: var(--bs-secondary-bg);
     border-radius: 2px;
     overflow: hidden;
     margin-bottom: 6px;
@@ -107,12 +107,12 @@
 
 .capacity-text {
     font-size: 12px;
-    color: #999;
+    color: var(--lanops-muted);
 }
 
 .event-card-footer {
     padding: 14px 24px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--bs-border-color);
     display: flex;
     gap: 8px;
     justify-content: flex-end;
@@ -123,7 +123,7 @@
  */
 
 .about-calendar-section {
-    background: #fff;
+    background: var(--lanops-surface);
 
     @media (min-width: 992px) {
         .col-md-5 {
@@ -140,7 +140,7 @@
 
 .cal-item {
     padding: 11px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--bs-border-color);
     display: flex;
     justify-content: space-between;
     align-items: baseline;
@@ -154,7 +154,7 @@
 .cal-name {
     font-size: 14px;
     font-weight: $font-bold;
-    color: $color_body_text;
+    color: var(--bs-body-color);
     flex: 1;
 
     &:hover {
@@ -165,7 +165,7 @@
 
 .cal-date {
     font-size: 12px;
-    color: #999;
+    color: var(--lanops-muted);
     white-space: nowrap;
     flex-shrink: 0;
 }

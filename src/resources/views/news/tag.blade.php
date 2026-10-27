@@ -7,7 +7,7 @@
 <div class="news-grid-section section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h1 class="section-heading">Tagged: {{ $tag }}</h1>
                 <p style="margin-top: -20px; margin-bottom: 30px;">
                     <a href="{{ url('/news') }}" class="news-card-more">&larr; All News</a>
@@ -17,7 +17,7 @@
         @if (!$newsArticles->isEmpty())
             <div class="row">
                 @foreach ($newsArticles as $newsArticle)
-                    <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="col-12 col-sm-6 col-md-4">
                         <div class="news-card">
                             <div class="news-card-body">
                                 <h4 class="news-card-title">

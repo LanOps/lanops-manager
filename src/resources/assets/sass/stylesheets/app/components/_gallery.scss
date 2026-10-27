@@ -3,12 +3,12 @@
  */
 
 .gallery-section {
-    background: #f5f5f5;
+    background: var(--lanops-surface-alt);
 }
 
 .gallery-card {
-    background: #fff;
-    border: 1px solid #e2e2e2;
+    background: var(--lanops-surface);
+    border: 1px solid var(--bs-border-color);
     border-top: 4px solid $color_primary;
     margin-bottom: 24px;
     display: flex;
@@ -47,7 +47,7 @@
 .gallery-card-title {
     font-size: 15px;
     font-weight: $font-bold;
-    color: $color_body_text;
+    color: var(--bs-body-color);
     margin: 0 0 6px;
 }
 
@@ -62,14 +62,14 @@
 
 .gallery-card-desc {
     font-size: 13px;
-    color: #666;
+    color: var(--lanops-muted-strong);
     line-height: 1.5;
     margin: 0;
 }
 
 .gallery-card-foot {
     padding: 12px 20px;
-    border-top: 1px solid #f0f0f0;
+    border-top: 1px solid var(--bs-border-color);
     display: flex;
     justify-content: flex-end;
 }
@@ -113,7 +113,7 @@
 }
 
 .gallery-album-section {
-    background: $color_body_background;
+    background: var(--bs-body-bg);
     padding: 40px 0 60px;
 }
 

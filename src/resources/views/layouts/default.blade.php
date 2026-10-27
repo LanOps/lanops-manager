@@ -16,7 +16,8 @@
 		<link rel="icon" type="image/png" sizes="32x32" href="{{ config('app.favicon') }}">
 		<link href='https://fonts.googleapis.com/css?family=Roboto:400,300,700' rel='stylesheet' type='text/css' />
 
-		@vite(['resources/assets/sass/app.scss'])
+		@include ('layouts._partials.color-mode-head')
+		@vite(['resources/assets/sass/app.scss', 'resources/js/app.js'])
     	
 		<title>
 			@hasSection ('page_title')
@@ -34,15 +35,16 @@
 			<div class='row'>
 				@foreach (['danger', 'warning', 'success', 'info'] as $msg)
 					@if (Session::has('alert-' . $msg))
-						<div class="col-xs-12" style="margin-top:30px; margin-bottom:-40px;">
-							<p class="alert alert-{{ $msg }}">
-								<b>{{ Session::get('alert-' . $msg) }}</b> <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-							</p>
+						<div class="col-12" style="margin-top:30px; margin-bottom:-40px;">
+							<div class="alert alert-{{ $msg }} alert-dismissible">
+								<b>{{ Session::get('alert-' . $msg) }}</b>
+								<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+							</div>
 						</div>
 					@endif
 				@endforeach
 				@if (isset($errors) && $errors->any())
-					<div class="col-xs-12" style="margin-top:30px; margin-bottom:-40px;">
+					<div class="col-12" style="margin-top:30px; margin-bottom:-40px;">
 						<div class="alert alert-danger">
 							<ul class="list-unstyled">
 								@foreach ($errors->all() as $error)
@@ -56,12 +58,10 @@
 		</div>
 		@yield ('content')
 		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
-		<!-- Latest compiled and minified JavaScript -->
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-		<div class="stats  section-padding">
+		<div class="stats section-padding">
 			<div class="container">
 				<div class="row">
-					<div class="col-md-4  text-center">
+					<div class="col-md-4 text-center">
 						<div class="stats-number">
 							{{ Helpers::getEventTotal() }}
 						</div>
@@ -71,7 +71,7 @@
 						</div>
 					</div>
 
-					<div class="col-md-4  text-center">
+					<div class="col-md-4 text-center">
 						<div class="stats-number">
 							{{ Helpers::getEventParticipantTotal() }}
 						</div>
@@ -81,7 +81,7 @@
 						</div>
 					</div>
 
-					<div class="col-md-4  text-center">
+					<div class="col-md-4 text-center">
 						<div class="stats-number">
 							A LOT
 						</div>
@@ -95,44 +95,45 @@
 		</div>
 		<footer class="footer">
 			<div class="container">
-				<div class="hidden-xs hidden-sm">
-					<br><br>
-				</div>
-				<div class="col-lg-4 hidden-md hidden-sm hidden-xs">
-					<img class="img-responsive" src="{{ config('app.logo') }}" alt="{{ config('app.name') }} logo footer">
-				</div>
-				<div class="col-lg-8 col-sm-12 col-md-12 text-center">
-					<div class="col-lg-6 col-md-6">
-						<h2 class="">Links</h2>
-						<p class=" hidden"><a href="/contact">Contact Us</a></p>
-						<p class=""><a href="/news">News</a></p>
-						<p class=""><a href="/info">Frequently Asked Questions</a></p>
-						<p class=""><a href="/terms">Terms & Conditions</a></p>
-						<p class=""><a href="/about">About Us</a></p>
-						<p class=""><a href="/polls">Polls</a></p>
-						<p class=" hidden">Lan Guide</p>
+				<div class="row align-items-center pt-md-5">
+					<div class="col-lg-4 d-none d-lg-block">
+						<img class="img-fluid" src="{{ config('app.logo') }}" alt="{{ config('app.name') }} logo footer">
 					</div>
-					<div class="col-lg-6 col-md-6">
-						<h2 class="">Connect</h2>
-						@if (config('app.facebook_link') != "")
-							<p class=""><a target="_blank" href="{{ config('app.facebook_link') }}">Facebook</a></p>
-						@endif
-						@if (config('app.bsky_link') != "")
-							<p class=""><a target="_blank" href="{{ config('app.bsky_link') }}">BSKY</a></p>
-						@endif
-						@if (config('app.discord_link') != "")
-							<p class=""><a target="_blank" href="{{ config('app.discord_link') }}">Discord</a></p>
-						@endif
-						@if (config('app.steam_link') != "")
-							<p class=""><a target="_blank" href="{{ config('app.steam_link') }}">Steam</a></p>
-						@endif
-						@if (config('app.youtube_link') != "")
-							<p class=""><a target="_blank" href="{{ config('app.youtube_link') }}">Youtube</a></p>
-						@endif
+					<div class="col-lg-8 col-12 text-center">
+						<div class="row">
+							<div class="col-md-6">
+								<h2>Links</h2>
+								<p class="d-none"><a href="/contact">Contact Us</a></p>
+								<p><a href="/news">News</a></p>
+								<p><a href="/info">Frequently Asked Questions</a></p>
+								<p><a href="/terms">Terms & Conditions</a></p>
+								<p><a href="/about">About Us</a></p>
+								<p><a href="/polls">Polls</a></p>
+								<p class="d-none">Lan Guide</p>
+							</div>
+							<div class="col-md-6">
+								<h2>Connect</h2>
+								@if (config('app.facebook_link') != "")
+									<p><a target="_blank" href="{{ config('app.facebook_link') }}">Facebook</a></p>
+								@endif
+								@if (config('app.bsky_link') != "")
+									<p><a target="_blank" href="{{ config('app.bsky_link') }}">BSKY</a></p>
+								@endif
+								@if (config('app.discord_link') != "")
+									<p><a target="_blank" href="{{ config('app.discord_link') }}">Discord</a></p>
+								@endif
+								@if (config('app.steam_link') != "")
+									<p><a target="_blank" href="{{ config('app.steam_link') }}">Steam</a></p>
+								@endif
+								@if (config('app.youtube_link') != "")
+									<p><a target="_blank" href="{{ config('app.youtube_link') }}">Youtube</a></p>
+								@endif
+							</div>
+						</div>
 					</div>
-				</div>
-				<div class="col-lg-12 text-center">
-					<p class="">© {{ config('app.name') }} {{ date("Y") }}. All rights reserved.</p>
+					<div class="col-12 text-center">
+						<p>© {{ config('app.name') }} {{ date("Y") }}. All rights reserved.</p>
+					</div>
 				</div>
 			</div>
 		</footer>

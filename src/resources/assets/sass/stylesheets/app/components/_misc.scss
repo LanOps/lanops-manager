@@ -8,7 +8,7 @@
 
 
 .btn-orange {
-  @include button-variant(#333333, $color_primary, #333333);
+  @include button-variant($color_primary, #333333, #333333);
 }
 
 .footer {

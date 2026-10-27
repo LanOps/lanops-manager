@@ -6,7 +6,7 @@
 					<td>
 						<strong>{{ $item->event->display_name }}: {{ $item->name }}</strong>
 					</td>
-					<td class="text-right">
+					<td class="text-end">
 						x {{ $item->quantity }}
 					</td>
 					<td>
@@ -19,7 +19,7 @@
 			@if ($basket->referral_discount_total > 0)
 				<tr>
 					<td></td>
-					<td class="text-right">
+					<td class="text-end">
 						<strong>Referral Discounts:</strong>
 					</td>
 					<td>
@@ -30,7 +30,7 @@
 			@if ($basket->referral_code) 
 			<tr>
 				<td></td>
-				<td class="text-right">
+				<td class="text-end">
 					<strong>Referral Code:</strong>
 				</td>
 				<td>
@@ -40,7 +40,7 @@
 			@endif
 			<tr>
 				<td></td>
-				<td class="text-right">
+				<td class="text-end">
 					<strong>Total:</strong>
 				</td>
 				<td>

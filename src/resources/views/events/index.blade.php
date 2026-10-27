@@ -7,7 +7,7 @@
 <div class="featured-events section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12">
+            <div class="col-12">
                 <h1 class="section-heading">Events</h1>
             </div>
         </div>
@@ -24,7 +24,7 @@
                         $remaining  = max($capacity - $filled, 0);
                         $pct        = $capacity > 0 ? round(($filled / $capacity) * 100) : 0;
                     @endphp
-                    <div class="col-xs-12 col-sm-6 col-lg-4">
+                    <div class="col-12 col-sm-6 col-lg-4">
                         <div class="event-card">
                             <div class="event-card-header">
                                 @if ($event->type)
@@ -71,7 +71,7 @@
                                 @endif
                             </div>
                             <div class="event-card-footer">
-                                <a href="/events/{{ $event->slug }}" class="btn btn-default btn-sm">Details</a>
+                                <a href="/events/{{ $event->slug }}" class="btn btn-outline-secondary btn-sm">Details</a>
                                 @if ($event->tickets && $event->tickets->count())
                                     <a href="/events/{{ $event->slug }}#tickets" class="btn btn-orange btn-sm">Book Now</a>
                                 @endif

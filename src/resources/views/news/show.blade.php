@@ -27,7 +27,7 @@
 <div class="news-article-section section-padding">
     <div class="container">
         <div class="row">
-            <div class="col-xs-12 col-md-8 col-md-offset-2">
+            <div class="col-12 col-md-8 offset-md-2">
                 <div class="news-article-body">
                     {!! $newsArticle->article !!}
                 </div>
@@ -46,7 +46,7 @@
 
         {{-- Comments --}}
         <div class="row">
-            <div class="col-xs-12 col-md-8 col-md-offset-2">
+            <div class="col-12 col-md-8 offset-md-2">
                 <h2 class="section-heading" style="margin-top: 40px;">Comments</h2>
 
                 @forelse ($newsArticle->comments->reverse() as $comment)
@@ -54,7 +54,7 @@
                         @include ('layouts._partials._news.comment-warnings')
                         <div class="news-comment">
                             <div class="news-comment-avatar">
-                                <img class="img-responsive img-rounded" alt="{{ $comment->user->username }}'s Avatar" src="{{ $comment->user->avatar }}"/>
+                                <img class="img-fluid rounded" alt="{{ $comment->user->username }}'s Avatar" src="{{ $comment->user->avatar }}"/>
                                 <p class="news-comment-author">{{ $comment->user->username }}</p>
                             </div>
                             <div class="news-comment-body">
@@ -62,7 +62,7 @@
                                 <div class="news-comment-actions">
                                     <span class="news-comment-date">{{ date('M j, Y', strtotime($comment->created_at)) }}</span>
                                     @if (Auth::user() && Auth::id() == $comment->user_id)
-                                        <a href="" onclick="editComment('{{ $comment->comment }}', '{{ $comment->id }}')" data-toggle="modal" data-target="#editCommentModal" class="news-comment-action">Edit</a>
+                                        <a href="" onclick="editComment('{{ $comment->comment }}', '{{ $comment->id }}')" data-bs-toggle="modal" data-bs-target="#editCommentModal" class="news-comment-action">Edit</a>
                                     @endif
                                     @if (Auth::user() && (Auth::user()->getAdmin() || $comment->user_id == Auth::id()))
                                         @php $postUrl = Auth::user()->getAdmin() ? '/admin' : ''; @endphp
@@ -87,7 +87,7 @@
                     <h3 class="news-comment-form-title">Post a Comment</h3>
                     @if (Auth::user())
                         {{ html()->form('POST', url('/news/' . $newsArticle->slug . '/comments'))->open() }}
-                            <div class="form-group">
+                            <div class="mb-3">
                                 {{ html()->textarea('comment', '')->class('form-control')->rows('4')->placeholder('Write a comment...') }}
                             </div>
                             <button type="submit" class="btn btn-orange">Post Comment</button>
@@ -106,19 +106,19 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="editCommentModalLabel">Edit Comment</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             @if (Auth::user())
                 {{ html()->form('POST', url('/news/' . $newsArticle->slug . '/comments'))->id('edit_comment_modal_form')->open() }}
                     <div class="modal-body">
-                        <div class="form-group">
+                        <div class="mb-3">
                             {{ html()->textarea('comment_modal', '')->class('form-control')->rows('4')->placeholder('Edit your comment') }}
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-orange">Save</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                     </div>
                 </form>
             @else

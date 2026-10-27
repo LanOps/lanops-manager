@@ -15,7 +15,7 @@
         @if ($participants)
             @foreach ($participants as $participant)
                 <tr class="table-row odd gradeX">
-                    <td width="10%"><img class="img-responsive img-rounded" src="{{ $participant->user->avatar }}"/></td>
+                    <td width="10%"><img class="img-fluid rounded" src="{{ $participant->user->avatar }}"/></td>
                     <td>
                         {{ $participant->user->username }}
                         @if ($steamProfile = Helpers::getSteamProfile($participant->user->steamid))

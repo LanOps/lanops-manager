@@ -13,40 +13,40 @@
                 @if (in_array('standard', $activeLoginMethods))
                     <form method="POST" action="/login/standard" class="form-horizontal">
                         @csrf
-                        <div class="form-group row">
-                            <label for="email" class="col-sm-2 control-label">Email</label>
-                            <div class="col-sm-10 @error('email') has-error @enderror">
+                        <div class="mb-3 row">
+                            <label for="email" class="col-sm-2 form-label">Email</label>
+                            <div class="col-sm-10 @error('email') @enderror">
                                 <input type="email" id="email" name="email" class="form-control" placeholder="Email address" required autofocus>
                             </div>
                         </div>
-                        <div class="form-group row">
-                            <label for="password" class="col-sm-2 control-label">Password</label>
-                            <div class="col-sm-10 @error('password') has-error @enderror">
+                        <div class="mb-3 row">
+                            <label for="password" class="col-sm-2 form-label">Password</label>
+                            <div class="col-sm-10 @error('password') @enderror">
                                 <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <div class="checkbox">
-                                    <label>
+                        <div class="mb-3">
+                            <div class="offset-sm-2 col-sm-10">
+                                <div class="form-check">
+                                    <label class="form-check-label">
                                         <input type="checkbox" value="remember-me"> Remember me
                                     </label>
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="col-sm-offset-2 col-sm-10">
-                                <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+                        <div class="mb-3">
+                            <div class="offset-sm-2 col-sm-10">
+                                <button class="btn btn-lg btn-primary w-100" type="submit">Sign in</button>
                             </div>
                         </div>
                     </form>
                     <div class="row">
-                        <div class="col-sm-offset-2 col-sm-10">
+                        <div class="offset-sm-2 col-sm-10">
                             <a href="/register/standard">
-                                <button class="btn btn-lg btn-primary btn-block">Register</button>
+                                <button class="btn btn-lg btn-primary w-100">Register</button>
                             </a>
                         </div>
-                        <div class="col-sm-offset-2 col-sm-10">
+                        <div class="offset-sm-2 col-sm-10">
                             <a class="btn btn-link" href="/login/forgot">
                                 Forgot Your Password?
                             </a>
@@ -59,7 +59,7 @@
                 @if (in_array('steam', $activeLoginMethods))
                     <a href="/login/steam">
                         <div class="">
-                            <button class="btn btn-lg btn-primary btn-block" type="submit"><img class="img img-responsive img-rounded login-icon-button" src="/images/login/steam.png"/>Steam</button>
+                            <button class="btn btn-lg btn-primary w-100" type="submit"><img class="img img-fluid rounded login-icon-button" src="/images/login/steam.png"/>Steam</button>
                         </div>
                     </a>
                 @endif
