@@ -44,4 +44,24 @@ class AvatarTest extends TestCase
             ->assertSee("this.src='" . $fallback . "'", false)
             ->assertSee($withoutAvatar->username . "&#039;s Avatar", false);
     }
+
+    public function testAttendeeListShowsEachUsersOwnAvatarWhenLoggedIn(): void
+    {
+        $ticket = $this->createEventWithTicket();
+        $attendee = $this->createUser(['avatar' => 'https://avatars.steamstatic.com/attendee_full.jpg']);
+        $viewer = $this->createUser(['avatar' => 'https://avatars.steamstatic.com/viewer_full.jpg']);
+
+        $participant = new EventParticipant();
+        $participant->forceFill([
+            'user_id'   => $attendee->id,
+            'event_id'  => $ticket->event_id,
+            'ticket_id' => $ticket->id,
+        ])->saveQuietly();
+
+        $this->actingAs($viewer)
+            ->get('/events/' . $ticket->event->slug)
+            ->assertOk()
+            ->assertSee('src="https://avatars.steamstatic.com/attendee_full.jpg"', false)
+            ->assertDontSee('src="https://avatars.steamstatic.com/viewer_full.jpg"', false);
+    }
 }
