@@ -56,7 +56,9 @@
 				@endif
 			</div>
 		</div>
-		@yield ('content')
+		<main class="page-content">
+			@yield ('content')
+		</main>
 		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha384-1H217gwSVyLSIfaLxHbE7dRb3v4mYCKbpQvzx0cegeju1MVsGrX5xXxAvs/HgeFs" crossorigin="anonymous"></script>
 		<div class="stats section-padding">
 			<div class="container">
