@@ -12,9 +12,9 @@
 }
 
 .footer {
-	// height: 200px;
-	background-color: $color_secondary;
+	background-color: var(--lanops-chrome-alt-bg);
+	border-top: 1px solid var(--lanops-chrome-border);
 	p, h1, h2, h3, h4, h5 {
-		color: $color_secondary_text;
+		color: var(--lanops-chrome-color);
 	}
 }

@@ -3,7 +3,7 @@
 @import 'variables';
 @import 'bootstrap/scss/bootstrap';
 
-// The header and footer stay dark in both colour modes so the logo looks the same
+// The admin topbar and sidebar stay dark in both colour modes
 :root,
 [data-bs-theme='light'],
 [data-bs-theme='dark'] {
