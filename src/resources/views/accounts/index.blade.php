@@ -19,7 +19,7 @@
 						<h3 class="panel-title">Account Details</h3>
 					</div>
 					<div class="panel-body">
-						{{ Form::open(array('url'=>'/account/' )) }}
+						{{ html()->form('POST', url('/account/'))->open() }}
 							<div class="row" style="display: flex; align-items: center;">
 								<div class="col-md-2 col-sm-12">
 									@if ($user->avatar != NULL)
@@ -30,30 +30,30 @@
 					                <div class="row">
 					                    <div class="col-xs-12 col-md-6">
 					                        <div class="form-group @error('firstname') has-error @enderror">
-					                            {{ Form::label('firstname','Firstname',array('id'=>'','class'=>'')) }}
+					                            {{ html()->label('Firstname', 'firstname') }}
 					                            <input id="firstname" type="firstname" class="form-control" name="firstname" value="{{ $user->firstname }}" required autocomplete="firstname">
 					                        </div>
 					                    </div>
 					                    <div class="col-xs-12 col-md-6">
 					                        <div class="form-group  @error('surname') has-error @enderror">
-					                            {{ Form::label('surname','Surname',array('id'=>'','class'=>'')) }}
+					                            {{ html()->label('Surname', 'surname') }}
 					                            <input id="surname" type="surname" class="form-control" name="surname" value="{{ $user->surname }}" required autocomplete="surname">
 					                        </div>
 					                    </div>
 					                </div>
 									<div class="form-group">
-										{{ Form::label('Username','User Name',array('id'=>'','class'=>'')) }}
-										{{ Form::text('name', $user->username ,array('id'=>'name','class'=>'form-control', 'disabled' => 'disabled')) }}
+										{{ html()->label('User Name', 'Username') }}
+										{{ html()->text('name', $user->username)->class('form-control')->disabled() }}
 									</div> 
 									@if ($steamProfile = Helpers::getSteamProfile($user->steamid))
 										<div class="form-group">
-											{{ Form::label('steamname','Linked Steam Account',array('id'=>'','class'=>'')) }}
-											{{ Form::text('steamname', $steamProfile["name"] ,array('id'=>'steamname','class'=>'form-control', 'disabled'=>'true')) }}
+											{{ html()->label('Linked Steam Account', 'steamname') }}
+											{{ html()->text('steamname', $steamProfile["name"])->class('form-control')->disabled() }}
 										</div>
 									@endif
 									@if ($user->email)
 										<div class="form-group">
-											{{ Form::label('email','Email',array('id'=>'','class'=>'')) }}
+											{{ html()->label('Email', 'email') }}
 											<input type="email" class="form-control" name="email" id="email @error('email') is-invalid @enderror" aria-describedby="email" value="{{ $user->email }}" placeholder="Enter email">
 											@error('email')
 				                                <span class="invalid-feedback" role="alert">
@@ -85,7 +85,7 @@
 									<button type="submit" class="btn btn-primary btn-block">Submit</button>
 								</div>
 							</div>
-						{{ Form::close() }}
+						</form>
 					</div>
 				</div>
 			</div>
@@ -111,11 +111,11 @@
 											<img alt="{{ $user->username }}'s Discord Avatar" class="img-responsive img-thumbnail" src="https://cdn.discordapp.com/avatars/{{ $user->discord_id }}/{{ $user->getFormattedDiscordAvatar() }}" />
 										</div>
 										<div class="col-xs-12 col-md-10">
-											{{ Form::open(array('url'=>'/account/discord/unlink')) }}
+											{{ html()->form('POST', url('/account/discord/unlink'))->open() }}
 												<button  type="submit"  class="btn btn-danger btn-block"> 
 													Unlink Account <strong>{{ $user->discord_username }}</strong>
 												</button>
-											{{ Form::close() }}
+											</form>
 										</div>
 									@endif
 								</div>
@@ -255,7 +255,7 @@
 					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 					<h4 class="modal-title" id="confirmDeleteModalLabel">Are you sure you want to Delete your Account?</h4>
 				</div>
-				{{ Form::open(array('url'=>'/account/delete/', 'id'=>'confirmDeleteFormModal')) }}
+				{{ html()->form('POST', url('/account/delete/'))->id('confirmDeleteFormModal')->open() }}
 					<div class="modal-body">
 						<div class="form-group">
 							<p>Once it's gone... It's gone, puff... Aaaannnd it's gone!</p>
@@ -271,7 +271,7 @@
 						<button type="submit" class="btn btn-success">Accept</button>
 						<button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
 					</div>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	</div> --}}

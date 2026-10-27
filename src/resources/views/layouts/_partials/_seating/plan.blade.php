@@ -81,32 +81,22 @@
                     <h4 class="modal-title" id="pickSeatModalLabel"></h4>
                 </div>
                 @if (Auth::user())
-                    {{ Form::open(array('url'=>'/events/' . $event->slug . '/seating/', 'id'=>'pickSeatFormModal')) }}
+                    {{ html()->form('POST', url('/events/' . $event->slug . '/seating/'))->id('pickSeatFormModal')->open() }}
                         <div class="modal-body">
                             <div class="form-group">
                                 <h4>Which ticket would you like to seat?</h4>
-                                {{
-                                    Form::select(
-                                        'participant_id',
-                                        $user->getTickets($event->id),             
-                                        null, 
-                                        array(
-                                            'id'    => 'format',
-                                            'class' => 'form-control'
-                                        )
-                                    )
-                                }}
+                                {{ html()->select('participant_id', $user->getTickets($event->id))->id('format')->class('form-control') }}
                                 <p>Are you sure you want this seat?</p>
                                 <p>You can remove it at anytime.</p>
                             </div>
                         </div>
-                        {{ Form::hidden('user_id', $user->id, array('id'=>'user_id','class'=>'form-control')) }}
-                        {{ Form::hidden('seat', NULL, array('id'=>'seat_modal','class'=>'form-control')) }}
+                        {{ html()->hidden('user_id', $user->id)->class('form-control') }}
+                        {{ html()->hidden('seat')->id('seat_modal')->class('form-control') }}
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-success">Yes</button>
                             <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
                         </div>
-                    {{ Form::close() }}
+                    </form>
                 @endif
             </div>
         </div>

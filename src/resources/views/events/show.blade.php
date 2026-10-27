@@ -119,15 +119,15 @@
 								@endif
 							</div>
 							@if ($user)
-								{{ Form::open(array('url'=>'/tickets/purchase/' . $ticket->id)) }}
+								{{ html()->form('POST', url('/tickets/purchase/' . $ticket->id))->open() }}
 									@if (
 										$event->capacity <= $event->eventParticipants->count()
 										|| ($ticket->participants()->count() >= $ticket->quantity && $ticket->quantity != 0)
 										)
 										<div class="row">
 											<div class="form-group col-sm-6 col-xs-12">
-												{{ Form::label('quantity','Quantity',array('id'=>'','class'=>'')) }}
-												{{ Form::select('quantity', array(1 => 1), null, array('id'=>'quantity','class'=>'form-control', 'disabled' => true)) }}
+												{{ html()->label('Quantity', 'quantity') }}
+												{{ html()->select('quantity', array(1 => 1))->class('form-control')->disabled() }}
 											</div>
 											<div class="form-group col-sm-6 col-xs-12">
 												<button class="btn btn-md btn-default btn-block"  style="margin-top:25px" disabled >SOLD OUT!</button>
@@ -147,16 +147,16 @@
 									@else
 										<div class="row">
 											<div class="form-group col-sm-6 col-xs-12">
-												{{ Form::label('quantity','Quantity',array('id'=>'','class'=>'')) }}
-												{{ Form::select('quantity', array(1 => 1, 2 => 2), null, array('id'=>'quantity','class'=>'form-control')) }}
+												{{ html()->label('Quantity', 'quantity') }}
+												{{ html()->select('quantity', array(1 => 1, 2 => 2))->class('form-control') }}
 											</div>
 											<div class="form-group col-sm-6 col-xs-12">
-												{{ Form::hidden('user_id', $user->id, array('id'=>'user_id','class'=>'form-control')) }}
+												{{ html()->hidden('user_id', $user->id)->class('form-control') }}
 												<button class="btn btn-md btn-orange btn-block" style="margin-top:25px" >Buy</button>
 											</div>
 										</div>
 									@endif
-								{{ Form::close() }}
+								</form>
 							@else
 								<div class="alert alert-info">
 									<h5>Please Log in to Purchase a ticket</h5>
@@ -208,17 +208,17 @@
 											@if ($user && !$user->eventParticipation->isEmpty())
 												@foreach ($user->eventParticipation as $participant)
 													@if ($participant->seat && $participant->seat->event_seating_plan_id == $seatingPlan->id)
-														{{ Form::open(array('url'=>'/events/' . $event->slug . '/seating/' . $seatingPlan->slug)) }}
-															{{ Form::hidden('_method', 'DELETE') }}
-															{{ Form::hidden('user_id', $user->id, array('id'=>'user_id','class'=>'form-control')) }}
-															{{ Form::hidden('participant_id', $participant->id, array('id'=>'participant_id','class'=>'form-control')) }}
-															{{ Form::hidden('seat_number', $participant->seat->seat, array('id'=>'seat_number','class'=>'form-control')) }}
+														{{ html()->form('POST', url('/events/' . $event->slug . '/seating/' . $seatingPlan->slug))->open() }}
+															@method('DELETE')
+															{{ html()->hidden('user_id', $user->id)->class('form-control') }}
+															{{ html()->hidden('participant_id', $participant->id)->class('form-control') }}
+															{{ html()->hidden('seat_number', $participant->seat->seat)->class('form-control') }}
 															<h5>
 																<button class="btn btn-success btn-block">
 																{{ $participant->seat->seat }} - Remove
 																</button>
 															</h5>
-														{{ Form::close() }}
+														</form>
 													@endif
 												@endforeach
 											@elseif(Auth::user())

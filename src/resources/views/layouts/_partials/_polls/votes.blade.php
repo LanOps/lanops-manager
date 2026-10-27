@@ -28,7 +28,7 @@
 		</div>
 		<div class="col-xs-12 col-sm-3 col-md-3">
 			@if (Auth::user())
-				{{ Form::label('name','You have voted for...',array('id'=>'','class'=>'')) }}
+				{{ html()->label('You have voted for...', 'name') }}
 				@foreach ($poll->options as $option)
 					@if ($option->hasVoted())
 						<p>
@@ -40,13 +40,13 @@
 					@endif
 				@endforeach
 				@if (!$poll->hasEnded() && $poll->allow_options_user)
-					{{ Form::open(array('url'=>'/polls/' . $poll->slug . '/options', 'files' => 'true')) }}
+					{{ html()->form('POST', url('/polls/' . $poll->slug . '/options'))->acceptsFiles()->open() }}
 						<div class="form-group">
-							{{ Form::label('name','Add Options',array('id'=>'','class'=>'')) }}
+							{{ html()->label('Add Options', 'name') }}
 							@include ('layouts._partials._polls.add-options')
 						</div>
 						<button type="submit" class="btn btn-default btn-block">Submit</button> 
-					{{ Form::close() }}
+					</form>
 				@endif
 			@else
 				<div class="alert alert-info">

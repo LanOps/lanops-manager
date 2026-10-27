@@ -1,6 +1,6 @@
 <div class="form-group" id="poll_options">
 	<div class="form-group">
-		{{ Form::text('options[]', '', array('id'=>'', 'class'=>'form-control')) }}
+		{{ html()->text('options[]', '')->class('form-control') }}
 	</div>
 </div>
 <button type="button" id="poll_options_add" class="btn btn-default btn-block">Extra Option</button> 
@@ -16,7 +16,7 @@
 	        e.preventDefault();
 	        if (x < max_fields) {
 	            x++;
-	            $(wrapper).append('<div class="form-group">{{ Form::text("options[]", "", array("id"=>"", "class"=>"form-control")) }}</div>'); //add input box
+	            $(wrapper).append('<div class="form-group">{{ html()->text("options[]", "")->class("form-control") }}</div>'); //add input box
 	        } else {
 	            alert('You Reached the limits')
 	        }

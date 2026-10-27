@@ -45,16 +45,16 @@
 				<h4 class="modal-title" id="editCommentModalLabel">Edit Comment</h4>
 			</div>
 			@if (Auth::user())
-				{{ Form::open(array('url'=>'/news/' . $newsArticle->slug . '/comments', 'id'=>'edit_comment_modal_form')) }}
+				{{ html()->form('POST', url('/news/' . $newsArticle->slug . '/comments'))->id('edit_comment_modal_form')->open() }}
 					<div class="modal-body">
 						<div class="form-group">
-							{{ Form::textarea('comment_modal', '',array('id'=>'comment_modal','class'=>'form-control', 'rows'=>'4', 'placeholder'=>'Post a Comment')) }}
+							{{ html()->textarea('comment_modal', '')->class('form-control')->rows('4')->placeholder('Post a Comment') }}
 						</div>
 						<div class="modal-footer">
 							<button type="submit" class="btn btn-success">Edit</button>
 						</div>
 					</div>
-				{{ Form::close() }}
+				</form>
 			@else
 				<div class="modal-body">
 					<p>Please log in to post a Comment</p>
