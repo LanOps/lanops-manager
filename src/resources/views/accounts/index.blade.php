@@ -52,7 +52,7 @@
 									@if ($user->email)
 										<div class="mb-3">
 											{{ html()->label('Email', 'email') }}
-											<input type="email" class="form-control" name="email" id="email @error('email') is-invalid @enderror" aria-describedby="email" value="{{ $user->email }}" placeholder="Enter email">
+											<input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email" aria-describedby="email" value="{{ $user->email }}" placeholder="Enter email">
 											@error('email')
 				                                <span class="invalid-feedback" role="alert">
 				                                    <strong>{{ $message }}</strong>
@@ -74,6 +74,15 @@
 											<label for="password2">Confirm Password</label>
 											<input type="password" name="password2" class="form-control @error('password2') is-invalid @enderror" id="password2" placeholder="Password">
 										 	@error('password2')
+				                                <span class="invalid-feedback" role="alert">
+				                                    <strong>{{ $message }}</strong>
+				                                </span>
+				                            @enderror
+										</div>
+										<div class="mb-3">
+											<label for="current_password">Current Password</label>
+											<input type="password" name="current_password" class="form-control @error('current_password') is-invalid @enderror" id="current_password" placeholder="Needed to change your email or password" autocomplete="current-password">
+										 	@error('current_password')
 				                                <span class="invalid-feedback" role="alert">
 				                                    <strong>{{ $message }}</strong>
 				                                </span>
