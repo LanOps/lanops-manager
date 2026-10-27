@@ -116,3 +116,12 @@ body.admin {
 .admin-main .card-header .card-title > a {
 	color: inherit;
 }
+
+// Stat card icons were big enough to run into the numbers; keep them clear
+.admin-main .card-header .fa-5x {
+	font-size: 3.5em;
+}
+
+.admin-main .card-header .huge {
+	font-size: 40px;
+}

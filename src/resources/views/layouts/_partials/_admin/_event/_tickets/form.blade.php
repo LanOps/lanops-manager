@@ -115,7 +115,7 @@
 
 </div>
 <hr>
-<button type="submit" class="btn btn-outline-secondary btn-success w-100">Submit</button>
+<button type="submit" class="btn btn-success w-100">Submit</button>
 
 <!-- JavaScript-->
 <script type="text/javascript">
