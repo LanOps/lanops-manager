@@ -33,7 +33,7 @@ class AvatarTest extends TestCase
                 'user_id'   => $user->id,
                 'event_id'  => $ticket->event_id,
                 'ticket_id' => $ticket->id,
-            ])->save();
+            ])->saveQuietly();
         }
 
         $fallback = asset('images/default-avatar.svg');
