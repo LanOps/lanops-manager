@@ -25,9 +25,25 @@
 							{{ html()->text('card_last_name', '')->class('form-control') }}
 						</div>
 					</div>
-					{{ html()->label('Card Details', 'card_number') }}
-					<div class="form-control" id="card-element"></div>
-			  		<div id="card-errors" role="alert"></div>
+					<div class="mb-3">
+						<label for="card-number-element">Card Number *</label>
+						<div class="form-control" id="card-number-element"></div>
+					</div>
+					<div class="row">
+						<div class="mb-3 col-sm-4 col-12">
+							<label for="card-expiry-element">Expiry Date *</label>
+							<div class="form-control" id="card-expiry-element"></div>
+						</div>
+						<div class="mb-3 col-sm-4 col-12">
+							<label for="card-cvc-element">CVC *</label>
+							<div class="form-control" id="card-cvc-element"></div>
+						</div>
+						<div class="mb-3 col-sm-4 col-12">
+							{{ html()->label('Postcode *', 'card_postcode') }}
+							{{ html()->text('card_postcode', '')->class('form-control')->attribute('autocomplete', 'postal-code') }}
+						</div>
+					</div>
+					<div id="card-errors" class="text-danger mb-3" role="alert"></div>
 					<p><small>* Required Fields</small></p>
 					{{ html()->hidden('gateway', $paymentGateway) }}
 					<button type="button" id="checkout_btn" class="btn btn-primary w-100">Confirm Order</button>
@@ -78,43 +94,111 @@
 @if ($paymentGateway == 'stripe')
 	<script src="https://js.stripe.com/v3/"></script>
 	<script>
+		const stripe = Stripe( "{!! config('laravel-omnipay.gateways.stripe.credentials.public') !!}" );
+		const elements = stripe.elements();
 
-        var style = {
-            base: {
-			  	lineHeight: '1.429'
-            }
-        };
+		// Stripe draws the card fields in iframes, so copy the text colours from a normal
+		// Bootstrap input to make them match, in light and dark mode
+		const styleSource = document.getElementById('card_first_name');
+		// Stripe rejects some colour formats (such as rgb() with percentages, which the
+		// Bootstrap variables use), so let the browser turn them into plain rgb()
+		function resolveColor(value, fallback) {
+			const probe = document.createElement('span');
+			probe.style.display = 'none';
+			probe.style.color = fallback;
+			probe.style.color = value;
+			document.body.appendChild(probe);
+			const color = window.getComputedStyle(probe).color;
+			probe.remove();
+			return color;
+		}
+		function cardStyle() {
+			const computed = window.getComputedStyle(styleSource);
+			const root = window.getComputedStyle(document.documentElement);
+			return {
+				base: {
+					color: resolveColor(computed.color, '#212529'),
+					fontFamily: computed.fontFamily,
+					fontSize: computed.fontSize,
+					lineHeight: computed.lineHeight,
+					'::placeholder': { color: resolveColor(root.getPropertyValue('--bs-secondary-color').trim(), '#6c757d') },
+				},
+				invalid: {
+					color: resolveColor(root.getPropertyValue('--bs-form-invalid-color').trim(), '#dc3545'),
+				},
+			};
+		}
 
-	    const stripe = Stripe( "{!! config('laravel-omnipay.gateways.stripe.credentials.public') !!}" );
+		const cardNumberElement = elements.create('cardNumber', { style: cardStyle(), showIcon: true });
+		const cardExpiryElement = elements.create('cardExpiry', { style: cardStyle() });
+		const cardCvcElement = elements.create('cardCvc', { style: cardStyle() });
+		const cardElements = [cardNumberElement, cardExpiryElement, cardCvcElement];
 
-	    const elements = stripe.elements();
-	    const cardElement = elements.create('card', {style: style});
+		cardNumberElement.mount('#card-number-element');
+		cardExpiryElement.mount('#card-expiry-element');
+		cardCvcElement.mount('#card-cvc-element');
 
-	    cardElement.mount('#card-element');
+		// Restyle the card fields when the colour mode is switched
+		new MutationObserver(function () {
+			const style = cardStyle();
+			cardElements.forEach(function (element) {
+				element.update({ style: style });
+			});
+		}).observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
 
-	    const cardHolderName = document.getElementById('card_first_name') + document.getElementById('card_last_name');
+		const cardErrors = document.getElementById('card-errors');
+		cardElements.forEach(function (element) {
+			element.on('change', function (event) {
+				cardErrors.textContent = event.error ? event.error.message : '';
+			});
+		});
+
 		const cardButton = document.getElementById('checkout_btn');
-		const clientSecret = cardButton.dataset.secret;
+		const cardButtonText = cardButton.textContent;
 		const form = document.getElementById('payment-form');
-		cardButton.addEventListener('click', async (e) => {
+
+		function showError(message) {
+			cardErrors.textContent = message;
+			cardButton.disabled = false;
+			cardButton.textContent = cardButtonText;
+		}
+
+		cardButton.addEventListener('click', function () {
+			const firstName = document.getElementById('card_first_name').value.trim();
+			const lastName = document.getElementById('card_last_name').value.trim();
+			const postcode = document.getElementById('card_postcode').value.trim();
+			if (firstName === '' || lastName === '') {
+				showError('Please enter the first and last name on the card.');
+				return;
+			}
+			if (postcode === '') {
+				showError('Please enter the postcode of the card\'s billing address.');
+				return;
+			}
+
 			cardButton.disabled = true;
 			cardButton.textContent = 'Processing Please Wait...';
-		    stripe.createPaymentMethod('card', cardElement, {
-                billing_details: {name: cardHolderName.value }
-            }).then(function(result) {
-                if (result.error) {
-                    cardButton.disabled = false;
-                    alert(result.error.message);
-                } else {
-					var hiddenInput = document.createElement('input');
+			cardErrors.textContent = '';
+
+			stripe.createPaymentMethod({
+				type: 'card',
+				card: cardNumberElement,
+				billing_details: {
+					name: firstName + ' ' + lastName,
+					address: { postal_code: postcode },
+				},
+			}).then(function (result) {
+				if (result.error) {
+					showError(result.error.message);
+				} else {
+					const hiddenInput = document.createElement('input');
 					hiddenInput.setAttribute('type', 'hidden');
 					hiddenInput.setAttribute('name', 'stripe_token');
 					hiddenInput.setAttribute('value', result.paymentMethod.id);
 					form.appendChild(hiddenInput);
-					console.log(result.paymentMethod.id);
 					form.submit();
-                }
-            });
+				}
+			});
 		});
 	</script>
 
