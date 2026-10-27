@@ -93,7 +93,7 @@ Route::group(['middleware' => ['web']], function () {
      * Gifts
      */
     Route::group(['middleware' => ['auth', 'banned', 'verified']], function () {
-        Route::get('/gift/accept', 'Events\ParticipantsController@acceptGift');
+        Route::get('/gift/accept', 'Events\ParticipantsController@acceptGift')->middleware('throttle:10,1');
         Route::post('/gift/{participant}', 'Events\ParticipantsController@gift');
         Route::post('/gift/{participant}/revoke', 'Events\ParticipantsController@revokeGift');
     });
