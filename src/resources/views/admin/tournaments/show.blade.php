@@ -35,27 +35,27 @@
 					(!$tournament->hasEvent())
 					)
 					@if (Auth::user() && !$tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen() && !$tournament->hasTeams())
-						{{ Form::open(array('url'=>'/tournaments/' . $tournament->slug . '/register')) }}
+						{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/register'))->open() }}
 							<button type="submit" class="btn btn-success btn-sm btn-block">Signup</button>
-						{{ Form::close() }}
+						</form>
 					@elseif (Auth::user() && !$tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen() && $tournament->hasTeams())
-						{{ Form::open(array('url'=>'/tournaments/' . $tournament->slug . '/registerTeam')) }}
+						{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/registerTeam'))->open() }}
 							<div class="row">
 								<div class="col-xs-12 col-md-6 form-group @error('team_name') has-error @enderror">
-									{{ Form::label('team_name','Team Name',array('id'=>'','class'=>'')) }}
+									{{ html()->label('Team Name', 'team_name') }}
 									<input id="team_name" type="team_name" class="form-control" name="team_name" required>
 								</div>
 								<div class="col-xs-12 col-md-6 form-group @error('team_password') has-error @enderror">
-									{{ Form::label('team_password','Team Password',array('id'=>'','class'=>'')) }}
+									{{ html()->label('Team Password', 'team_password') }}
 									<input id="team_password" type="team_password" class="form-control" name="team_password">
 								</div>
 							</div>
 							<button type="submit" class="btn btn-success btn-sm btn-block">Register Team</button>
-						{{ Form::close() }}
+						</form>
 					@elseif (Auth::user() && $tournament->isUserSignedUp(Auth::user()) && $tournament->signupsOpen())
-						{{ Form::open(array('url'=>'/tournaments/' . $tournament->slug . '/unregister')) }}
+						{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/unregister'))->open() }}
 							<button type="submit" class="btn btn-danger btn-sm btn-block">Remove Signup</button>
-						{{ Form::close() }}
+						</form>
 					@endif
 				@endif --}}
 				@if ($tournament->hasTeams())
@@ -80,10 +80,10 @@
 												Auth::user() && !$tournament->isUserSignedUp(Auth::user()) && 
 												$tournament->signupsOpen() && 
 												(($tournament->hasEvent() && $tournament->event->getEventParticipant()) || !$tournament->hasEvent()))
-												{{ Form::open(array('url'=>'/tournaments/' . $tournament->slug . '/register')) }}
-													{{ Form::hidden('tournament_team_id', $team->id) }}
+												{{ html()->form('POST', url('/tournaments/' . $tournament->slug . '/register'))->open() }}
+													{{ html()->hidden('tournament_team_id', $team->id) }}
 													<button type="submit" class="btn btn-success btn-sm btn-block">Join Team</button>
-												{{ Form::close() }}
+												</form>
 											@endif --}}
 										</td>
 									</tr>
@@ -131,56 +131,36 @@
 				<i class="fa fa-pencil fa-fw"></i> Edit {{ $tournament->name }}
 			</div>
 			<div class="panel-body">
-				{{ Form::label('name','Tournament Signup Link:',array('id'=>'','class'=>'')) }}
+				{{ html()->label('Tournament Signup Link:', 'name') }}
 				<a href="{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/tournaments/{{ $tournament->slug }}">
 					{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/tournaments/{{ $tournament->slug }}
 				</a>
-				{{ Form::open(array('url'=>'/admin/tournaments/' . $tournament->slug, 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/tournaments/' . $tournament->slug))->acceptsFiles()->open() }}
 					<div class="form-group">
-						{{ Form::label('name','Name',array('id'=>'','class'=>'')) }}
-						{{ Form::text('name', $tournament->name, array('id'=>'name','class'=>'form-control')) }}
+						{{ html()->label('Name', 'name') }}
+						{{ html()->text('name', $tournament->name)->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('status','Status',array('id'=>'','class'=>'')) }}
-						{{ 
-							Form::select(
-								'status',
-								App\Models\Tournament::getStatusArray(),
-								$tournament->status,
-								array(
-									'id'=>'status',
-									'class'=>'form-control'
-								)
-							)
-						}}
+						{{ html()->label('Status', 'status') }}
+						{{ html()->select('status', App\Models\Tournament::getStatusArray(), $tournament->status)->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('team_size','Team Size (0 is no Teams)',array('id'=>'','class'=>'')) }}
-						{{ Form::text('team_size', $tournament->team_size ,array('id'=>'name','class'=>'form-control')) }}
+						{{ html()->label('Team Size (0 is no Teams)', 'team_size') }}
+						{{ html()->text('team_size', $tournament->team_size)->id('name')->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('event_id','Link to Event',array('id'=>'','class'=>'')) }}
-						{{ 
-							Form::select(
-								'event_id',
-								Helpers::getEventNames('DESC', 0, true),
-								$tournament->event_id,
-								array(
-									'id'=>'event_id',
-									'class'=>'form-control'
-								)
-							)
-						}}
+						{{ html()->label('Link to Event', 'event_id') }}
+						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), $tournament->event_id)->class('form-control') }}
 					</div>
 					<div class="form-group">
 						<button type="submit" class="btn btn-success btn-block">Submit</button> 
 					</div>
-				{{ Form::close() }}
+				</form>
 				<hr>
-				{{ Form::open(array('url'=>'/admin/tournaments/' . $tournament->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-					{{ Form::hidden('_method', 'DELETE') }}
+				{{ html()->form('POST', url('/admin/tournaments/' . $tournament->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+					@method('DELETE')
 					<button type="submit" class="btn btn-danger btn-block">Delete</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	</div>

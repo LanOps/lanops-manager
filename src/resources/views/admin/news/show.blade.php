@@ -25,26 +25,26 @@
 				<i class="fa fa-pencil fa-fw"></i> Edit {{ $newsArticle->title }}
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/news/' . $newsArticle->slug, 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/news/' . $newsArticle->slug))->acceptsFiles()->open() }}
 					<div class="form-group">
-						{{ Form::label('title','Title',array('id'=>'','class'=>'')) }}
-						{{ Form::text('title', $newsArticle->title ,array('id'=>'title','class'=>'form-control')) }}
+						{{ html()->label('Title', 'title') }}
+						{{ html()->text('title', $newsArticle->title)->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('article','Article',array('id'=>'','class'=>'')) }}
-						{{ Form::textarea('article', $newsArticle->article, array('id'=>'','class'=>'form-control wysiwyg-editor')) }}
+						{{ html()->label('Article', 'article') }}
+						{{ html()->textarea('article', $newsArticle->article)->class('form-control wysiwyg-editor')->rows('10') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('tags','Tags',array('id'=>'','class'=>'')) }}<small> - Separate with a comma</small>
-						{{ Form::text('tags', $newsArticle->getTags(), array('id'=>'', 'class'=>'form-control')) }}
+						{{ html()->label('Tags', 'tags') }}<small> - Separate with a comma</small>
+						{{ html()->text('tags', $newsArticle->getTags())->class('form-control') }}
 					</div>
 					<button type="submit" class="btn btn-success btn-block">Submit</button> 
-				{{ Form::close() }}
+				</form>
 				<hr>
-				{{ Form::open(array('url'=>'/admin/news/' . $newsArticle->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-					{{ Form::hidden('_method', 'DELETE') }}
+				{{ html()->form('POST', url('/admin/news/' . $newsArticle->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+					@method('DELETE')
 					<button type="submit" class="btn btn-danger btn-block">Delete</button>
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	</div>

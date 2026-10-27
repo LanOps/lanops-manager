@@ -91,18 +91,18 @@
 				@if ($participant->signed_in)
 					<h4>User is signed in at present at the event</h4>
 				@endif
-				{{ Form::label('','Ticket',array('id'=>'','class'=>'')) }}
+				{{ html()->label('Ticket', '') }}
 				@if ($participant->ticket)
 					<p>{{ $participant->ticket->name }}</p>
 				@else
 					<p>No Ticket Bought / Free</p>
 				@endif
 				@if ($participant->purchase && $participant->purchase->referral_discount_total > 0)
-					{{ Form::label('','Referral Code Discount Applied!',array('id'=>'','class'=>'')) }}
+					{{ html()->label('Referral Code Discount Applied!', '') }}
 					<p>{{ config('app.currency_symbol') }}{{ $participant->purchase->referral_discount_total }}</p>
 				@endif
 				@if ($participant->purchase && $participant->purchase->referral_code_user_id)
-					{{ Form::label('','Referral Code Used!',array('id'=>'','class'=>'')) }}
+					{{ html()->label('Referral Code Used!', '') }}
 					<p>{{ $participant->purchase->referralUser->username }}'s Referral Code Used</p>
 				@endif
 				@if ($participant->purchase)
@@ -112,31 +112,21 @@
 					</div>
 				@endif
 				@if (!$participant->signed_in)
-					{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/participants/' . $participant->id . '/transfer')) }}
+					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/participants/' . $participant->id . '/transfer'))->open() }}
 						<div class="form-group">
-							{{ Form::label('event_id','Transfer to event',array('id'=>'','class'=>'')) }}
-							{{ 
-								Form::select(
-									'event_id',
-									Helpers::getEventNames('DESC', 0, true),
-									'',
-									array(
-										'id'=>'event_id',
-										'class'=>'form-control'
-									)
-								)
-							}}
+							{{ html()->label('Transfer to event', 'event_id') }}
+							{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), '')->class('form-control') }}
 						</div>
 						<div class="form-group">
 							<button type="submit" class="btn btn-success btn-block">Transfer</button>
 						</div>
-					{{ Form::close() }}
+					</form>
 					<hr>
-					{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/participants/' . $participant->id . '/signin')) }}
+					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/participants/' . $participant->id . '/signin'))->open() }}
 						<div class="form-group">
 							<button type="submit" class="btn btn-success btn-block">Sign in</button>
 						</div>
-					{{ Form::close() }}
+					</form>
 					<hr>
 					<div class="form-group">
 						<button type="submit" class="btn btn-danger btn-block" disabled>Refund - <small>Coming soon</small></button>

@@ -125,7 +125,7 @@
 				<i class="fa fa-wrench fa-fw"></i> Settings
 			</div>
 			<div class="panel-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug, 'files' => 'true')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug))->acceptsFiles()->open() }}
 					@if ($errors->any())
 						<div class="alert alert-danger">
 							<ul>
@@ -137,57 +137,49 @@
 					@endif
 					<div class="row">
 						<div class="col-lg-12 col-sm-12 form-group">
-							{{ Form::label('name','Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name', $seatingPlan->name ,array('id'=>'name','class'=>'form-control')) }}
+							{{ html()->label('Name', 'name') }}
+							{{ html()->text('name', $seatingPlan->name)->class('form-control') }}
 						</div>
 						<div class="col-lg-12 col-sm-12 form-group">
-							{{ Form::label('name_short','Short Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('name_short', $seatingPlan->name_short ,array('id'=>'name_short','class'=>'form-control')) }}
+							{{ html()->label('Short Name', 'name_short') }}
+							{{ html()->text('name_short', $seatingPlan->name_short)->class('form-control') }}
 							<small>For display on Attendance Lists</small>
 						</div>
 					</div>
 					<hr>
 					<div class="row">
 						<div class="col-lg-12 col-sm-12 form-group">
-								{{ Form::label('event_status','Status',array('id'=>'','class'=>'')) }}
+								{{ html()->label('Status', 'event_status') }}
 								{{ 
-									Form::select(
-										'status',
-										array(
+									html()->select('status', array(
 											'draft'=>'Draft',
 											'preview'=>'Preview',
 											'published'=>'Published',
-										),
-										strtolower($seatingPlan->status),
-										array(
-											'id'=>'status',
-											'class'=>'form-control'
-										)
-									)
+										), strtolower($seatingPlan->status))->class('form-control')
 								}}
 						</div>
 					</div>
 					<div class="row">
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('columns','Columns',array('id'=>'','class'=>'')) }}
-							{{ Form::text('columns', $seatingPlan->columns ,array('id'=>'columns','class'=>'form-control')) }}
+							{{ html()->label('Columns', 'columns') }}
+							{{ html()->text('columns', $seatingPlan->columns)->class('form-control') }}
 						</div> 
 						<div class="col-lg-6 col-sm-12 form-group">
-							{{ Form::label('rows','Rows',array('id'=>'','class'=>'')) }}
-							{{ Form::text('rows', $seatingPlan->rows ,array('id'=>'rows','class'=>'form-control')) }}
+							{{ html()->label('Rows', 'rows') }}
+							{{ html()->text('rows', $seatingPlan->rows)->class('form-control') }}
 						</div>
 					</div>
 					<div class="form-group">
-						{{ Form::label('image','Seating Plan Image',array('id'=>'','class'=>'')) }}
-						{{ Form::file('image',array('id'=>'image','class'=>'form-control')) }}
+						{{ html()->label('Seating Plan Image', 'image') }}
+						{{ html()->file('image')->class('form-control') }}
 					</div>
 					<div class="form-group"> 
 						<div class="checkbox"> 
 							<label> 
 								@if ($seatingPlan->locked) 
-									{{ Form::checkbox('locked', 1, true)}} Lock Seating 
+									{{ html()->checkbox('locked', true, 1)}} Lock Seating 
 								@else 
-									{{ Form::checkbox('locked', 1)}} Lock Seating 
+									{{ html()->checkbox('locked', false, 1)}} Lock Seating 
 								@endif 
 							</label> 
 						</div> 
@@ -198,7 +190,7 @@
 						<h4>Image Preview</h4>
 						<img src="{{ $seatingPlan->getFirstMediaUrl() }}" alt="{{ $seatingPlan->name }} Layout" class="img img-responsive" />
 					@endif
-				{{ Form::close() }}
+				</form>
 			</div>
 		</div>
 	
@@ -214,35 +206,35 @@
 				<h4 class="modal-title" id="editSeatingModalLabel">Edit Seating</h4>
 			</div>
 			<div class="modal-body">
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat')) }}
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat'))->open() }}
 					<div class="form-group">
-						{{ Form::label('seat_number_modal','Seat Number',array('id'=>'','class'=>'')) }}
-						{{ Form::text('seat_number_modal', null, array('id'=>'seat_number_modal','class'=>'form-control')) }}
+						{{ html()->label('Seat Number', 'seat_number_modal') }}
+						{{ html()->text('seat_number_modal')->class('form-control') }}
 					</div>
 					<div class="form-group">
-						{{ Form::label('participant_select_modal','Participant',array('id'=>'','class'=>'')) }}
-						{{ Form::select('participant_select_modal', $event->getParticipants(), null, array('id'=>'participant_select_modal','class'=>'form-control')) }}
+						{{ html()->label('Participant', 'participant_select_modal') }}
+						{{ html()->select('participant_select_modal', $event->getParticipants())->class('form-control') }}
 					</div> 
-					{{ Form::hidden('participant_id_modal', null, array('id'=>'participant_id_modal','class'=>'form-control')) }}
-					{{ Form::hidden('event_id_modal', null, array('id'=>'event_id_modal','class'=>'form-control')) }}
+					{{ html()->hidden('participant_id_modal')->class('form-control') }}
+					{{ html()->hidden('event_id_modal')->class('form-control') }}
 					
 					<a href="" id="participant_link">
 						<button type="button" class="btn btn-default btn-block">Go to Participant</button>
 					</a>
 					<br>
 					<button type="submit" class="btn btn-success btn-block">Save Changes</button>
-				{{ Form::close() }}
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat', 'id'=>'clear_seat_form')) }}
+				</form>
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat'))->id('clear_seat_form')->open() }}
 					<hr>
-					{{ Form::hidden('_method', 'DELETE') }}
-					{{ Form::hidden('seat_number_clear', null, array('id'=>'seat_number_clear')) }}
+					@method('DELETE')
+					{{ html()->hidden('seat_number_clear') }}
 					<button type="submit" class="btn btn-danger btn-block">Clear Seat</button>
-				{{ Form::close() }}
-				{{ Form::open(array('url'=>'/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat/disable', 'id'=>'disable_seat_form')) }}
+				</form>
+				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/seating/' . $seatingPlan->slug . '/seat/disable'))->id('disable_seat_form')->open() }}
 					<hr>
-					{{ Form::hidden('seat_number_disable', null, array('id'=>'seat_number_disable')) }}
+					{{ html()->hidden('seat_number_disable') }}
 					<button type="submit" class="btn btn-danger btn-block">Enable/Disable Seat</button>
-				{{ Form::close() }}
+				</form>
 
 			</div>
 		</div>

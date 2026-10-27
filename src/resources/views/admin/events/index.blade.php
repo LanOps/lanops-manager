@@ -48,10 +48,10 @@
 										<a href="/admin/events/{{ $event->slug }}"><button type="button" class="btn btn-primary btn-sm btn-block">Edit</button></a>
 									</td>
 									<td width="15%">
-										{{ Form::open(array('url'=>'/admin/events/' . $event->slug, 'onsubmit' => 'return ConfirmDelete()')) }}
-											{{ Form::hidden('_method', 'DELETE') }}
+										{{ html()->form('POST', url('/admin/events/' . $event->slug))->attribute('onsubmit', 'return ConfirmDelete()')->open() }}
+											@method('DELETE')
 											<button type="submit" class="btn btn-danger btn-sm btn-block">Delete</button>
-										{{ Form::close() }}
+										</form>
 									</td>
 								</tr>
 							@endforeach
@@ -80,56 +80,56 @@
 					</div>
 				@endif
 				<div class="list-group">
-					{{ Form::open(array('url'=>'/admin/events/')) }}
+					{{ html()->form('POST', url('/admin/events/'))->open() }}
 						<div class="form-group">
-							{{ Form::label('event_name','Event Name',array('id'=>'','class'=>'')) }}
-							{{ Form::text('event_name', '',array('id'=>'event_name','class'=>'form-control')) }}
+							{{ html()->label('Event Name', 'event_name') }}
+							{{ html()->text('event_name', '')->class('form-control') }}
 						</div>
 						<div class="row">
 							<div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('start_date','Start Date',array('id'=>'','class'=>'')) }}
-								{{ Form::text('start_date', '',array('id'=>'start_date','class'=>'form-control')) }}
+								{{ html()->label('Start Date', 'start_date') }}
+								{{ html()->text('start_date', '')->class('form-control') }}
 							</div>
 							<div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('start_time','Start  Time',array('id'=>'','class'=>'')) }}
-								{{ Form::text('start_time', '16:00',array('id'=>'start_time','class'=>'form-control')) }}
+								{{ html()->label('Start  Time', 'start_time') }}
+								{{ html()->text('start_time', '16:00')->class('form-control') }}
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('end_date','End Date',array('id'=>'','class'=>'')) }}
-								{{ Form::text('end_date', '',array('id'=>'end_date','class'=>'form-control')) }}
+								{{ html()->label('End Date', 'end_date') }}
+								{{ html()->text('end_date', '')->class('form-control') }}
 							</div>
 							<div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('end_time','End Time',array('id'=>'','class'=>'')) }}
-								{{ Form::text('end_time', '18:00',array('id'=>'end_time','class'=>'form-control')) }}
+								{{ html()->label('End Time', 'end_time') }}
+								{{ html()->text('end_time', '18:00')->class('form-control') }}
 							</div>
 						</div>
 						<div class="form-group">
-							{{ Form::label('desc_short','Short Description',array('id'=>'','class'=>'')) }}
-							{{ Form::text('desc_short', '',array('id'=>'desc_short','class'=>'form-control')) }}
+							{{ html()->label('Short Description', 'desc_short') }}
+							{{ html()->text('desc_short', '')->class('form-control') }}
 						</div>
 						<div class="form-group">
-							{{ Form::label('desc_long','Long Description',array('id'=>'','class'=>'')) }}
-							{{ Form::textarea('desc_long', '',array('id'=>'desc_long','class'=>'form-control', 'rows'=>'2')) }}
+							{{ html()->label('Long Description', 'desc_long') }}
+							{{ html()->textarea('desc_long', '')->class('form-control')->rows('2') }}
 						</div>
 						<div class="row">
 							<div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('capacity','Capacity',array('id'=>'','class'=>'')) }}
-								{{ Form::text('capacity', '',array('id'=>'capacity','class'=>'form-control')) }}
+								{{ html()->label('Capacity', 'capacity') }}
+								{{ html()->text('capacity', '')->class('form-control') }}
 							</div>
 							<div class="col-lg-6 col-sm-12 form-group">
-								{{ Form::label('venue','Venue',array('id'=>'','class'=>'')) }}
-								{{ Form::select('venue', Helpers::getVenues(), null, array('id'=>'venue','class'=>'form-control')) }}
+								{{ html()->label('Venue', 'venue') }}
+								{{ html()->select('venue', Helpers::getVenues())->class('form-control') }}
 							</div>
 						</div>
 						<div class="checkbox">
 							<label>
-								{{ Form::checkbox('allow_spec','Y',true) }} Allow Spectators
+								{{ html()->checkbox('allow_spec', true, 'Y') }} Allow Spectators
 							</label>
 						</div>
 						<button type="submit" class="btn btn-success btn-block">Submit</button>
-					{{ Form::close() }}
+					</form>
 				</div>
 			</div>
 		</div>
