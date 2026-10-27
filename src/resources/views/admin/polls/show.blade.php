@@ -46,8 +46,10 @@
 									<td width="30%">{{ $option->name }}</td>
 									<td width="5%">{{ $option->getTotalVotes() }}</td>
 									<td width="40%">
-										<div class="progress-bar" role="progressbar" aria-valuenow="{{ $option->getPercentage() }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $option->getPercentage() }}%;">
-											{{ $option->getPercentage() }}%
+										<div class="progress" style="height: 20px;">
+											<div class="progress-bar" role="progressbar" aria-valuenow="{{ $option->getPercentage() }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $option->getPercentage() }}%;">
+												{{ $option->getPercentage() }}%
+											</div>
 										</div>
 									</td>
 									<td width="25%"><small>{{ $option->user->username }}</small></td>

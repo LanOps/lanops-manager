@@ -11,7 +11,7 @@
     </div>
     <div class="card-body">
         @if ($tournament->hasEvent() && !$tournament->event->getEventParticipant())
-            <p class="bg-info padding">Event ticket required for this Tournament</p>
+            <p class="bg-info-subtle text-info-emphasis padding">Event ticket required for this Tournament</p>
         @endif
         @if (
             ($tournament->hasEvent() && $tournament->event->getEventParticipant()) ||

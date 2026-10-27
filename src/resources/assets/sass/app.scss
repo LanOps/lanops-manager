@@ -32,6 +32,10 @@ $paragraph-margin-bottom: 10px;
 	max-width: 200px;
 }
 
+.custom-header .navbar-toggler {
+	border: none;
+}
+
 // Bootstrap 3's navbar was 50px tall and the page layout allows for that
 @include media-breakpoint-up(md) {
 	.custom-header.navbar {
@@ -66,6 +70,27 @@ h4, h5, h6 {
 
 .card {
 	margin-bottom: 20px;
+}
+
+h1, h2, h3 {
+	small {
+		font-size: 65%;
+	}
+}
+
+h4, h5, h6 {
+	small {
+		font-size: 75%;
+	}
+}
+
+.btn {
+	white-space: nowrap;
+}
+
+label:not(.form-check-label) {
+	font-weight: bold;
+	margin-bottom: 5px;
 }
 
 @import 'stylesheets/app/modules/variables',

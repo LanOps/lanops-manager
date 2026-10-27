@@ -27,6 +27,10 @@
 .card-header .card-title {
 	font-size: 1rem;
 	margin: 0;
+
+	> a {
+		color: inherit;
+	}
 }
 
 // Colour mode toggle (see resources/js/color-mode.js): show the icon for the current mode

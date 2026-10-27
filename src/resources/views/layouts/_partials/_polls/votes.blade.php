@@ -5,8 +5,10 @@
 					<tr class="table-row odd gradeX">
 						<td width="30%">{{ $option->name }}</td>
 						<td>
-							<div class="progress-bar" role="progressbar" aria-valuenow="{{ number_format($option->getPercentage(), 2) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $option->getPercentage() }}%;">
-								{{ $option->getTotalVotes() }}
+							<div class="progress" style="height: 20px;">
+								<div class="progress-bar" role="progressbar" aria-valuenow="{{ number_format($option->getPercentage(), 2) }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $option->getPercentage() }}%;">
+									{{ $option->getTotalVotes() }}
+								</div>
 							</div>
 						</td>
 						@if (!$poll->hasEnded() && Auth::user())
