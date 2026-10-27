@@ -172,11 +172,8 @@ class EventParticipant extends Model implements HasMedia
      */
     public function getTicketUrl()
     {
-        $baseUrl = rtrim(config('app.url'), '/');
-        if (!preg_match('#^https?://#i', $baseUrl)) {
-            $baseUrl = 'https://' . $baseUrl;
-        }
-        return $baseUrl . '/tickets/retrieve/' . $this->id;
+        $host = preg_replace('#^https?:?/*#i', '', rtrim(config('app.url'), '/'));
+        return 'https://' . $host . '/tickets/retrieve/' . $this->id;
     }
 
     /**

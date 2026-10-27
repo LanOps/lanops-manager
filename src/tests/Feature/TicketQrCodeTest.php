@@ -35,6 +35,13 @@ class TicketQrCodeTest extends TestCase
         $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/1971', $this->participant(1971)->getTicketUrl());
     }
 
+    public function testTicketUrlFixesAppUrlMissingTheColon(): void
+    {
+        config(['app.url' => 'https//www.lanops.co.uk']);
+
+        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/1971', $this->participant(1971)->getTicketUrl());
+    }
+
     public function testRegenerateCommandRunsWithNoParticipants(): void
     {
         $this->artisan('tickets:regenerate-qr', ['--event' => 999999])
