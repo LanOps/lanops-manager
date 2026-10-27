@@ -9,6 +9,16 @@ export default defineConfig({
     build: {
         cssMinify: 'esbuild',
     },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                // Bootstrap 3 and 5 both still use @import and the old global Sass functions;
+                // hide those warnings until Bootstrap moves to the Sass module system
+                quietDeps: true,
+                silenceDeprecations: ['import', 'global-builtin', 'color-functions', 'if-function', 'slash-div'],
+            },
+        },
+    },
     plugins: [
         laravel([
             'resources/assets/sass/app.scss',

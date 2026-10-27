@@ -5,6 +5,8 @@
         "build": "vite build"
     },
     "devDependencies": {
+        "@popperjs/core": "^2.11.8",
+        "bootstrap": "^5.3.8",
         "bootstrap-sass": "^3.4.3",
         "cross-env": "^7.0.3",
         "esbuild": "^0.28.2",

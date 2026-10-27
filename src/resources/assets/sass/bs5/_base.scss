@@ -1,0 +1,34 @@
+// Bootstrap 5 with the LanOps theme and light/dark colour modes.
+// Shared by the public and admin bundles; each imports this first.
+@import 'variables';
+@import 'bootstrap/scss/bootstrap';
+
+// The header and footer stay dark in both colour modes so the logo looks the same
+:root,
+[data-bs-theme='light'],
+[data-bs-theme='dark'] {
+	--lanops-header-bg: #{$lanops-charcoal};
+	--lanops-header-color: #{$lanops-header-text};
+}
+
+[data-bs-theme='dark'] {
+	--bs-link-color: #{$lanops-orange};
+	--bs-link-color-rgb: #{to-rgb($lanops-orange)};
+	--bs-link-hover-color: #{lighten($lanops-orange, 10%)};
+	--bs-link-hover-color-rgb: #{to-rgb(lighten($lanops-orange, 10%))};
+}
+
+.lanops-header {
+	background-color: var(--lanops-header-bg);
+	color: var(--lanops-header-color);
+}
+
+// Colour mode toggle (see resources/js/color-mode.js): show the icon for the current mode
+.color-mode-icon-dark,
+[data-bs-theme='dark'] .color-mode-icon-light {
+	display: none;
+}
+
+[data-bs-theme='dark'] .color-mode-icon-dark {
+	display: inline-block;
+}
