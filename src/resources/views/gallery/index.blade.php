@@ -19,7 +19,9 @@
                     <div class="col-12 col-sm-6 col-md-4 col-lg-3">
                         <div class="gallery-card">
                             <a href="/gallery/{{ $album->slug }}" class="gallery-card-img">
-                                <img src="{{ $album->getAlbumCoverImageUrl() }}" alt="{{ $album->name }}">
+                                @if ($cover = $album->getAlbumCoverImageUrl())
+                                    <img src="{{ $cover }}" alt="{{ $album->name }}">
+                                @endif
                             </a>
                             <div class="gallery-card-body">
                                 <h4 class="gallery-card-title">{{ $album->name }}</h4>

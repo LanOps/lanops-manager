@@ -23,7 +23,10 @@ class GalleryController extends Controller
             ->url(url('/gallery'));
 
         $event = Event::where('start', '>=', date("Y-m-d 00:00:00"))->first();
-        $albums = GalleryAlbum::all();
+        // Newest first, by the album's event date (or the album's own date if it has no event)
+        $albums = GalleryAlbum::with('event')->get()
+            ->sortByDesc(fn ($album) => (string) ($album->event?->start ?? $album->created_at))
+            ->values();
         return view('gallery.index')
             ->withAlbums($albums)
             ->withEvent($event);
