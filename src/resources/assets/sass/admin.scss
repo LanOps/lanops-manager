@@ -1,3 +1,6 @@
+// Admin keeps Bootstrap 3's denser 14px text
+$font-size-base: 0.875rem;
+
 @import 'bs5/base';
 
 // Admin layout: dark top bar, sidebar on the left (an offcanvas menu below lg)
@@ -102,4 +105,14 @@ body.admin {
 .admin-main label:not(.form-check-label) {
 	font-weight: $font-weight-bold;
 	margin-bottom: 0.3rem;
+}
+
+// Collapsible section titles (event information) read as headings, not links
+.admin-main .card-header .card-title {
+	font-size: 1rem;
+	margin: 0;
+}
+
+.admin-main .card-header .card-title > a {
+	color: inherit;
 }
