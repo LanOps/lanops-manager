@@ -118,15 +118,23 @@ class AuthController extends Controller
         }
         switch ($method) {
             case 'steam':
+                // The Steam account comes from the Steam login, never from the form
+                $steamUser = Session::get('user');
+                if (empty($steamUser['steamid'])) {
+                    return Redirect::to('/login');
+                }
                 $this->validate($request, [
                     'firstname' => 'required|string',
                     'surname'   => 'required|string',
-                    'steamid'   => 'required|string',
-                    'avatar'    => 'required|string',
                     'username'  => 'required|unique:users,username',
                 ]);
-                $user->avatar               = $request->avatar;
-                $user->steamid              = $request->steamid;
+                if (User::where('steamid', $steamUser['steamid'])->exists()) {
+                    Session::forget('user');
+                    Session::flash('alert-danger', 'That Steam account is already registered. Please log in.');
+                    return Redirect::to('/login');
+                }
+                $user->avatar               = $steamUser['avatar'] ?? null;
+                $user->steamid              = $steamUser['steamid'];
                 // No email Verification needed - just add the email_verified_at
                 $user->email_verified_at    = new \DateTime('NOW');
                 break;

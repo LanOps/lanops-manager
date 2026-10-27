@@ -18,7 +18,9 @@ class Banned
             return $next($request);
         }
 
+        // Back could be another page behind this middleware, so log out and go home
+        Auth::logout();
         Session::flash('alert-danger', 'You have been banned!');
-        return Redirect::back()->withError('You have been banned.');
+        return Redirect::to('/');
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Events;
 use Auth;
 use Session;
 
-use App\Models\User;
 use App\Models\EventParticipant;
 use App\Models\EventTicket;
 
@@ -24,7 +23,7 @@ class TicketsController extends Controller
      */
     public function purchase(Request $request, EventTicket $ticket)
     {
-        $user = User::where('id', $request->user_id)->first();
+        $user = Auth::user();
 
         if ($user == null) {
             Session::flash('alert-danger', 'User not found.');

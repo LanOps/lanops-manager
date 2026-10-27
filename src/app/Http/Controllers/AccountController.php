@@ -51,6 +51,12 @@ class AccountController extends Controller
 
     public function linkDiscord(Request $request)
     {
+        $state = Session::pull('discordoauth');
+        if (!$state || !is_string($request->input('state')) || !hash_equals($state, $request->input('state'))) {
+            Session::flash('alert-danger', 'Discord link expired, please try again.');
+            return Redirect::to('account');
+        }
+
         $response = Http::asform()->withHeaders([
                 'Content-Type' => 'application/json',
             ])->post("https://discord.com/api/oauth2/token", [
@@ -90,14 +96,16 @@ class AccountController extends Controller
 
     public function update(Request $request)
     {
+        $user = Auth::user();
         $rules = [
             'firstname'     => 'filled',
             'surname'       => 'filled',
-            'email'         => 'filled|email',
+            'email'         => 'filled|email|unique:users,email,' . $user->id,
             'password1'     => 'same:password2',
             'password2'     => 'same:password1',
         ];
         $messages = [
+            'email.unique'      => 'That Email Address is already in use.',
             'email.filled'      => 'Email Cannot be blank.',
             'firstname.filled'  => 'Firstname Cannot be blank.',
             'surname.filled'    => 'Surname Cannot be blank.',
@@ -107,8 +115,17 @@ class AccountController extends Controller
         ];
         $this->validate($request, $rules, $messages);
 
-        $user = Auth::user();
-        if (isset($request->password1) && $request->password1 != null) {
+        $changingEmail = $request->filled('email') && $request->email !== $user->email;
+        $changingPassword = isset($request->password1) && $request->password1 != null;
+
+        // Email and password changes need the current password, when the account has one
+        if (($changingEmail || $changingPassword) && $user->password != null &&
+            !Hash::check((string) $request->current_password, $user->password)
+        ) {
+            return Redirect::back()->withErrors(['current_password' => 'Your current password is incorrect.']);
+        }
+
+        if ($changingPassword) {
             $rules = [
                 'password1'     => 'same:password2|min:8',
                 'password2'     => 'same:password1|min:8',
@@ -123,12 +140,24 @@ class AccountController extends Controller
             $user->password = Hash::make($request->password1);
         }
 
-        $user->email = @$request->email;
-        $user->firstname = @$request->firstname;
-        $user->surname = @$request->surname;
+        if ($request->filled('email')) {
+            $user->email = $request->email;
+        }
+        if ($request->filled('firstname')) {
+            $user->firstname = $request->firstname;
+        }
+        if ($request->filled('surname')) {
+            $user->surname = $request->surname;
+        }
+        if ($changingEmail) {
+            $user->email_verified_at = null;
+        }
 
         if (!$user->save()) {
             return Redirect::back()->withFail("Oops, Something went Wrong.");
+        }
+        if ($changingEmail) {
+            $user->sendEmailVerificationNotification();
         }
         return Redirect::back()->withSuccess('Account successfully updated!');
     }
