@@ -53,9 +53,20 @@ class TicketsController extends Controller
             return Redirect::to('/events/' . $ticket->event->slug);
         }
 
+        $this->validate($request, [
+            'quantity' => 'required|integer|min:1|max:' . EventTicket::MAX_PER_ORDER,
+        ], [
+            'quantity.*' => 'You can buy between 1 and ' . EventTicket::MAX_PER_ORDER . ' tickets at a time.',
+        ]);
+
+        if ($soldOut = $ticket->soldOutMessage((int) $request->quantity)) {
+            Session::flash('alert-danger', $soldOut);
+            return Redirect::to('/events/' . $ticket->event->slug);
+        }
+
         $params = [
             'tickets' => [
-                $ticket->id => $request->quantity,
+                $ticket->id => (int) $request->quantity,
             ],
             'referral_discount' => false
         ];

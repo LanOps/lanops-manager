@@ -142,7 +142,7 @@
 										<div class="row">
 											<div class="mb-3 col-sm-6 col-12">
 												{{ html()->label('Quantity', 'quantity') }}
-												{{ html()->select('quantity', array(1 => 1, 2 => 2))->class('form-select') }}
+												{{ html()->select('quantity', array_combine(range(1, \App\Models\EventTicket::MAX_PER_ORDER), range(1, \App\Models\EventTicket::MAX_PER_ORDER)))->class('form-select') }}
 											</div>
 											<div class="mb-3 col-sm-6 col-12">
 												{{ html()->hidden('user_id', $user->id)->class('form-control') }}

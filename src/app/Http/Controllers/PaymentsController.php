@@ -120,8 +120,8 @@ class PaymentsController extends Controller
         if (array_key_exists('tickets', $basket)) {
             foreach ($basket['tickets'] as $ticketId => $quantity) {
                 $ticket = EventTicket::where('id', $ticketId)->first();
-                if ($ticket->event->capacity <= $ticket->event->EventParticipants->count()) {
-                    Session::flash('alert-danger', $ticket->event->display_name . ' has sold out!');
+                if ($soldOut = $ticket->soldOutMessage($quantity)) {
+                    Session::flash('alert-danger', $soldOut);
                     return Redirect::back();
                 }
             }
@@ -192,6 +192,10 @@ class PaymentsController extends Controller
                 break;
         }
         Session::put('params', $params);
+        // Tickets are issued from this copy of the basket, so changing the
+        // basket in another tab during 3D Secure changes nothing
+        Session::put('payment_basket', $basket);
+        Session::forget('payment_intent');
         Session::save();
         if (!$processPaymentSkip) {
             if (config('app.debug')) {
@@ -209,17 +213,7 @@ class PaymentsController extends Controller
         }
 
         if ($response->isSuccessful()) {
-            // Payment was successful: update database
-            try {
-                $gateway->confirm([
-                    'paymentIntentReference' => $response->getPaymentIntentReference(),
-                    'returnUrl' => $this->getCallbackReturnUrl($paymentGateway),
-                ])->send();
-            } catch (\Exception $e) {
-                Session::flash('alert-danger', $e->getMessage());
-                return Redirect::back();
-            }
-            $responseStripe = $response->getData();
+            // Payment was successful (purchase was sent with confirm): update database
             $purchaseParams = [
                 'user_id'                   => Auth::id(),
                 'type'                      => 'Stripe',
@@ -232,7 +226,11 @@ class PaymentsController extends Controller
             $this->processBasket($basket, $purchase->id);
             return Redirect::to('/payment/successful/' . $purchase->id);
         } elseif ($response->isRedirect()) {
-            // Payment Requires redirect
+            // Payment Requires redirect; only this payment may complete on return
+            if ($paymentGateway == 'stripe') {
+                Session::put('payment_intent', $response->getPaymentIntentReference());
+                Session::save();
+            }
             try {
                 $response->redirect();
             } catch (\Exception $e) {
@@ -264,27 +262,35 @@ class PaymentsController extends Controller
             Session::flash('alert-danger', 'Payment was CANCELLED!');
             return Redirect::to('/payment/cancelled');
         }
-        if (!Session::has('params')) {
+        if (!Session::has('params') || !Session::has('payment_basket')) {
             Session::flash('alert-danger', 'Payment was UNSUCCESSFUL!');
             return Redirect::to('/payment/failed');
         }
         $params = Session::get('params');
+        $basket = Session::get('payment_basket');
         if (config('app.debug')) {
             $this->sandbox = true;
         }
         $successful = false;
         switch ($paymentGateway) {
             case 'stripe':
+                $paymentIntent = $request->get('payment_intent');
+                if (!$paymentIntent ||
+                    $paymentIntent !== Session::get('payment_intent') ||
+                    Purchase::where('token', $paymentIntent)->exists()
+                ) {
+                    break;
+                }
                 $gateway = Omnipay::create('Stripe\PaymentIntents');
                 $gateway->setApiKey(config('laravel-omnipay.gateways.stripe.credentials.secret'));
 
                 //Complete Purchase
                 $response = $gateway->confirm([
-                    'paymentIntentReference' => $request->get('payment_intent'),
+                    'paymentIntentReference' => $paymentIntent,
                     'returnUrl'     => $this->getCallbackReturnUrl($paymentGateway),
                 ])->send();
 
-                if ($response->isSuccessful()) {
+                if ($response->isSuccessful() && $this->chargedAmountMatches($response->getData(), $params)) {
                     //Add Purchase to database
                     $purchaseParams = [
                         'user_id'                   => Auth::id(),
@@ -342,10 +348,10 @@ class PaymentsController extends Controller
      */
     public function showSuccessful(Purchase $purchase)
     {
-        if (!Session::has('params')) {
+        if (!Session::has('params') || $purchase->user_id != Auth::id()) {
             return Redirect::to('/');
         }
-        $basket = Session::get(config('app.basket_name'));
+        $basket = $purchase->basket;
         $type = 'tickets';
         if (array_key_exists('shop', $basket)) {
             $type = 'shop';
@@ -354,6 +360,7 @@ class PaymentsController extends Controller
         Session::forget('params');
         Session::forget(config('app.basket_name'));
         Session::forget('payment_terms_accepted');
+        Session::forget(['payment_basket', 'payment_intent']);
         return view('payments.successful')
             ->withType($type)
             ->withBasket($basket)
@@ -371,6 +378,7 @@ class PaymentsController extends Controller
         Session::forget('params');
         Session::forget(config('app.basket_name'));
         Session::forget('payment_terms_accepted');
+        Session::forget(['payment_basket', 'payment_intent']);
         return view('payments.failed');
     }
 
@@ -384,6 +392,7 @@ class PaymentsController extends Controller
         Session::forget('params');
         Session::forget(config('app.basket_name'));
         Session::forget('payment_terms_accepted');
+        Session::forget(['payment_basket', 'payment_intent']);
         return view('payments.cancelled');
     }
 
@@ -448,7 +457,7 @@ class PaymentsController extends Controller
      */
     private function getCallbackReturnUrl($paymentGateway)
     {
-        return $this->getRequestScheme($paymentGateway) . '://' . $_SERVER['HTTP_HOST'] . '/payment/callback?gate=' . $paymentGateway . '&type=return';
+        return rtrim(config('app.url'), '/') . '/payment/callback?gate=' . $paymentGateway . '&type=return';
     }
 
     /**
@@ -458,24 +467,20 @@ class PaymentsController extends Controller
      */
     private function getCallbackCancelUrl($paymentGateway)
     {
-        return $this->getRequestScheme($paymentGateway) . '://' . $_SERVER['HTTP_HOST'] . '/payment/callback?gate=' . $paymentGateway . '&type=cancel';
+        return rtrim(config('app.url'), '/') . '/payment/callback?gate=' . $paymentGateway . '&type=cancel';
     }
 
     /**
-     * Get Request Scheme
-     * @param  $paymentGateway
-     * @return $requestScheme
+     * Check Stripe charged the amount and currency this payment was started for
+     * @param  array $paymentIntent
+     * @param  array $params
+     * @return Boolean
      */
-    private function getRequestScheme($paymentGateway)
+    private function chargedAmountMatches($paymentIntent, $params)
     {
-        $requestScheme = 'http';
-        if ((! empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https') ||
-                (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ||
-                (! empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443')
-            ) {
-            $requestScheme = 'https';
-        }
-        return $requestScheme;
+        return isset($paymentIntent['amount'], $paymentIntent['currency']) &&
+            (int) $paymentIntent['amount'] === (int) round($params['amount'] * 100) &&
+            strtolower($paymentIntent['currency']) === strtolower($params['currency']);
     }
 
     public function applyDiscountCode(Request $request)
