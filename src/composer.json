@@ -29,7 +29,6 @@
         "mews/captcha": "^3.4",
         "sentry/sentry-laravel": "^4.23",
         "socialiteproviders/steam": "^4.4",
-        "rdx/laravelcollective-html": "^6.10",
         "spatie/laravel-html": "^3.13"
     },
     "require-dev": {

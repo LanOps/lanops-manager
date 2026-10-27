@@ -86,12 +86,12 @@
                 <div class="news-comment-form">
                     <h3 class="news-comment-form-title">Post a Comment</h3>
                     @if (Auth::user())
-                        {{ Form::open(['url' => '/news/' . $newsArticle->slug . '/comments']) }}
+                        {{ html()->form('POST', url('/news/' . $newsArticle->slug . '/comments'))->open() }}
                             <div class="form-group">
-                                {{ Form::textarea('comment', '', ['id' => 'comment', 'class' => 'form-control', 'rows' => '4', 'placeholder' => 'Write a comment...']) }}
+                                {{ html()->textarea('comment', '')->class('form-control')->rows('4')->placeholder('Write a comment...') }}
                             </div>
                             <button type="submit" class="btn btn-orange">Post Comment</button>
-                        {{ Form::close() }}
+                        </form>
                     @else
                         <p class="text-muted"><a href="{{ url('/login') }}">Log in</a> to post a comment.</p>
                     @endif
@@ -110,17 +110,17 @@
                 <h4 class="modal-title" id="editCommentModalLabel">Edit Comment</h4>
             </div>
             @if (Auth::user())
-                {{ Form::open(['url' => '/news/' . $newsArticle->slug . '/comments', 'id' => 'edit_comment_modal_form']) }}
+                {{ html()->form('POST', url('/news/' . $newsArticle->slug . '/comments'))->id('edit_comment_modal_form')->open() }}
                     <div class="modal-body">
                         <div class="form-group">
-                            {{ Form::textarea('comment_modal', '', ['id' => 'comment_modal', 'class' => 'form-control', 'rows' => '4', 'placeholder' => 'Edit your comment']) }}
+                            {{ html()->textarea('comment_modal', '')->class('form-control')->rows('4')->placeholder('Edit your comment') }}
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-orange">Save</button>
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     </div>
-                {{ Form::close() }}
+                </form>
             @else
                 <div class="modal-body">
                     <p>Please log in to edit a comment.</p>
