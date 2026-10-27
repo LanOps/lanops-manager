@@ -1,6 +1,6 @@
 <div class="row">
 	<div class="col-2">
-		<img class="img-fluid rounded img-small news-post-comment-image" alt="{{ $comment->user->username }}'s Avatar" src="{{ $comment->user->avatar }}"/>
+		<x-avatar :user="$comment->user" class="img-fluid rounded img-small news-post-comment-image" />
 		<p class="news-post-comment-image-text">{{ $comment->user->username }}</p>
 	</div>
 	<div class="col-10">

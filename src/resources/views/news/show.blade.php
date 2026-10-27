@@ -54,7 +54,7 @@
                         @include ('layouts._partials._news.comment-warnings')
                         <div class="news-comment">
                             <div class="news-comment-avatar">
-                                <img class="img-fluid rounded" alt="{{ $comment->user->username }}'s Avatar" src="{{ $comment->user->avatar }}"/>
+                                <x-avatar :user="$comment->user" class="img-fluid rounded" />
                                 <p class="news-comment-author">{{ $comment->user->username }}</p>
                             </div>
                             <div class="news-comment-body">

@@ -38,7 +38,7 @@
 							@foreach ($users as $user)
 								<tr class="">
 									<td width="3%">
-										<img class="img-fluid rounded" src="{{ $user->avatar }}">
+										<x-avatar :user="$user" class="img-fluid rounded" />
 									</td>
 									<td>
 										{{ $user->username }}
