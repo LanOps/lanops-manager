@@ -41,12 +41,12 @@
 								@if ($basket->referral_code)
 									<b>{{ \App\Models\User::getUserByReferralCode($basket->referral_code)->username}}'s Referral Code has been applied! Such a rinsing Geezer!</b>
 								@else
-									{{ Form::open(array('url'=>'/payment/checkout/code' )) }}
+									{{ html()->form('POST', url('/payment/checkout/code'))->open() }}
 										<div class="form-group">
-											{{ Form::text('referral_code', '', array('id'=>'referral_code','class'=>'form-control')) }}
+											{{ html()->text('referral_code', '')->class('form-control') }}
 										</div>
 										<button type="submit" class="btn btn-primary btn-block">Submit</button>
-									{{ Form::close() }}
+									</form>
 								@endif
 							</div>
 						</div>

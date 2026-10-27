@@ -66,32 +66,32 @@
 			</dd>
 		</dl>
 		@if ($tournament->status == 'OPEN' && !$tournament->getParticipant($user->active_event_participant->id) && $tournament->team_size == '1v1')
-			{{ Form::open(array('url'=>'/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register', 'files' => true )) }}
+			{{ html()->form('POST', url('/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register'))->acceptsFiles()->open() }}
 				<input type="hidden" name="event_participant_id" value="{{ $user->active_event_participant->id }}">
 				<button type="submit" name="action" value="sign_up" class="btn btn-default">Signup</button>
-			{{ Form::close() }}
+			</form>
 		@endif
 
 		@if ($tournament->status == 'OPEN' && !$tournament->getParticipant($user->active_event_participant->id) && $tournament->team_size != '1v1')
-			{{ Form::open(array('url'=>'/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register/pug', 'files' => true )) }}
+			{{ html()->form('POST', url('/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register/pug'))->acceptsFiles()->open() }}
 				<input type="hidden" name="event_participant_id" value="{{ $user->active_event_participant->id }}">
 				<button type="submit" name="action" value="sign_up" class="btn btn-default">PUG</button>
-			{{ Form::close() }}
-			{{ Form::open(array('url'=>'/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register/team', 'files' => true )) }}
+			</form>
+			{{ html()->form('POST', url('/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register/team'))->acceptsFiles()->open() }}
 				<div class="form-group">
-					{{ Form::label('team_name','Team Name',array('id'=>'','class'=>'')) }}
-					{{ Form::text('team_name', '',array('id'=>'team_name','class'=>'form-control', 'required' => 'required')) }}
+					{{ html()->label('Team Name', 'team_name') }}
+					{{ html()->text('team_name', '')->class('form-control')->required() }}
 				</div>
 				<input type="hidden" name="event_participant_id" value="{{ $user->active_event_participant->id }}">
 				<button type="submit" name="action" value="sign_up" class="btn btn-default">Create Team</button>
-			{{ Form::close() }}
+			</form>
 		@endif
 
 		@if ($tournament->status == 'OPEN' && $tournament->getParticipant($user->active_event_participant->id))
-			{{ Form::open(array('url'=>'/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register/remove', 'files' => true )) }}
+			{{ html()->form('POST', url('/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register/remove'))->acceptsFiles()->open() }}
 				<input type="hidden" name="event_participant_id" value="{{ $user->active_event_participant->id }}">
 				<button type="submit" name="action" value="remove_sign_up" class="btn btn-default">Remove Signup</button>
-			{{ Form::close() }}
+			</form>
 		@endif
 
 		@if ($tournament->status == 'LIVE' && isset($tournament->matches))
@@ -221,11 +221,11 @@
 											</td>
 											<td>
 												@if (!$tournament->getParticipant($user->active_event_participant->id))
-													{{ Form::open(array('url'=>'/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register', 'files' => true )) }}
+													{{ html()->form('POST', url('/events/' . $event->slug . '/tournaments/' . $tournament->slug . '/register'))->acceptsFiles()->open() }}
 														<input type="hidden" name="event_participant_id" value="{{ $user->active_event_participant->id }}">
 														<input type="hidden" name="event_tournament_team_id" value="{{ $tournamentTeam->id }}">
 														<button type="submit" name="action" value="sign_up" class="btn btn-default">Join Team</button>
-													{{ Form::close() }}
+													</form>
 												@endif
 											</td>
 										</tr>

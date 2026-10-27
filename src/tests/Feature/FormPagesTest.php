@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EventSeatingPlan;
+use App\Models\EventTicket;
 use App\Models\EventTimetable;
 use App\Models\NewsArticle;
 use App\Models\User;
@@ -18,6 +19,7 @@ class FormPagesTest extends TestCase
 {
     protected User $admin;
     protected User $member;
+    protected EventTicket $ticket;
     protected array $slugs = [];
 
     protected function setUp(): void
@@ -40,7 +42,7 @@ class FormPagesTest extends TestCase
     {
         $this->admin = $this->createUser(['admin' => true]);
         $this->member = $this->createUser();
-        $ticket = $this->createEventWithTicket();
+        $ticket = $this->ticket = $this->createEventWithTicket();
         $event = $ticket->event;
         $now = now();
 
@@ -124,6 +126,9 @@ class FormPagesTest extends TestCase
             'news article (member)'  => ['member', '/news/{article}'],
             'poll (member)'          => ['member', '/polls/next-game'],
             'register'               => ['guest', '/register/standard'],
+            'checkout'               => ['buyer', '/payment/checkout'],
+            'payment review'         => ['buyer', '/payment/review/stripe'],
+            'payment details'        => ['buyer', '/payment/details/stripe'],
             'forgot password'        => ['guest', '/login/forgot'],
             'admin events'           => ['admin', '/admin/events'],
             'admin event'            => ['admin', '/admin/events/{event}'],
@@ -152,8 +157,12 @@ class FormPagesTest extends TestCase
     protected function fetch(string $as, string $url): string
     {
         $this->withoutExceptionHandling();
-        if ($as !== 'guest') {
+        if ($as === 'admin' || $as === 'member') {
             $this->actingAs($as === 'admin' ? $this->admin : $this->member);
+        }
+        if ($as === 'buyer') {
+            // a first-time buyer, so checkout offers the referral code form
+            $this->actingAs($this->createUser())->withSession($this->basketFor($this->ticket));
         }
 
         return $this->get(strtr($url, $this->slugs))->assertOk()->getContent();

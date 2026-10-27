@@ -48,23 +48,23 @@
 								{{ config('app.url') }}/gift/accept/?url={{ $participant->gift_accepted_url }}
 							</strong>
 						</p>
-						{{ Form::open(array('url'=>'/gift/' . $participant->id . '/revoke', 'id'=>'revokeGiftTicketForm')) }}
+						{{ html()->form('POST', url('/gift/' . $participant->id . '/revoke'))->id('revokeGiftTicketForm')->open() }}
 							<button type="submit" class="btn btn-primary btn-md btn-block">Revoke Gift</button>
-						{{ Form::close() }}
+						</form>
 					@endif
 					@if ($participant->seat)
 						<hr>
-						{{ Form::open(array('url'=>'/events/' . $participant->event->slug . '/seating/' . $participant->seat->seatingPlan->slug)) }}
-							{{ Form::hidden('_method', 'DELETE') }}
-							{{ Form::hidden('user_id', $user->id, array('id'=>'user_id','class'=>'form-control')) }} 
-							{{ Form::hidden('participant_id', $participant->id, array('id'=>'participant_id','class'=>'form-control')) }} 
-							{{ Form::hidden('seat_number', $participant->seat->seat, array('id'=>'seat_number','class'=>'form-control')) }} 
+						{{ html()->form('POST', url('/events/' . $participant->event->slug . '/seating/' . $participant->seat->seatingPlan->slug))->open() }}
+							@method('DELETE')
+							{{ html()->hidden('user_id', $user->id)->class('form-control') }} 
+							{{ html()->hidden('participant_id', $participant->id)->class('form-control') }} 
+							{{ html()->hidden('seat_number', $participant->seat->seat)->class('form-control') }} 
 							<h5>
 								<button class="btn btn-danger btn-block"> 
 									Remove Seating
 								</button>
 							</h5>
-						{{ Form::close() }}
+						</form>
 					@endif
 				</div>
 				<div class="col-md-offset-2 col-md-2 col-sm-offset-2 col-sm-4 col-xs-12">

@@ -14,24 +14,24 @@
 		<div class="col-xs-12 col-md-8">
 			@if ($paymentGateway == 'stripe')
 				
-				{{ Form::open(array('url'=>'/payment/post', 'id'=>'payment-form')) }}
+				{{ html()->form('POST', url('/payment/post'))->id('payment-form')->open() }}
 					<div class="row">
 						<div class="form-group col-sm-6 col-xs-12">
-							{{ Form::label('card_first_name', 'First Name *', array('id'=>'','class'=>'')) }}
-							{{ Form::text('card_first_name', '', array('id'=>'card_first_name','class'=>'form-control')) }}
+							{{ html()->label('First Name *', 'card_first_name') }}
+							{{ html()->text('card_first_name', '')->class('form-control') }}
 						</div> 
 						<div class="form-group col-sm-6 col-xs-12">
-							{{ Form::label('card_last_name', 'Last Name *', array('id'=>'','class'=>'')) }}
-							{{ Form::text('card_last_name', '', array('id'=>'card_last_name','class'=>'form-control')) }}
+							{{ html()->label('Last Name *', 'card_last_name') }}
+							{{ html()->text('card_last_name', '')->class('form-control') }}
 						</div>
 					</div>
-					{{ Form::label('card_number', 'Card Details', array('id'=>'','class'=>'')) }}
+					{{ html()->label('Card Details', 'card_number') }}
 					<div class="form-control" id="card-element"></div>
 			  		<div id="card-errors" role="alert"></div>
 					<p><small>* Required Fields</small></p>
-					{{ Form::hidden('gateway', $paymentGateway) }}
+					{{ html()->hidden('gateway', $paymentGateway) }}
 					<button type="button" id="checkout_btn" class="btn btn-primary btn-block">Confirm Order</button>
-				{{ Form::close() }}
+				</form>
 			@endif
 		</div>
 		<div class="col-xs-12 col-md-4">

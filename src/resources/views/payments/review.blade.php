@@ -22,10 +22,10 @@
 			<div class="alert alert-warning">
 				<h5>By Clicking on Continue you are agreeing to the Terms and Conditions as set by {!! config('app.name') !!}</h5>
 			</div>
-			{{ Form::open(array('url'=>'/payment/post')) }}
-				{{ Form::hidden('gateway', $paymentGateway) }}
+			{{ html()->form('POST', url('/payment/post'))->open() }}
+				{{ html()->hidden('gateway', $paymentGateway) }}
 				<button class="btn btn-primary btn-block">Continue</button>
-			{{ Form::close() }}
+			</form>
 		</div>
 		<div class="col-xs-12 col-md-4">
 			<div class="panel panel-default">
