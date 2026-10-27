@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Events;
 
+use Auth;
 use Session;
 
 use App\Models\Event;
@@ -50,7 +51,21 @@ class SeatingController extends Controller
         ];
         $this->validate($request, $rules, $messages);
         
-        if (!$participant = $event->EventParticipants()->where('id', $request->participant_id)->first()) {
+        if (!$event->seatingPlans()->whereKey($seatingPlan->id)->exists()) {
+            abort(404);
+        }
+
+        if ($seatingPlan->locked) {
+            Session::flash('alert-danger', 'Seating is locked for this event');
+            return Redirect::back();
+        }
+
+        // Only your own tickets can be seated
+        if (!$participant = $event->EventParticipants()
+            ->where('id', $request->participant_id)
+            ->where('user_id', Auth::id())
+            ->first()
+        ) {
             Session::flash('alert-danger', 'Event Participant not found');
             return Redirect::back();
         }
@@ -58,14 +73,6 @@ class SeatingController extends Controller
         if ($participant->ticket && !$participant->ticket->seatable) {
             Session::flash('alert-danger', 'That ticket is not seatable');
             return Redirect::back();
-        }
-
-        if ($participant->seat != null) {
-            $participant->seat->event_participant_id = null;
-            if (!$participant->seat->save()) {
-                Session::flash('alert-danger', 'Could not remove seating');
-                return Redirect::back();
-            }
         }
 
         if (!$seat = $event->getSeat($seatingPlan->id, $request->seat)) {
@@ -83,7 +90,16 @@ class SeatingController extends Controller
             return Redirect::back();
         }
 
-        $seat->event_participant_id = $request->participant_id;
+        // Free the old seat only once the new one is known to be free
+        if ($participant->seat != null) {
+            $participant->seat->event_participant_id = null;
+            if (!$participant->seat->save()) {
+                Session::flash('alert-danger', 'Could not remove seating');
+                return Redirect::back();
+            }
+        }
+
+        $seat->event_participant_id = $participant->id;
 
         if (!$seat->save()) {
             Session::flash('alert-danger', 'Could not update seating');

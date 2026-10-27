@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Events;
 
 use Auth;
 use Session;
+use Illuminate\Support\Str;
 use App\Models\EventParticipant;
 
 use App\Http\Controllers\Controller;
@@ -21,10 +22,14 @@ class ParticipantsController extends Controller
      */
     public function gift(EventParticipant $participant, Request $request)
     {
+        if ($participant->user_id != Auth::id()) {
+            $request->session()->flash('alert-danger', 'This is not your ticket to gift.');
+            return Redirect::back();
+        }
         if ($participant->gift != true && $participant->gift_sendee == null) {
             $participant->gift = true;
             $participant->gift_accepted = false;
-            $participant->gift_accepted_url = base_convert(microtime(false), 10, 36);
+            $participant->gift_accepted_url = Str::random(32);
             $participant->gift_sendee = $participant->user_id;
             if ($participant->save()) {
                 $request->session()->flash(
@@ -48,6 +53,10 @@ class ParticipantsController extends Controller
      */
     public function revokeGift(EventParticipant $participant, $accepted = false)
     {
+        if ($participant->gift_sendee != Auth::id()) {
+            Session::flash('alert-danger', 'This is not your gift to revoke.');
+            return Redirect::back();
+        }
         if ($participant->gift == true) {
             if ($participant->gift_accepted != true) {
                 if ($accepted !== true) {
@@ -75,7 +84,12 @@ class ParticipantsController extends Controller
     {
         $user = Auth::user();
         if ($user) {
-            $participant = EventParticipant::where(['gift_accepted_url' => $request->url])->first();
+            $code = $request->query('url');
+            $participant = null;
+            if (is_string($code) && $code !== '') {
+                // The code is cleared when a gift is accepted or revoked
+                $participant = EventParticipant::where('gift_accepted_url', $code)->first();
+            }
             if ($participant != null) {
                 $participant->gift_accepted = true;
                 $participant->user_id = $user->id;
