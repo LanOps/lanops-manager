@@ -98,11 +98,11 @@ class GalleryAlbum extends Model implements HasMedia
 
     /**
      * Get Album Cover Path
-     * @return Media
+     * @return string|null
      */
     public function getAlbumCoverImageUrl()
     {
-        return $this->getFirstMedia('images')->getUrl('thumb');
+        return $this->getFirstMedia('images')?->getUrl('thumb');
     }
 
     public function registerMediaConversions(?Media $media = null): void
