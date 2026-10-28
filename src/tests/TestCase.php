@@ -24,6 +24,20 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Switch user like a fresh login would: AuthenticateSession keeps the
+     * signed-in user's password hash in the session, and would sign out a
+     * different user acting on that same session.
+     */
+    public function actingAs(\Illuminate\Contracts\Auth\Authenticatable $user, $guard = null)
+    {
+        if ($this->app->bound('session.store')) {
+            $this->app['session.store']->forget('password_hash_web');
+        }
+
+        return parent::actingAs($user, $guard);
+    }
+
+    /**
      * Create a verified, unbanned user.
      */
     protected function createUser(array $attributes = []): User

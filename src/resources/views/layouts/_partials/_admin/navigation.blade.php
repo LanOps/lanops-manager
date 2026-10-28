@@ -17,7 +17,12 @@
 			<ul class="dropdown-menu dropdown-menu-end position-absolute">
 				<li><a class="dropdown-item" href="/account"><i class="fa fa-fw fa-user"></i> Profile</a></li>
 				<li><hr class="dropdown-divider"></li>
-				<li><a class="dropdown-item" href="/logout"><i class="fa fa-fw fa-power-off"></i> Log Out</a></li>
+				<li>
+					<form method="POST" action="/logout">
+						@csrf
+						<button type="submit" class="dropdown-item"><i class="fa fa-fw fa-power-off"></i> Log Out</button>
+					</form>
+				</li>
 			</ul>
 		</li>
 	</ul>

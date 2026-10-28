@@ -62,8 +62,10 @@ class LoginController extends Controller
 
             return $this->sendLockoutResponse($request);
         }
+        // Only say an account is banned once the password is right, so the
+        // message can't be used to find out which emails have accounts
         if ($user = User::where('email', $request->email)->first()) {
-            if ($user->banned) {
+            if ($user->banned && $this->guard()->validate($this->credentials($request))) {
                 Session::flash('alert-danger', 'You have been banned!');
                 return Redirect::back()->withError('You have been banned.');
             }

@@ -26,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::useBootstrap();
 
+        // Where a session that was signed out by a password change ends up
+        \Illuminate\Session\Middleware\AuthenticateSession::redirectUsing(fn () => url('/login'));
+
         // Read the keys through config, so this still works once config is cached
         $availablePaymentGateways = [];
         if (config('laravel-omnipay.gateways.stripe.credentials.secret') != '' &&
