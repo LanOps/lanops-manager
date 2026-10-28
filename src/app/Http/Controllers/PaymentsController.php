@@ -14,6 +14,7 @@ use App\Models\EventParticipant;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 
@@ -271,6 +272,33 @@ class PaymentsController extends Controller
         if (config('app.debug')) {
             $this->sandbox = true;
         }
+        // The same return can arrive several times at once (double click, reload,
+        // or on purpose). Lock the buyer's row so only one request at a time can
+        // check, confirm and record the payment; the rest then see it recorded.
+        // Tickets are issued after the lock, so a ticket error can't undo the record.
+        $purchase = DB::transaction(function () use ($request, $paymentGateway, $params, $basket) {
+            User::whereKey(Auth::id())->lockForUpdate()->first();
+            return $this->recordCallbackPayment($request, $paymentGateway, $params, $basket);
+        });
+        if ($purchase) {
+            $this->processBasket($basket, $purchase->id);
+            return Redirect::to('/payment/successful/' . $purchase->id);
+        }
+        //Failed transaction
+        Session::flash('alert-danger', 'Payment was UNSUCCESSFUL! - Please try again.');
+        return Redirect::to('/payment/failed');
+    }
+
+    /**
+     * Confirm a returning payment with the gateway and record its purchase
+     * @param  Request $request
+     * @param  $paymentGateway
+     * @param  $params
+     * @param  $basket
+     * @return Purchase|null
+     */
+    private function recordCallbackPayment(Request $request, $paymentGateway, $params, $basket)
+    {
         $successful = false;
         switch ($paymentGateway) {
             case 'stripe':
@@ -313,9 +341,11 @@ class PaymentsController extends Controller
                 $gateway->completePurchase($params)->send();
                 $response = $gateway->fetchCheckout($params)->send(); // this is the raw response object
                 $paypalResponse = $response->getData();
-                if (isset($paypalResponse['ACK']) &&
+                if (isset($paypalResponse['ACK'], $paypalResponse['TOKEN']) &&
                     $paypalResponse['ACK'] === 'Success' &&
-                    isset($paypalResponse['PAYMENTREQUEST_0_TRANSACTIONID'])
+                    isset($paypalResponse['PAYMENTREQUEST_0_TRANSACTIONID']) &&
+                    $this->paypalAmountMatches($paypalResponse, $params) &&
+                    !Purchase::where('token', $paypalResponse['TOKEN'])->exists()
                 ) {
                     //Add Purchase to database
                     $purchaseParams = [
@@ -331,14 +361,10 @@ class PaymentsController extends Controller
                 }
                 break;
         }
-        if ($successful) {
-            $purchase = Purchase::create($purchaseParams);
-            $this->processBasket($basket, $purchase->id);
-            return Redirect::to('/payment/successful/' . $purchase->id);
+        if (!$successful) {
+            return null;
         }
-        //Failed transaction
-        Session::flash('alert-danger', 'Payment was UNSUCCESSFUL! - Please try again.');
-        return Redirect::to('/payment/failed');
+        return Purchase::create($purchaseParams);
     }
 
     /**
@@ -478,6 +504,19 @@ class PaymentsController extends Controller
         return isset($paymentIntent['amount'], $paymentIntent['currency']) &&
             (int) $paymentIntent['amount'] === (int) round($params['amount'] * 100) &&
             strtolower($paymentIntent['currency']) === strtolower($params['currency']);
+    }
+
+    /**
+     * Check PayPal took the amount and currency this payment was started for
+     * @param  array $paypalResponse
+     * @param  array $params
+     * @return Boolean
+     */
+    private function paypalAmountMatches($paypalResponse, $params)
+    {
+        return isset($paypalResponse['PAYMENTREQUEST_0_AMT'], $paypalResponse['PAYMENTREQUEST_0_CURRENCYCODE']) &&
+            (int) round($paypalResponse['PAYMENTREQUEST_0_AMT'] * 100) === (int) round($params['amount'] * 100) &&
+            strtolower($paypalResponse['PAYMENTREQUEST_0_CURRENCYCODE']) === strtolower($params['currency']);
     }
 
     public function applyDiscountCode(Request $request)
