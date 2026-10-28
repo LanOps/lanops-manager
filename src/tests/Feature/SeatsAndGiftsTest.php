@@ -190,4 +190,21 @@ class SeatsAndGiftsTest extends TestCase
 
         $this->assertSame($owner->id, $participant->fresh()->user_id);
     }
+
+    public function testSeatInAHiddenSeatingPlanDoesNotBreakThePages()
+    {
+        // Draft and preview plans are hidden from non-admins, so the seat's plan loads as null
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket();
+        $plan = $this->createSeatingPlan($ticket);
+        $participant = $this->createParticipant($user, $ticket);
+        $plan->seats()->where('seat', 'A1')->update(['event_participant_id' => $participant->id]);
+        $plan->forceFill(['status' => 'DRAFT'])->save();
+
+        $this->get('/events/' . $ticket->event->slug)
+            ->assertOk()
+            ->assertSee('A1');
+
+        $this->actingAs($user)->get('/account')->assertOk();
+    }
 }

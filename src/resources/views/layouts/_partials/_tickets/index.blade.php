@@ -33,7 +33,7 @@
 				<div class="col-md-8 col-sm-8 col-12">
 					<div class="alert alert-success">
 						<strong>
-							{{ $participant->event->display_name }} @if ($participant->ticket && $participant->ticket->seatable) - Seat: @if ($participant->seat) {{$participant->seat->seat}} <small>in {{$participant->seat->seatingPlan->name}}</small> @else Not Seated @endif @endif
+							{{ $participant->event->display_name }} @if ($participant->ticket && $participant->ticket->seatable) - Seat: @if ($participant->seat) {{$participant->seat->seat}} @if ($participant->seat->seatingPlan) <small>in {{$participant->seat->seatingPlan->name}}</small> @endif @else Not Seated @endif @endif
 						</strong>
 					</div>
 					@if ($participant->gift != 1 && $participant->gift_accepted != 1)
@@ -52,7 +52,7 @@
 							<button type="submit" class="btn btn-primary btn-md w-100">Revoke Gift</button>
 						</form>
 					@endif
-					@if ($participant->seat)
+					@if ($participant->seat && $participant->seat->seatingPlan)
 						<hr>
 						{{ html()->form('POST', url('/events/' . $participant->event->slug . '/seating/' . $participant->seat->seatingPlan->slug))->open() }}
 							@method('DELETE')

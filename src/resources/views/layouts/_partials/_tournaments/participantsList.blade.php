@@ -24,7 +24,9 @@
                     </td>
                     @if ($tournament->hasEvent())
                         <td>
-                            {{ $participant->getSeat()->seat }} - {{ $participant->getSeat()->seatingPlan->name }}
+                            @if ($seat = $participant->getSeat())
+                                {{ $seat->seat }}@if ($seat->seatingPlan) - {{ $seat->seatingPlan->name }}@endif
+                            @endif
                         </td>
                     @endif
                     @if ($tournament->hasTeams() && $participant->team)
