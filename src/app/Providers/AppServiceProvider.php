@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\URL;
 
 use Auth;
 use App\Models\Event;
@@ -25,6 +26,15 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Paginator::useBootstrap();
+
+        // Build links (password resets, email verification) from APP_URL, never
+        // from the request's Host or X-Forwarded-Host headers
+        if ($this->app->environment('production') && config('app.url')) {
+            URL::forceRootUrl(config('app.url'));
+            if (str_starts_with(config('app.url'), 'https://')) {
+                URL::forceScheme('https');
+            }
+        }
 
         // Read the keys through config, so this still works once config is cached
         $availablePaymentGateways = [];
