@@ -44,12 +44,14 @@ class UsersController extends Controller
     public function update(User $user, Request $request)
     {
         $rules = [
-            'username'      => 'required|unique:users,username',
+            'username'      => 'required|max:255|unique:users,username,' . $user->id,
         ];
         $messages = [
             'username.unique'       => 'Username must be unique',
             'username.required'     => 'Username is required',
         ];
+
+        $this->validate($request, $rules, $messages);
 
         $user->username = $request->username;
         $user->username_nice    = strtolower(str_replace(' ', '-', $request->username));

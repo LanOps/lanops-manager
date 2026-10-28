@@ -159,6 +159,10 @@ class AccountController extends Controller
         if ($changingEmail) {
             $user->sendEmailVerificationNotification();
         }
+        if ($changingPassword) {
+            // Anyone else signed in to this account (other devices, remember-me cookies) is signed out
+            Auth::logoutOtherDevices($request->password1);
+        }
         return Redirect::back()->withSuccess('Account successfully updated!');
     }
 

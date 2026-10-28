@@ -6,6 +6,11 @@
 		@endif
 		<li><a class="dropdown-item" href="/account">Profile</a></li>
 		<li><hr class="dropdown-divider"></li>
-		<li><a class="dropdown-item" href="/logout">Logout</a></li>
+		<li>
+			<form method="POST" action="/logout">
+				@csrf
+				<button type="submit" class="dropdown-item">Logout</button>
+			</form>
+		</li>
 	</ul>
 </li>

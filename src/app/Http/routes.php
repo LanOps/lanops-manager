@@ -25,7 +25,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/register/{method}', 'Auth\AuthController@showRegister');
     Route::post('/register/{method}', 'Auth\AuthController@register');
 
-    Route::get('/login', 'Auth\AuthController@prompt');
+    Route::get('/login', 'Auth\AuthController@prompt')->name('login');
     Route::get('/login/steam', 'Auth\SteamController@login');
 
     Route::post('/login/standard', 'Auth\LoginController@login');
@@ -34,7 +34,9 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/register/email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
 
     Route::get('/login/forgot', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
-    Route::post('/login/forgot', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+    Route::post('/login/forgot', 'Auth\ForgotPasswordController@sendResetLinkEmail')
+        ->middleware('throttle:5,1')
+        ->name('password.email');
 
     Route::post('/login/reset/password', 'Auth\ResetPasswordController@reset')->name('password.update');
     Route::get('/login/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
@@ -47,7 +49,7 @@ Route::group(['middleware' => ['web']], function () {
     });
 
     Route::group(['middleware' => ['auth']], function () {
-        Route::get('/logout', 'Auth\AuthController@logout');
+        Route::post('/logout', 'Auth\AuthController@logout');
     });
     
     /**
@@ -60,10 +62,12 @@ Route::group(['middleware' => ['web']], function () {
      */
     Route::get('/news', 'NewsController@index');
     Route::get('/news/{newsArticle}', 'NewsController@show');
-    Route::post('/news/{newsArticle}/comments', 'NewsController@storeComment');
-    Route::post('/news/{newsArticle}/comments/{newsComment}', 'NewsController@editComment');
-    Route::post('/news/{newsArticle}/comments/{newsComment}/report', 'NewsController@reportComment');
-    Route::post('/news/{newsArticle}/comments/{newsComment}/delete', 'NewsController@destroyComment');
+    Route::group(['middleware' => ['auth', 'banned', 'verified', 'throttle:10,1']], function () {
+        Route::post('/news/{newsArticle}/comments', 'NewsController@storeComment');
+        Route::post('/news/{newsArticle}/comments/{newsComment}', 'NewsController@editComment');
+        Route::post('/news/{newsArticle}/comments/{newsComment}/report', 'NewsController@reportComment');
+        Route::post('/news/{newsArticle}/comments/{newsComment}/delete', 'NewsController@destroyComment');
+    });
     Route::get('/news/tags/{newsTag}', 'NewsController@showTag');
 
     /**
@@ -261,7 +265,7 @@ Route::group(['middleware' => ['web', 'admin']], function () {
      * Users
      */
     Route::get('/admin/users', 'Admin\UsersController@index');
-    Route::get('/admin/users/referralcodes', 'Admin\UsersController@generalReferralCodes');
+    Route::post('/admin/users/referralcodes', 'Admin\UsersController@generalReferralCodes');
     Route::get('/admin/users/{user}', 'Admin\UsersController@show');
     Route::post('/admin/users/{user}', 'Admin\UsersController@update');
     Route::post('/admin/users/{user}/admin', 'Admin\UsersController@grantAdmin');

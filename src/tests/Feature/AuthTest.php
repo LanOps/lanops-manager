@@ -59,7 +59,7 @@ class AuthTest extends TestCase
 
     public function testLogout()
     {
-        $this->actingAs($this->createUser())->get('/logout')->assertRedirect();
+        $this->actingAs($this->createUser())->post('/logout')->assertRedirect();
 
         $this->assertGuest();
     }
