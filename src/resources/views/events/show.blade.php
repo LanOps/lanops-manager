@@ -437,8 +437,10 @@
 							{{$participant->user->firstname}}
 						</td>
 						<td>
-							@if ($participant->seat)
+							@if ($participant->seat && $participant->seat->seatingPlan)
 								{{ $participant->seat->seatingPlan->getShortName() }} | {{ $participant->seat->seat }}
+							@elseif ($participant->seat)
+								{{ $participant->seat->seat }}
 							@else
 								Not Seated
 							@endif
