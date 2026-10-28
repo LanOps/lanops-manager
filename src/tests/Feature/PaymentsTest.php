@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\EventParticipant;
 use App\Models\EventTicket;
 use App\Models\Purchase;
+use Illuminate\Support\Facades\DB;
 use Mockery;
 use Omnipay\Common\GatewayFactory;
 use Omnipay\Common\GatewayInterface;
@@ -345,6 +346,32 @@ class PaymentsTest extends TestCase
 
         $this->assertSame(1, Purchase::count());
         $this->assertSame(1, EventParticipant::count());
+    }
+
+    public function testCallbackLocksTheBuyerBeforeCheckingForAnEarlierPurchase()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket([], ['price' => 30]);
+
+        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 30));
+
+        $queries = [];
+        DB::listen(function ($query) use (&$queries) {
+            $queries[] = strtolower($query->sql);
+        });
+
+        $this->actingAs($user)
+            ->withSession($this->awaitingThreeDSecure($ticket))
+            ->get('/payment/callback?gate=stripe&type=return&payment_intent=pi_3ds_123');
+
+        // Parallel returns of one payment queue on this lock, so the second
+        // one sees the first one's purchase and records nothing
+        $lock = array_key_first(array_filter($queries, fn ($sql) => str_contains($sql, 'from `users`') && str_contains($sql, 'for update')));
+        $check = array_key_first(array_filter($queries, fn ($sql) => str_contains($sql, 'from `purchases`') && str_contains($sql, '`token`')));
+        $this->assertNotNull($lock);
+        $this->assertNotNull($check);
+        $this->assertLessThan($check, $lock);
+        $this->assertSame(1, Purchase::count());
     }
 
     public function testSuccessPageOnlyShowsYourOwnPurchase()
