@@ -21,7 +21,8 @@ $factory->define(App\Models\Event::class, function (Faker\Generator $faker) {
     $end_date   = date('Y-m-d', strtotime($start_date. ' + 2 days'));
     return [
         'display_name'      => $event_name,
-        'nice_name'         => strtolower(str_replace(' ', '-', $event_name)),
+        // nice_name is unique, and there are only 9 names, so add a random part
+        'nice_name'         => strtolower(str_replace(' ', '-', $event_name)) . '-' . Str::lower(Str::random(6)),
         'slug'              => strtolower(str_replace(' ', '-', $event_name)) . '-' . Str::random(4),
         'start'             => $start_date . ' 16:00:00',
         'end'               => $end_date . ' 18:00:00',
