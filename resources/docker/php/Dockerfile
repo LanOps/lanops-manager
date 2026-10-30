@@ -55,6 +55,7 @@ COPY resources/docker/php/entrypoint-cron.sh /entrypoint-cron.sh
 
 
 COPY resources/docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
+COPY resources/docker/php/php-fpm-pool.conf /usr/local/etc/php-fpm.d/zz-lanops.conf
 
 COPY resources/docker/php/crontab /etc/cron.d/laravel-cron
 RUN chmod 0644 /etc/cron.d/laravel-cron && crontab /etc/cron.d/laravel-cron
