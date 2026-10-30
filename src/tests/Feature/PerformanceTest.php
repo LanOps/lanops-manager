@@ -138,7 +138,8 @@ class PerformanceTest extends TestCase
 
         $this->actingAs($this->createUser(['admin' => 1]))->get('/admin')
             ->assertOk()
-            ->assertSee("month: '" . now()->subDays(2)->format('Y-m') . "', value: 1", false)
-            ->assertDontSee("month: '" . now()->subYears(2)->format('Y-m') . "'", false);
+            ->assertSee('data-chart-labels="[&quot;' . now()->subDays(2)->format('M Y') . '&quot;]"', false)
+            ->assertSee('data-chart-values="[1]"', false)
+            ->assertDontSee(now()->subYears(2)->format('M Y'));
     }
 }

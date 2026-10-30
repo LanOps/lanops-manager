@@ -31,38 +31,44 @@
 				<i class="fa fa-chart-column fa-fw"></i> Ticket Breakdown
 			</div>
 			<div class="card-body">
-				<div class="col-sm-6 col-12">
-					<h4>Purchase Breakdown</h4>
-					<div id="ticket-purchase-breakdown"></div>
-				</div>
-				<div class="col-sm-6 col-12">
-					<h4>Income Breakdown</h4>
-					<div id="ticket-income-breakdown"></div>
+				@php
+					$ticketNames = $event->tickets->pluck('name');
+					$ticketCounts = $event->tickets->map(fn ($ticket) => $ticket->participants()->count());
+					$ticketIncome = $event->tickets->map(fn ($ticket, $index) => round($ticket->price * $ticketCounts[$index], 2));
+				@endphp
+				<div class="row g-4">
+					<div class="col-md-6 col-12">
+						<h5 class="mb-3">Purchase Breakdown</h5>
+						<div class="admin-chart">
+							<canvas
+								data-chart="doughnut"
+								data-chart-labels="{{ $ticketNames->toJson() }}"
+								data-chart-values="{{ $ticketCounts->toJson() }}"
+								data-chart-series="Tickets"
+								data-chart-total-label="Tickets"
+								aria-label="Tickets purchased by type"
+								role="img"
+							></canvas>
+						</div>
+					</div>
+					<div class="col-md-6 col-12">
+						<h5 class="mb-3">Income Breakdown</h5>
+						<div class="admin-chart">
+							<canvas
+								data-chart="bar"
+								data-chart-labels="{{ $ticketNames->toJson() }}"
+								data-chart-values="{{ $ticketIncome->toJson() }}"
+								data-chart-series="Income"
+								data-chart-format="currency"
+								aria-label="Income by ticket type"
+								role="img"
+							></canvas>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 
-		<script>
-			Morris.Donut({
-				element: 'ticket-purchase-breakdown',
-				data: [
-					@foreach ($event->tickets as $ticket)
-						{label: '{{ $ticket->name }}', value: {{ $ticket->participants()->count() }} },
-					@endforeach
-				]
-			});
-			Morris.Bar({
-				element: 'ticket-income-breakdown',
-				data: [
-					@foreach ($event->tickets as $ticket)
-						{ y: '{{ $ticket->name }}', a: {{ $ticket->price * $ticket->participants()->count() }} },
-					@endforeach
-				],
-				xkey: 'y',
-				ykeys: ['a'],
-				labels: ['Pounds']
-			});
-		</script>
 		<div class="card">
 			<div class="card-header">
 				<i class="fa fa-ticket fa-fw"></i> Tickets

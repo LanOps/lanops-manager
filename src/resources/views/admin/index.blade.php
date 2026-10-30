@@ -93,7 +93,17 @@
 				<i class="fa fa-ticket fa-fw"></i> Ticket Sales Per Month
 			</div>
 			<div class="card-body">
-				<div id="ticket-breakdown"></div>
+				<div class="admin-chart">
+					<canvas
+						data-chart="bar"
+						data-chart-colour="single"
+						data-chart-labels="{{ json_encode(array_map(fn ($month) => date('M Y', strtotime($month . '-01')), array_keys($ticketBreakdown))) }}"
+						data-chart-values="{{ json_encode(array_map('count', array_values($ticketBreakdown))) }}"
+						data-chart-series="Tickets"
+						aria-label="Ticket sales per month"
+						role="img"
+					></canvas>
+				</div>
 			</div>
 		</div>	
 	</div>
@@ -173,22 +183,5 @@
 	</div>
 </div>
 
-<script>
-	Morris.Bar({
-		element: 'ticket-breakdown',
-		data: [
-			@foreach ($ticketBreakdown as $key => $month)
-				{ month: '{{ $key }}', value: {{ count($month) }} },
-			@endforeach
-		],
-		// The name of the data record attribute that contains x-values.
-		xkey: 'month',
-		// A list of names of data record attributes that contain y-values.
-		ykeys: ['value'],
-		// Labels for the ykeys -- will be displayed when you hover over the
-		// chart.
-		labels: ['Number of Tickets']
-	});
-</script>
 
 @endsection

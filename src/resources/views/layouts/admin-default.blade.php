@@ -27,10 +27,6 @@
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.2/dist/themes/smoothness/jquery-ui.min.css" integrity="sha384-e4Bm/JKXqLbEnnDNLZIbB0u9VBy3H9D+TNdLb22ybxTLsmtWgRhQ3/BKEgJ13zU2" crossorigin="anonymous">
 		<script src="https://cdn.jsdelivr.net/npm/jquery-ui@1.14.2/dist/jquery-ui.min.js" integrity="sha384-tBcEcHGtNy7/Mx08+YxuvQ6v6s0N2jgehtFiT+bLtGwTj/txXtB/L5GqXfggm5sS" crossorigin="anonymous"></script>
 
-		<!-- Morris Charts JavaScript -->
-		<script src="/js/morris/raphael.min.js"></script>
-		<script src="/js/morris/morris.min.js"></script>
-
 		<!-- include summernote css/js -->
 		<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" integrity="sha384-NCIOkH1RWTLh0uk0cWmHMJbcBZE8aFTbBNELvTaRgLwGsGIgaacBRlWynjlAt69p" crossorigin="anonymous" rel="stylesheet">
 		<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js" integrity="sha384-FycAzMryzUZA6EwTBPuugMzUKzpNjcXJhQvibi8ej/+2/imEZ6kTAsxHGtrNn8Py" crossorigin="anonymous"></script>
