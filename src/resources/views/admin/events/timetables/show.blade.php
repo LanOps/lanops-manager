@@ -56,6 +56,10 @@
 								@endif
 								<td width="10%">
 									<button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" onclick="editTimeSlot(@js($slot->id), @js($slot->start_time), @js($slot->name), @js($slot->desc))" data-bs-target="#editTimeSlotModal">Edit</button>
+									{{ html()->form('POST', url('/admin/events/' . $event->slug . '/timetables/' . $timetable->slug . '/data/' . $slot->id))->attribute('onsubmit', 'return ConfirmDelete()')->class('mt-1')->open() }}
+										@method('DELETE')
+										<button type="submit" class="btn btn-danger btn-sm w-100">Delete</button>
+									</form>
 								</td>
 							</tr>
 						@endforeach

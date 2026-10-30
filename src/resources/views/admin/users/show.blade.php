@@ -158,7 +158,7 @@
 				<hr>
 				{{ html()->form('POST', url('/admin/users/' . $userShow->id))->open() }}
 					<div class="mb-3">
-						{{ html()->text('username', '')->class('form-control') }}
+						{{ html()->text('username', $userShow->username)->class('form-control') }}
 					</div>
 					<button type="submit" class="btn btn-success w-100">Submit</button>
 				</form>

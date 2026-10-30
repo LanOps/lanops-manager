@@ -412,11 +412,11 @@
 						</div>
 					@endif
 					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/discord/unlink'))->acceptsFiles()->open() }}
-						Are you Sure you want to Unlink this Event from Discord? It will do the following (this is done Automatically after each event):
+						Are you Sure you want to Unlink this Event from Discord? It will do the following:
 						<ul>
-							<li>Stop the Bot Watching this Event</li>
-							<li>Remove the Event Role</li>
+							<li>Stop sending new attendees, gifts and timetable updates to the Bot</li>
 						</ul>
+						The event's Discord channel and role are left as they are. You can link the event again later, which creates new ones.
 						<button type="submit" class="btn btn-outline-secondary w-100">Submit</button>
 					</form>
 				</div>

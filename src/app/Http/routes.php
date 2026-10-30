@@ -182,6 +182,7 @@ Route::group(['middleware' => ['web', 'admin', 'banned']], function () {
     Route::post('/admin/information/{information}', 'Admin\Events\InformationController@update');
     Route::delete('/admin/information/{information}', 'Admin\Events\InformationController@destroy');
     Route::post('/admin/events/{event}/discord/link', 'Admin\Events\EventsController@linkDiscord');
+    Route::post('/admin/events/{event}/discord/unlink', 'Admin\Events\EventsController@unlinkDiscord');
     Route::post('/admin/events/{event}/duplicate', 'Admin\Events\EventsController@duplicate');
     
     /**
@@ -209,13 +210,16 @@ Route::group(['middleware' => ['web', 'admin', 'banned']], function () {
         '/admin/events/{event}/timetables/{timetable}/data/{data}',
         'Admin\Events\TimetableDataController@update'
     );
+    Route::delete(
+        '/admin/events/{event}/timetables/{timetable}/data/{data}',
+        'Admin\Events\TimetableDataController@destroy'
+    );
 
     /**
      * Participants
      */
     Route::get('/admin/events/{event}/participants', 'Admin\Events\ParticipantsController@index');
     Route::get('/admin/events/{event}/participants/{participant}', 'Admin\Events\ParticipantsController@show');
-    Route::post('/admin/events/{event}/participants/{participant}', 'Admin\Events\ParticipantsController@update');
     Route::post(
         '/admin/events/{event}/participants/{participant}/signin',
         'Admin\Events\ParticipantsController@signIn'

@@ -39,18 +39,6 @@ class ParticipantsController extends Controller
     }
 
     /**
-     * Update Participant
-     * @param  Event            $event
-     * @param  EventParticipant $participant
-     * @param  Request          $request
-     */
-    public function update(Event $event, EventParticipant $participant, Request $request)
-    {
-        //DEBUG
-        dd('edit me');
-    }
-
-    /**
      * Sign in to Event
      * @param  Event            $event
      * @param  EventParticipant $participant

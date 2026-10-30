@@ -318,6 +318,23 @@ class EventsController extends Controller
         return Redirect::to('admin/events/' . $event->slug);
     }
 
+    /**
+     * Stop sending this event's attendees and updates to the Discord bot
+     * @param  Event   $event
+     * @return Redirect
+     */
+    public function unlinkDiscord(Event $event)
+    {
+        $event->discord_link_enabled = false;
+        if (!$event->save()) {
+            Session::flash('alert-danger', 'Cannot Unlink Event!');
+            return Redirect::to('admin/events/' . $event->slug);
+        }
+
+        Session::flash('alert-success', 'Successfully Unlinked Event!');
+        return Redirect::to('admin/events/' . $event->slug);
+    }
+
     public function duplicate(Request $request, Event $event)
     {
         $randomNameSuffix = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(5/strlen($x)))), 1, 5);
