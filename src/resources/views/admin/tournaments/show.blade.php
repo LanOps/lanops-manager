@@ -132,8 +132,8 @@
 			</div>
 			<div class="card-body">
 				{{ html()->label('Tournament Signup Link:', 'name') }}
-				<a href="{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/tournaments/{{ $tournament->slug }}">
-					{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/tournaments/{{ $tournament->slug }}
+				<a href="{{ url('/tournaments/' . $tournament->slug) }}">
+					{{ url('/tournaments/' . $tournament->slug) }}
 				</a>
 				{{ html()->form('POST', url('/admin/tournaments/' . $tournament->slug))->acceptsFiles()->open() }}
 					<div class="mb-3">
@@ -150,7 +150,7 @@
 					</div>
 					<div class="mb-3">
 						{{ html()->label('Link to Event', 'event_id') }}
-						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), $tournament->event_id)->class('form-select') }}
+						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true, false, $tournament->event_id), $tournament->event_id)->class('form-select') }}
 					</div>
 					<div class="mb-3">
 						<button type="submit" class="btn btn-success w-100">Submit</button> 

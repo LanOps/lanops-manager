@@ -53,9 +53,12 @@ class GalleryController extends Controller
             ->description($description)
             ->url(url('/gallery/' . $album->slug));
 
-        try {
-            seo()->image($album->getFirstMedia('images')->getUrl('optimized'));
-        } catch (\Exception $e) {
+        // An album with no photos yet has no cover image to share
+        if ($cover = $album->getFirstMedia('images')) {
+            try {
+                seo()->image($cover->getUrl('optimized'));
+            } catch (\Exception $e) {
+            }
         }
 
         return view('gallery.show')

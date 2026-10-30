@@ -120,7 +120,7 @@ class EventSeatingPlan extends Model implements HasMedia
     public function getShortName()
     {
         $name = $this->name;
-        if ($this->name_short !== null) {
+        if ($this->name_short !== null && trim($this->name_short) !== '') {
             $name = $this->name_short;
         }
         return $name;

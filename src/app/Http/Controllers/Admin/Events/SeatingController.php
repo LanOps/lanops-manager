@@ -69,7 +69,7 @@ class SeatingController extends Controller
         $seatingPlan                = new EventSeatingPlan();
         $seatingPlan->event_id      = $event->id;
         $seatingPlan->name          = $request->name;
-        $seatingPlan->name_short    = @$request->name_short;
+        $seatingPlan->name_short    = trim((string) $request->name_short) === '' ? null : $request->name_short;
 
         $seatingPlan->columns  = $request->columns;
         $seatingPlan->rows     = $request->rows;
@@ -120,7 +120,8 @@ class SeatingController extends Controller
         }
 
         if (isset($request->name_short)) {
-            $seatingPlan->name_short        = $request->name_short;
+            // Blank means no short name, so the full name is used instead
+            $seatingPlan->name_short        = trim($request->name_short) === '' ? null : $request->name_short;
         }
 
         if (isset($request->status)) {
@@ -131,11 +132,7 @@ class SeatingController extends Controller
 
         if (isset($request->rows) || isset($request->columns)) {
             if ($seatingPlan->columns != $request->columns || $seatingPlan->rows != $request->rows) {
-                $alphabet = range('A', 'Z');
-                for ($i = 0; $i < $request->columns; $i++) {
-                    $seatingHeaders[]   = $alphabet[$i];
-                }
-                $seatingPlan->headers   = implode(',', $seatingHeaders);
+                // The model rebuilds the seats and row headers when rows or columns change
                 $seatingPlan->columns   = $request->columns;
                 $seatingPlan->rows      = $request->rows;
             }
