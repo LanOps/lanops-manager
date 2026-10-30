@@ -72,31 +72,10 @@ body.admin {
 	line-height: normal;
 }
 
-// Morris chart hover box
-.morris-hover {
-	position: absolute;
-	z-index: 1000;
-}
-
-.morris-hover.morris-default-style {
-	border-radius: 10px;
-	padding: 6px;
-	color: var(--bs-body-color);
-	background: rgba(var(--bs-body-bg-rgb), 0.85);
-	border: solid 2px var(--bs-border-color);
-	font-family: sans-serif;
-	font-size: 12px;
-	text-align: center;
-}
-
-.morris-hover.morris-default-style .morris-hover-row-label {
-	font-weight: bold;
-	margin: 0.25em 0;
-}
-
-.morris-hover.morris-default-style .morris-hover-point {
-	white-space: nowrap;
-	margin: 0.1em 0;
+// Chart.js charts (resources/js/admin-charts.js) fill a fixed-height box
+.admin-chart {
+	position: relative;
+	height: 300px;
 }
 
 // Keep the Bootstrap 3 panel spacing and bold form labels
