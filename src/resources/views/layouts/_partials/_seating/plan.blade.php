@@ -25,7 +25,7 @@
                                             '{{ $seat->seat }}'
                                         )"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#pickSeatModal"
+                                        data-bs-target="#pickSeatModal_{{ $seatingPlan->slug }}"
                                     @endif
                                     >
                                     {{ $seat->seat }} - @if ($seat->eventParticipant) {{ $seat->eventParticipant->user->username }} @elseif ($seat->disabled) Disabled @else Empty @endif
@@ -46,14 +46,14 @@
                             
                                 <button 
                                     class="btn @if ($seat->disabled) btn-danger @elseif ($seat->eventParticipant) btn-success @else btn-primary @endif btn-sm" 
-                                    @if ($seat->disabled) disabled @endif
-                                    @if (!$seat->eventParticipant && !$seat->disabled)
+                                    @if ($seat->disabled || $seatingPlan->locked) disabled @endif
+                                    @if (!$seat->eventParticipant && !$seat->disabled && !$seatingPlan->locked)
                                         onclick="pickSeat(
                                             '{{ $seatingPlan->slug }}',
                                             '{{ $seat->seat }}'
                                         )"
                                         data-bs-toggle="modal"
-                                        data-bs-target="#pickSeatModal"
+                                        data-bs-target="#pickSeatModal_{{ $seatingPlan->slug }}"
                                     @endif
                                     >
                                     {{ $seat->seat }} - @if ($seat->eventParticipant) {{ $seat->eventParticipant->user->username }} @elseif ($seat->disabled) Disabled @else Empty @endif
@@ -72,31 +72,50 @@
 </div>
 
 @if (!$seatingPlan->locked)
-    <!-- Seat Modal -->
-    <div class="modal fade" id="pickSeatModal" tabindex="-1" role="dialog" aria-labelledby="editSeatingModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    @php
+        // Only seatable tickets can be picked, so guests and people without one get told why instead
+        $pickableTickets = Auth::user() ? $user->getTickets($event->id) : [];
+    @endphp
+    <!-- Seat Modal (one per plan, so the ids must be unique) -->
+    <div class="modal fade" id="pickSeatModal_{{ $seatingPlan->slug }}" tabindex="-1" aria-labelledby="pickSeatModalLabel_{{ $seatingPlan->slug }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="pickSeatModalLabel"></h4>
+                    <h4 class="modal-title" id="pickSeatModalLabel_{{ $seatingPlan->slug }}">Pick a seat</h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                @if (Auth::user())
-                    {{ html()->form('POST', url('/events/' . $event->slug . '/seating/'))->id('pickSeatFormModal')->open() }}
+                @if (!Auth::user())
+                    <div class="modal-body">
+                        <p class="mb-0">You need to log in to pick a seat.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="/login" class="btn btn-primary">Log in</a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                @elseif (empty($pickableTickets))
+                    <div class="modal-body">
+                        <p>You need a ticket for this event to pick a seat.</p>
+                        <p class="mb-0">If someone gifted you a ticket, open their gift link while logged in to claim it first.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                @else
+                    {{ html()->form('POST', url('/events/' . $event->slug . '/seating/' . $seatingPlan->slug))->class('pick-seat-form')->open() }}
                         <div class="modal-body">
                             <div class="mb-3">
-                                <h4>Which ticket would you like to seat?</h4>
-                                {{ html()->select('participant_id', $user->getTickets($event->id))->id('format')->class('form-select') }}
-                                <p>Are you sure you want this seat?</p>
-                                <p>You can remove it at anytime.</p>
+                                <label class="form-label" for="pickSeatTicket_{{ $seatingPlan->slug }}">Which ticket would you like to seat?</label>
+                                {{ html()->select('participant_id', $pickableTickets)->id('pickSeatTicket_' . $seatingPlan->slug)->class('form-select') }}
                             </div>
+                            <p class="mb-0">You can change or remove your seat at any time.</p>
                         </div>
-                        {{ html()->hidden('user_id', $user->id)->class('form-control') }}
-                        {{ html()->hidden('seat')->id('seat_modal')->class('form-control') }}
+                        {{ html()->hidden('user_id', $user->id) }}
+                        {{ html()->hidden('seat')->class('pick-seat-input') }}
                         <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">Yes</button>
-                            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">No</button>
+                            <button type="submit" class="btn btn-success">Yes, pick this seat</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         </div>
-                    </form>
+                    {{ html()->form()->close() }}
                 @endif
             </div>
         </div>
@@ -105,15 +124,14 @@
     <script>
         function pickSeat(seating_plan_slug, seat)
         {
-            // The form is only there for logged in users
-            var seatInput = document.getElementById('seat_modal');
-            var form = document.getElementById('pickSeatFormModal');
-            document.getElementById('pickSeatModalLabel').textContent = 'Do you what to choose seat ' + seat;
+            var modal = document.getElementById('pickSeatModal_' + seating_plan_slug);
+            if (!modal) {
+                return;
+            }
+            var seatInput = modal.querySelector('.pick-seat-input');
+            modal.querySelector('.modal-title').textContent = seatInput ? 'Do you want to choose seat ' + seat + '?' : 'Seat ' + seat;
             if (seatInput) {
                 seatInput.value = seat;
-            }
-            if (form) {
-                form.action = '/events/{{ $event->slug }}/seating/' + seating_plan_slug;
             }
         }
     </script>

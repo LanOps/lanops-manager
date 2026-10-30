@@ -57,7 +57,8 @@ class SteamController extends Controller
                 }
                 $user->last_login = Carbon::now()->toDateTimeString();
                 $user->save();
-                return redirect('/'); // redirect to site
+                // Back to where they were sent to log in from (e.g. a gift link), like the email login
+                return redirect()->intended('/');
             } else {
                 $user = [
                         'avatar'        => $info->avatarfull,
