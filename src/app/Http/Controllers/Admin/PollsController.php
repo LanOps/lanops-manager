@@ -22,7 +22,13 @@ class PollsController extends Controller
     public function index()
     {
         return view('admin.polls.index')
-            ->withPolls(Poll::paginate(10))
+            ->withPolls(
+                // Open polls first, then newest first
+                Poll::orderByRaw('CASE WHEN `end` IS NOT NULL AND `end` != ? AND `end` <= ? THEN 1 ELSE 0 END', ['0000-00-00 00:00:00', date("Y-m-d H:i:s")])
+                    ->orderBy('created_at', 'desc')
+                    ->orderBy('id', 'desc')
+                    ->paginate(10)
+            )
         ;
     }
 

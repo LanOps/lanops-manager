@@ -134,4 +134,15 @@ class PollEndTest extends TestCase
 
         $this->get('/polls')->assertOk()->assertSeeInOrder(['Open Poll', 'Previous Polls', 'Ended Poll']);
     }
+
+    public function testAdminListShowsOpenPollsFirstThenNewest()
+    {
+        $this->createPoll(['name' => 'Old Ended Poll', 'end' => now()->subMonth(), 'created_at' => now()->subYear()]);
+        $this->createPoll(['name' => 'New Ended Poll', 'end' => now()->subDay(), 'created_at' => now()->subWeek()]);
+        $this->createPoll(['name' => 'Old Open Poll', 'created_at' => now()->subYears(2)]);
+
+        $this->actingAs($this->createUser(['admin' => 1]))->get('/admin/polls')
+            ->assertOk()
+            ->assertSeeInOrder(['Old Open Poll', 'New Ended Poll', 'Old Ended Poll']);
+    }
 }
