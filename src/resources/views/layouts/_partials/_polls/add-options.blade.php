@@ -5,27 +5,19 @@
 </div>
 <button type="button" id="poll_options_add" class="btn btn-outline-secondary w-100">Extra Option</button> 
 <script type="text/javascript">
-	// jQuery is loaded at the end of the page layout, so wait for it rather than loading a second copy
- 	document.addEventListener('DOMContentLoaded', function() {
+	(function() {
 	    var max_fields = 20;
-	    var wrapper = $("#poll_options");
-	    var add_button = $("#poll_options_add");
-
+	    var wrapper = document.getElementById('poll_options');
 	    var x = 1;
-	    $(add_button).click(function(e) {
+
+	    document.getElementById('poll_options_add').addEventListener('click', function(e) {
 	        e.preventDefault();
 	        if (x < max_fields) {
 	            x++;
-	            $(wrapper).append('<div class="mb-3">{{ html()->text("options[]", "")->class("form-control") }}</div>'); //add input box
+	            wrapper.insertAdjacentHTML('beforeend', '<div class="mb-3">{{ html()->text("options[]", "")->class("form-control") }}</div>');
 	        } else {
 	            alert('You Reached the limits')
 	        }
 	    });
-
-	    $(wrapper).on("click", ".delete", function(e) {
-	        e.preventDefault();
-	        $(this).parent('div').remove();
-	        x--;
-	    })
-	});
+	})();
 </script>

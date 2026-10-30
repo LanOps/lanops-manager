@@ -45,6 +45,6 @@
 <script>
 	function giftTicket(participant_id)
 	{
-		$("#giftTicketForm").prop('action', '/gift/' + participant_id);
+		document.getElementById('giftTicketForm').action = '/gift/' + participant_id;
 	}
 </script>

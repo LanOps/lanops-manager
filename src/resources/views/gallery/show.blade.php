@@ -4,8 +4,6 @@
 
 @section ('content')
 
-<script src="https://cdn.jsdelivr.net/npm/spotlight.js@0.7.8/dist/spotlight.bundle.js" integrity="sha384-APnh1sT6cHstjesb921u67f0fUtboyI0hft0kCPtvOWBtFDDbM8aoynIGil7txkh" crossorigin="anonymous"></script>
-
 {{-- Album Header --}}
 <div class="gallery-album-header">
     <div class="container">

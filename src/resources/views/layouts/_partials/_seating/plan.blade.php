@@ -105,10 +105,16 @@
     <script>
         function pickSeat(seating_plan_slug, seat)
         {
-            $("#seat_number_modal").val(seat);
-            $("#seat_modal").val(seat);
-            $("#pickSeatModalLabel").html('Do you what to choose seat ' + seat);
-            $("#pickSeatFormModal").prop('action', '/events/{{ $event->slug }}/seating/' + seating_plan_slug);
+            // The form is only there for logged in users
+            var seatInput = document.getElementById('seat_modal');
+            var form = document.getElementById('pickSeatFormModal');
+            document.getElementById('pickSeatModalLabel').textContent = 'Do you what to choose seat ' + seat;
+            if (seatInput) {
+                seatInput.value = seat;
+            }
+            if (form) {
+                form.action = '/events/{{ $event->slug }}/seating/' + seating_plan_slug;
+            }
         }
     </script>
 @endif
