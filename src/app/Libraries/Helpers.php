@@ -343,46 +343,118 @@ class Helpers
         return $countriesArray;
     }
 
+    /**
+     * Steam profiles already looked up in this request
+     * @var array<string, array|false>
+     */
+    private static array $steamProfiles = [];
+
     public static function getSteamProfile(?string $steamId): ?array
     {
-        if (! $steamId || ! preg_match('/^\d{17}$/', $steamId)) {
+        if (! $steamId) {
+            return null;
+        }
+        return self::getSteamProfiles([$steamId])[$steamId] ?? null;
+    }
+
+    /**
+     * Look up several Steam profiles with one Steam API request.
+     * Call it before a list that shows Steam names, so each row reads from the cache.
+     * @param  array $steamIds
+     * @return array<string, array> profiles keyed by Steam id; ids with no profile are left out
+     */
+    public static function getSteamProfiles(array $steamIds): array
+    {
+        $steamIds = array_values(array_unique(array_filter(
+            array_map('strval', array_filter($steamIds)),
+            fn ($steamId) => preg_match('/^\d{17}$/', $steamId)
+        )));
+
+        $missing = [];
+        foreach ($steamIds as $steamId) {
+            if (! array_key_exists($steamId, self::$steamProfiles)) {
+                // false is a cached "no profile", so a failed lookup isn't retried on every page view
+                $cached = Cache::get("steam_profile_{$steamId}");
+                if ($cached === null) {
+                    $missing[] = $steamId;
+                } else {
+                    self::$steamProfiles[$steamId] = $cached;
+                }
+            }
+        }
+
+        // GetPlayerSummaries takes up to 100 ids per request
+        foreach (array_chunk($missing, 100) as $chunk) {
+            $players = self::fetchSteamPlayers($chunk);
+            foreach ($chunk as $steamId) {
+                if ($players === null) {
+                    // Steam is down or slow: don't cache, but don't ask again in this request
+                    self::$steamProfiles[$steamId] = false;
+                    continue;
+                }
+                $profile = $players[$steamId] ?? false;
+                Cache::put(
+                    "steam_profile_{$steamId}",
+                    $profile,
+                    $profile ? now()->addDays(7) : now()->addHour()
+                );
+                self::$steamProfiles[$steamId] = $profile;
+            }
+        }
+
+        $profiles = [];
+        foreach ($steamIds as $steamId) {
+            if (self::$steamProfiles[$steamId] ?? false) {
+                $profiles[$steamId] = self::$steamProfiles[$steamId];
+            }
+        }
+        return $profiles;
+    }
+
+    /**
+     * Forget profiles looked up in this request (for tests)
+     */
+    public static function flushSteamProfiles(): void
+    {
+        self::$steamProfiles = [];
+    }
+
+    /**
+     * @param  array $steamIds at most 100
+     * @return array<string, array>|null profiles keyed by Steam id, or null if Steam could not be reached
+     */
+    private static function fetchSteamPlayers(array $steamIds): ?array
+    {
+        // Steam being slow or down must not break the pages that show profiles
+        try {
+            $response = Http::timeout(5)->get(
+                'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
+                [
+                    'key' => config('services.steam.client_secret'),
+                    'steamids' => implode(',', $steamIds),
+                ]
+            );
+        } catch (ConnectionException $e) {
             return null;
         }
 
-        return Cache::remember(
-            "steam_profile_{$steamId}",
-            now()->addDays(1),
-            function () use ($steamId) {
-                // Steam being slow or down must not break the admin pages that show profiles
-                try {
-                    $response = Http::timeout(5)->get(
-                        'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/',
-                        [
-                            'key' => config('services.steam.client_secret'),
-                            'steamids' => $steamId,
-                        ]
-                    );
-                } catch (ConnectionException $e) {
-                    return null;
-                }
+        if (! $response->successful()) {
+            return null;
+        }
 
-                if (! $response->successful()) {
-                    return null;
-                }
-
-                $player = $response->json('response.players.0');
-
-                if (! $player) {
-                    return null;
-                }
-
-                return [
-                    'steam_id' => $player['steamid'] ?? null,
-                    'name' => $player['personaname'] ?? null,
-                    'avatar' => $player['avatarfull'] ?? ($player['avatarmedium'] ?? $player['avatar'] ?? null),
-                    'profile_url' => $player['profileurl'] ?? null,
-                ];
+        $players = [];
+        foreach ($response->json('response.players') ?? [] as $player) {
+            $steamId = $player['steamid'] ?? (count($steamIds) === 1 ? $steamIds[0] : null);
+            if ($steamId === null) {
+                continue;
             }
-        );
+            $players[(string) $steamId] = [
+                'steam_id' => $steamId,
+                'name' => $player['personaname'] ?? null,
+                'avatar' => $player['avatarfull'] ?? ($player['avatarmedium'] ?? $player['avatar'] ?? null),
+                'profile_url' => $player['profileurl'] ?? null,
+            ];
+        }
+        return $players;
     }
 }

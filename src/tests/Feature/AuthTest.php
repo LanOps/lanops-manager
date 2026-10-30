@@ -270,6 +270,62 @@ class AuthTest extends TestCase
         $this->assertNull(\App\Libraries\Helpers::getSteamProfile('76561198000000009'));
     }
 
+    public function testSteamProfilesAreFetchedInOneRequest()
+    {
+        Http::fake(['api.steampowered.com/*' => Http::response(['response' => ['players' => [
+            ['steamid' => '76561198000000011', 'personaname' => 'First'],
+            ['steamid' => '76561198000000012', 'personaname' => 'Second'],
+        ]]])]);
+
+        $profiles = \App\Libraries\Helpers::getSteamProfiles(['76561198000000011', '76561198000000012', '76561198000000013', null, 'not-an-id']);
+
+        $this->assertEquals(['76561198000000011', '76561198000000012'], array_keys($profiles));
+        $this->assertSame('Second', \App\Libraries\Helpers::getSteamProfile('76561198000000012')['name']);
+        Http::assertSentCount(1);
+        Http::assertSent(fn ($request) => $request['steamids'] === '76561198000000011,76561198000000012,76561198000000013');
+
+        // A profile Steam didn't return is remembered too, so it isn't asked for on every page view
+        \App\Libraries\Helpers::flushSteamProfiles();
+        $this->assertNull(\App\Libraries\Helpers::getSteamProfile('76561198000000013'));
+        Http::assertSentCount(1);
+    }
+
+    public function testEventPageAsksSteamOnceForAllAttendees()
+    {
+        Http::fake(['api.steampowered.com/*' => Http::response(['response' => ['players' => [
+            ['steamid' => '76561198000000021', 'personaname' => 'Steam One'],
+            ['steamid' => '76561198000000022', 'personaname' => 'Steam Two'],
+        ]]])]);
+        $ticket = $this->createEventWithTicket();
+        foreach (['76561198000000021', '76561198000000022', '76561198000000023'] as $steamId) {
+            $participant = new \App\Models\EventParticipant();
+            $participant->forceFill([
+                'user_id'   => $this->createUser(['steamid' => $steamId])->id,
+                'event_id'  => $ticket->event_id,
+                'ticket_id' => $ticket->id,
+            ])->saveQuietly();
+        }
+
+        $this->get('/events/' . $ticket->event->slug)
+            ->assertOk()
+            ->assertSee('Steam: Steam One')
+            ->assertSee('Steam: Steam Two');
+
+        Http::assertSentCount(1);
+    }
+
+    public function testSteamProfileTimeoutIsNotCached()
+    {
+        Http::fakeSequence('api.steampowered.com/*')
+            ->pushFailedConnection()
+            ->push(['response' => ['players' => [['steamid' => '76561198000000014', 'personaname' => 'Back']]]]);
+
+        $this->assertNull(\App\Libraries\Helpers::getSteamProfile('76561198000000014'));
+
+        \App\Libraries\Helpers::flushSteamProfiles();
+        $this->assertSame('Back', \App\Libraries\Helpers::getSteamProfile('76561198000000014')['name']);
+    }
+
     public function testSteamRegistrationCreatesAVerifiedUser()
     {
         Http::fake(['api.steampowered.com/*' => Http::response(['response' => ['players' => [['personaname' => 'Steam Person']]]])]);

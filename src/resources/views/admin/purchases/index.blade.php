@@ -38,6 +38,10 @@
 						</tr>
 					</thead>
 					<tbody>
+						{{-- One Steam request for the whole list, instead of one per row --}}
+						@php
+						    Helpers::getSteamProfiles($purchases->pluck('user.steamid')->all());
+						@endphp
 						@foreach ($purchases as $purchase)
 							@php
 								$statusColor = 'warning';

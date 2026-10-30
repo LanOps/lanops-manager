@@ -20,6 +20,7 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->withoutVite();
+        \App\Libraries\Helpers::flushSteamProfiles();
         Storage::fake(config('media-library.disk_name'));
     }
 
