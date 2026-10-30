@@ -89,7 +89,7 @@ Route::group(['middleware' => ['web']], function () {
      * Tickets
      */
     Route::group(['middleware' => ['auth', 'banned', 'verified']], function () {
-        Route::get('/tickets/retrieve/{participant}', 'Events\TicketsController@retrieve');
+        Route::get('/tickets/retrieve/{participant:qr_token}', 'Events\TicketsController@retrieve');
         Route::post('/tickets/purchase/{ticket}', 'Events\TicketsController@purchase');
     });
 

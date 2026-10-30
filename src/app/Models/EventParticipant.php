@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Auth;
 use QrCode;
+use Illuminate\Support\Str;
 
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -31,6 +32,7 @@ class EventParticipant extends Model implements HasMedia
     protected $hidden = array(
         'created_at',
         'updated_at',
+        'qr_token',
     );
 
     protected $fillable = [
@@ -43,6 +45,11 @@ class EventParticipant extends Model implements HasMedia
     public static function boot()
     {
         parent::boot();
+        self::creating(function ($model) {
+            if (empty($model->qr_token)) {
+                $model->qr_token = Str::random(40);
+            }
+        });
         self::created(function ($model) {
             if (!$model->generateQRCode()) {
                 return false;
@@ -176,7 +183,14 @@ class EventParticipant extends Model implements HasMedia
         if (!preg_match('#^https?://#i', $baseUrl)) {
             $baseUrl = 'https://' . $baseUrl;
         }
-        return $baseUrl . '/tickets/retrieve/' . $this->id;
+        // A random token rather than the id, so a QR code can't be made for someone else's ticket
+        if (empty($this->qr_token)) {
+            $this->qr_token = Str::random(40);
+            if ($this->exists) {
+                $this->saveQuietly();
+            }
+        }
+        return $baseUrl . '/tickets/retrieve/' . $this->qr_token;
     }
 
     /**

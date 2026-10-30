@@ -12,6 +12,7 @@ class TicketQrCodeTest extends TestCase
     {
         $participant = new EventParticipant();
         $participant->id = $id;
+        $participant->qr_token = 'tok' . $id;
         return $participant;
     }
 
@@ -19,21 +20,21 @@ class TicketQrCodeTest extends TestCase
     {
         config(['app.url' => 'https://www.lanops.co.uk']);
 
-        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/1971', $this->participant(1971)->getTicketUrl());
+        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/tok1971', $this->participant(1971)->getTicketUrl());
     }
 
     public function testTicketUrlHandlesTrailingSlash(): void
     {
         config(['app.url' => 'https://www.lanops.co.uk/']);
 
-        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/1971', $this->participant(1971)->getTicketUrl());
+        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/tok1971', $this->participant(1971)->getTicketUrl());
     }
 
     public function testTicketUrlAddsHttpsWhenAppUrlHasNoScheme(): void
     {
         config(['app.url' => 'www.lanops.co.uk']);
 
-        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/1971', $this->participant(1971)->getTicketUrl());
+        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/tok1971', $this->participant(1971)->getTicketUrl());
     }
 
     public function testRegeneratingReplacesTheOldQrCode(): void
@@ -53,6 +54,42 @@ class TicketQrCodeTest extends TestCase
         $media = $participant->fresh()->getMedia('qr');
         $this->assertCount(1, $media);
         $this->assertNotSame('oldqr.png', $media->first()->file_name);
+    }
+
+    public function testTicketUrlUsesARandomTokenNotTheId(): void
+    {
+        config(['app.url' => 'https://www.lanops.co.uk']);
+        $ticket = $this->createEventWithTicket();
+        $participant = new EventParticipant();
+        $participant->forceFill([
+            'user_id'   => $this->createUser()->id,
+            'event_id'  => $ticket->event_id,
+            'ticket_id' => $ticket->id,
+        ])->saveQuietly();
+
+        $url = $participant->getTicketUrl();
+
+        $token = $participant->fresh()->qr_token;
+        $this->assertSame(40, strlen($token));
+        $this->assertSame('https://www.lanops.co.uk/tickets/retrieve/' . $token, $url);
+        $this->assertArrayNotHasKey('qr_token', $participant->fresh()->toArray());
+    }
+
+    public function testRetrieveFindsTheTicketByTokenOnly(): void
+    {
+        $admin = $this->createUser(['admin' => 1]);
+        $ticket = $this->createEventWithTicket();
+        $participant = new EventParticipant();
+        $participant->forceFill([
+            'user_id'   => $this->createUser()->id,
+            'event_id'  => $ticket->event_id,
+            'ticket_id' => $ticket->id,
+            'qr_token'  => 'known-token',
+        ])->saveQuietly();
+
+        $this->actingAs($admin)->get('/tickets/retrieve/known-token')
+            ->assertRedirect('/admin/events/' . $participant->event_id . '/participants/' . $participant->id);
+        $this->actingAs($admin)->get('/tickets/retrieve/' . $participant->id)->assertNotFound();
     }
 
     public function testRegenerateCommandRunsWithNoParticipants(): void
