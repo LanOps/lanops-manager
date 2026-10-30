@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\EventParticipant;
+use App\Models\EventSeating;
 use App\Models\EventSeatingPlan;
 use App\Models\EventTicket;
 use App\Models\User;
@@ -126,6 +127,19 @@ class SeatsAndGiftsTest extends TestCase
         $this->assertSame('A1', $participant->fresh()->seat->seat);
     }
 
+    public function testMovingSeatFreesTheOldOne()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket();
+        $plan = $this->createSeatingPlan($ticket);
+        $participant = $this->createParticipant($user, $ticket);
+        $this->pickSeat($user, $plan, $participant, 'A1');
+
+        $this->pickSeat($user, $plan, $participant, 'B2')->assertSessionHas('alert-success');
+
+        $this->assertSame(['B2'], EventSeating::where('event_participant_id', $participant->id)->pluck('seat')->all());
+    }
+
     public function testGiftingMakesARandomCode()
     {
         $user = $this->createUser();
@@ -176,6 +190,21 @@ class SeatsAndGiftsTest extends TestCase
 
         $this->assertSame($friend->id, $participant->fresh()->user_id);
         $this->assertNull($participant->fresh()->gift_accepted_url);
+    }
+
+    public function testAGiftLinkWorksOnlyOnce()
+    {
+        $owner = $this->createUser();
+        $friend = $this->createUser();
+        $participant = $this->createParticipant($owner, $this->createEventWithTicket());
+        $this->actingAs($owner)->post('/gift/' . $participant->id);
+        $code = $participant->fresh()->gift_accepted_url;
+
+        $this->actingAs($friend)->get('/gift/accept?url=' . $code);
+        $this->actingAs($this->createUser())->get('/gift/accept?url=' . $code)
+            ->assertSessionHas('alert-danger', 'Redemption code not found.');
+
+        $this->assertSame($friend->id, $participant->fresh()->user_id);
     }
 
     public function testAcceptWithoutACodeTakesNothing()
