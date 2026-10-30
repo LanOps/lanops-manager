@@ -43,10 +43,12 @@ class PollsController extends Controller
         $rules = [
             'name'          => 'filled',
             'status'        => 'in:draft,preview,published',
+            'end'           => 'nullable|date',
         ];
         $messages = [
             'name.filled'           => 'Name cannot be empty',
             'status.in'             => 'Status must be draft, preview or published',
+            'end.date'              => 'End must be a date',
         ];
         if (isset($request->event_id) && $request->event_id != 0) {
             $rules['event_id'] = 'exists:events,id';
@@ -59,6 +61,10 @@ class PollsController extends Controller
         $poll->event_id = null;
         if (isset($request->event_id) && $request->event_id != 0) {
             $poll->event_id = $request->event_id;
+        }
+        // An empty end date reopens the poll
+        if ($request->has('end')) {
+            $poll->end = $this->parseEnd($request->end);
         }
         if (!$poll->save()) {
             Session::flash('alert-danger', 'Cannot update Poll!');
@@ -78,11 +84,13 @@ class PollsController extends Controller
         $rules = [
             'name'          => 'required',
             'options'       => 'filled|array',
+            'end'           => 'nullable|date',
         ];
         $messages = [
             'name.required'         => 'Name is required',
             'options.filled'        => 'Options cannot be empty',
             'options.array'         => 'Options must be an array',
+            'end.date'              => 'End must be a date',
         ];
         if (isset($request->event_id) && $request->event_id != 0) {
             $rules['event_id'] = 'exists:events,id';
@@ -99,6 +107,7 @@ class PollsController extends Controller
         $poll->description = $request->description;
         $poll->allow_options_multi = ($request->allow_options_multi ? true : false);
         $poll->allow_options_user = ($request->allow_options_user ? true : false);
+        $poll->end = $this->parseEnd($request->end);
         if (!$poll->save()) {
             Session::flash('alert-danger', 'Cannot create Poll!');
             return Redirect::back();
@@ -191,5 +200,18 @@ class PollsController extends Controller
         }
         Session::flash('alert-success', 'Successfully ended Poll!');
         return Redirect::to('/admin/polls/' . $poll->slug);
+    }
+
+    /**
+     * Turn the end date from the form (datetime-local) into a database date
+     * @param  string|null $end
+     * @return string|null
+     */
+    private function parseEnd($end)
+    {
+        if (empty($end)) {
+            return null;
+        }
+        return date('Y-m-d H:i:s', strtotime($end));
     }
 }

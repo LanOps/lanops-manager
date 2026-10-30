@@ -38,6 +38,9 @@
 								<td>
 									@if (!$poll->hasEnded())
 										{{ $poll->status }}
+										@if ($poll->getScheduledEnd())
+											<br><small>Ends {{ date('H:i d-m-Y', strtotime($poll->getScheduledEnd())) }}</small>
+										@endif
 									@else
 										ENDED
 									@endif
@@ -84,6 +87,10 @@
 					<div class="mb-3">
 						{{ html()->label('Link to Event', 'event_id') }}
 						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), '')->class('form-select') }}
+					</div>
+					<div class="mb-3">
+						{{ html()->label('Voting Ends (optional)', 'end') }}
+						{{ html()->input('datetime-local', 'end', '')->class('form-control') }}
 					</div>
 					{{ html()->label('Options', 'options') }}
 					@include ('layouts._partials._polls.add-options')

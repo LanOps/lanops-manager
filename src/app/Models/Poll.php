@@ -156,10 +156,44 @@ class Poll extends Model
      */
     public function hasEnded()
     {
-        if ($this->end == null || ($this->end == "0000-00-00 00:00:00" || $this->end >= date("Y-m-d H:i:s"))) {
+        if ($this->end == null || ($this->end == "0000-00-00 00:00:00" || $this->end > date("Y-m-d H:i:s"))) {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Get the end date if the Poll is set to end in the future
+     * @return string|null
+     */
+    public function getScheduledEnd()
+    {
+        if ($this->end == null || $this->end == "0000-00-00 00:00:00" || $this->hasEnded()) {
+            return null;
+        }
+        return $this->end;
+    }
+
+    /**
+     * Polls still open for voting
+     */
+    public function scopeOpen(Builder $query)
+    {
+        return $query->where(function ($query) {
+            $query->whereNull('end')
+                ->orWhere('end', '0000-00-00 00:00:00')
+                ->orWhere('end', '>', date("Y-m-d H:i:s"));
+        });
+    }
+
+    /**
+     * Polls that have ended
+     */
+    public function scopeEnded(Builder $query)
+    {
+        return $query->whereNotNull('end')
+            ->where('end', '!=', '0000-00-00 00:00:00')
+            ->where('end', '<=', date("Y-m-d H:i:s"));
     }
 
     /**
