@@ -20,7 +20,7 @@
                         <div class="gallery-card">
                             <a href="/gallery/{{ $album->slug }}" class="gallery-card-img">
                                 @if ($cover = $album->getAlbumCoverImageUrl())
-                                    <img src="{{ $cover }}" alt="{{ $album->name }}">
+                                    <img src="{{ $cover }}" alt="{{ $album->name }}" loading="lazy">
                                 @endif
                             </a>
                             <div class="gallery-card-body">

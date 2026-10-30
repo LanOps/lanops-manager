@@ -45,22 +45,16 @@ class HomeController extends Controller
             ->image(config('app.url') . '/images/og-image.jpg');
 
         return view("home")
-            ->withNextEvent(
-                Event::where('end', '>=', \Carbon\Carbon::now())
-                    ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-            )
-            ->withNextEventLan(
-                Event::where('end', '>=', \Carbon\Carbon::now())
-                    ->where('type', Event::$typeLan)
-                    ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-            )
+            ->withNextEvent(\App\Libraries\Helpers::getNextEvent())
+            ->withNextEventLan($nextLan)
             ->withNextEventTabletop(
                 Event::where('end', '>=', \Carbon\Carbon::now())
                     ->where('type', Event::$typeTabletop)
                     ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
             )
             ->withNewsArticles(NewsArticle::limit(4)->orderBy('created_at', 'desc')->get())
-            ->withEvents(Event::orderBy('created_at', 'DESC')->get())
+            // Only upcoming events are shown in the calendar
+            ->withEvents(Event::where('start', '>', \Carbon\Carbon::today())->orderBy('created_at', 'DESC')->get())
             ->withSliderVideos($sliderVideos)
         ;
     }

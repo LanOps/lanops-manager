@@ -75,7 +75,8 @@ class Poll extends Model
 
     public function options()
     {
-        return $this->hasMany('App\Models\PollOption', 'poll_id');
+        // chaperone() sets each option's poll, so getPercentage() doesn't load the poll again per option
+        return $this->hasMany('App\Models\PollOption', 'poll_id')->chaperone();
     }
 
     public function event()

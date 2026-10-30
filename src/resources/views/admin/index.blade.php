@@ -133,7 +133,7 @@
 			<div class="card-body">
 				<ul class="list-group">
 					<li class="list-group-item list-group-item-info"><strong>Next Event: <span class="float-end">{{ $nextEvent }}</span></strong></li>
-					<li class="list-group-item list-group-item-info"><strong>No of Events: <span class="float-end">{{ $events->count() }}</span></strong></li>
+					<li class="list-group-item list-group-item-info"><strong>No of Events: <span class="float-end">{{ $eventCount }}</span></strong></li>
 					<li class="list-group-item list-group-item-info"><strong>No of Attendees: <span class="float-end">{{ $participantCount }}</span></strong></li>
 				</ul>
 			</div>

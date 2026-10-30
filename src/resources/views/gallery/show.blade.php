@@ -24,7 +24,7 @@
             @foreach ($album->getMedia('images') as $image)
                 <div class="gallery-grid-item">
                     <a class="spotlight gallery-thumb" href="{{ $image->getUrl('optimized') }}">
-                        <img src="{{ $image->getUrl('thumb') }}" alt="{{ $album->name }}">
+                        <img src="{{ $image->getUrl('thumb') }}" alt="{{ $album->name }}" loading="lazy" width="300" height="300">
                     </a>
                 </div>
             @endforeach

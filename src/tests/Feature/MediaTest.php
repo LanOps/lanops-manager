@@ -35,6 +35,28 @@ class MediaTest extends TestCase
             ->assertSeeInOrder(['Album Newer', 'Album No Event', 'Album Older']);
     }
 
+    public function testGalleryCoverIsTheFirstPhotoAndLoadsOnlyThatPhoto()
+    {
+        $album = GalleryAlbum::forceCreate(['name' => 'Album Cover', 'slug' => 'album-cover', 'status' => 'PUBLISHED']);
+        $images = collect(range(1, 3))->map(fn ($i) => $album->addMediaFromString('not really an image')
+            ->usingFileName('photo' . $i . '.txt')
+            ->toMediaCollection('images'));
+
+        $loadedMedia = 0;
+        \Illuminate\Support\Facades\DB::listen(function ($query) use (&$loadedMedia) {
+            if (str_contains($query->sql, 'from `media`')) {
+                $loadedMedia++;
+            }
+        });
+
+        $this->get('/gallery')
+            ->assertOk()
+            ->assertSee($images[0]->getUrl('thumb'))
+            ->assertDontSee($images[1]->getUrl('thumb'))
+            ->assertSee('loading="lazy"', false);
+        $this->assertSame(1, $loadedMedia);
+    }
+
     public function testCaptchaRendersAnImage()
     {
         $response = $this->get('/captcha/default');

@@ -133,7 +133,8 @@ class EventSeatingPlan extends Model implements HasMedia
      */
     public function getSeatsForRow($row)
     {
-        return $this->seats()->where('seat', 'REGEXP', "^[{$row}]\d+$")->get();
+        // Filter the loaded seats rather than query per row; /i matches MySQL's case-insensitive REGEXP
+        return $this->seats->filter(fn ($seat) => preg_match("/^[{$row}]\d+$/i", $seat->seat))->values();
     }
 
     /**
@@ -143,7 +144,7 @@ class EventSeatingPlan extends Model implements HasMedia
      */
     public function getSeatsForColumn($column)
     {
-        return $this->seats()->where('seat', 'REGEXP', "^[A-Za-z]{1,9}{$column}$")->get();
+        return $this->seats->filter(fn ($seat) => preg_match("/^[A-Za-z]{1,9}{$column}$/i", $seat->seat))->values();
     }
     
     public function createSeats($occupiedSeats = null)
@@ -183,11 +184,11 @@ class EventSeatingPlan extends Model implements HasMedia
 
     public function getCapacity()
     {
-        return $this->seats()->where('disabled', false)->get()->count();
+        return $this->seats->where('disabled', false)->count();
     }
 
     public function getSeatedCount()
     {
-        return $this->seats()->where('disabled', false)->where('event_participant_id', '!=', null)->get()->count();
+        return $this->seats->where('disabled', false)->whereNotNull('event_participant_id')->count();
     }
 }

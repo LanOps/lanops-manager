@@ -24,7 +24,11 @@ class GalleryController extends Controller
 
         $event = Event::where('start', '>=', date("Y-m-d 00:00:00"))->first();
         // Newest first, by the album's event date (or the album's own date if it has no event)
-        $albums = GalleryAlbum::with('event')->get()
+        // Only the first photo of each album is needed, for its cover
+        $albums = GalleryAlbum::with([
+            'event',
+            'media' => fn ($query) => $query->where('collection_name', 'images')->orderBy('order_column')->limit(1),
+        ])->get()
             ->sortByDesc(fn ($album) => (string) ($album->event?->start ?? $album->created_at))
             ->values();
         return view('gallery.index')
