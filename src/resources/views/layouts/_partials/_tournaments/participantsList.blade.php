@@ -13,6 +13,10 @@
     </thead>
     <tbody>
         @if ($participants)
+            {{-- One Steam request for the whole list, instead of one per row --}}
+            @php
+                Helpers::getSteamProfiles($participants->pluck('user.steamid')->all());
+            @endphp
             @foreach ($participants as $participant)
                 <tr class="table-row odd gradeX">
                     <td width="10%"><x-avatar :member="$participant->user" class="img-fluid rounded" /></td>

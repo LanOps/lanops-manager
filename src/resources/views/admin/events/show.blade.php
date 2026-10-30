@@ -293,6 +293,10 @@
 			<div class="card-body">
 				@if (!$event->eventParticipants->isEmpty())
 					<div class="list-group">
+						{{-- One Steam request for the whole list, instead of one per row --}}
+						@php
+						    Helpers::getSteamProfiles($participants->pluck('user.steamid')->all());
+						@endphp
 						@foreach ($participants as $participant)
 							<a href="/admin/events/{{ $event->slug }}/participants/{{ $participant->id }}" class="list-group-item">
 								<i class="fa fa-comment fa-fw"></i> {{ $participant->user->username }}

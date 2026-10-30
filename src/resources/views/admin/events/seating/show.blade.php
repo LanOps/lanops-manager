@@ -80,6 +80,10 @@
 							</tr>
 						</thead>
 						<tbody>
+							{{-- One Steam request for the whole list, instead of one per row --}}
+							@php
+							    Helpers::getSteamProfiles($seats->pluck('eventParticipant.user.steamid')->all());
+							@endphp
 							@foreach ($seats as $seat)
 								<tr class="odd gradeX">
 									<td></td>

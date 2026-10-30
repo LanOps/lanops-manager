@@ -422,6 +422,8 @@
 					</tr>
 				</thead>
 				<tbody>
+					{{-- One Steam request for the whole list, instead of one per row --}}
+					@php(Helpers::getSteamProfiles($event->eventParticipants->pluck('user.steamid')->all()))
 					@foreach ($event->eventParticipants as $participant)
 					<tr>
 						<td>
