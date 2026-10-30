@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Events;
 
 use Auth;
+use DB;
 use Session;
 
 use App\Models\Event;
+use App\Models\EventParticipant;
 use App\Models\EventSeating;
 use App\Models\EventSeatingPlan;
 
@@ -85,24 +87,25 @@ class SeatingController extends Controller
             return Redirect::back();
         }
 
-        if ($seat->event_participant_id != null) {
-            Session::flash('alert-danger', 'That seat is already taken!');
-            return Redirect::back();
-        }
-
-        // Free the old seat only once the new one is known to be free
-        if ($participant->seat != null) {
-            $participant->seat->event_participant_id = null;
-            if (!$participant->seat->save()) {
-                Session::flash('alert-danger', 'Could not remove seating');
-                return Redirect::back();
+        // Lock the participant so their own requests run one at a time, and only claim the
+        // seat if it is still free, so two people can't end up in the same seat
+        $result = DB::transaction(function () use ($participant, $seat) {
+            EventParticipant::whereKey($participant->id)->lockForUpdate()->first();
+            $claimed = EventSeating::whereKey($seat->id)
+                ->whereNull('event_participant_id')
+                ->update(['event_participant_id' => $participant->id]);
+            if (!$claimed) {
+                return 'taken';
             }
-        }
+            // Free the old seat only once the new one is ours
+            EventSeating::where('event_participant_id', $participant->id)
+                ->where('id', '!=', $seat->id)
+                ->update(['event_participant_id' => null]);
+            return 'seated';
+        });
 
-        $seat->event_participant_id = $participant->id;
-
-        if (!$seat->save()) {
-            Session::flash('alert-danger', 'Could not update seating');
+        if ($result == 'taken') {
+            Session::flash('alert-danger', 'That seat is already taken!');
             return Redirect::back();
         }
 

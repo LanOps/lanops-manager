@@ -323,6 +323,18 @@ class Helpers
      * Get Countries for Select
      * @return array
      */
+    /**
+     * Countries a venue can be in, by ISO code. Kept here rather than fetched
+     * from a web service on every save; add to it alongside getSelectCountries.
+     * @return array
+     */
+    public static function getCountries()
+    {
+        return [
+            'GB' => 'United Kingdom',
+        ];
+    }
+
     public static function getSelectCountries()
     {
         $countriesArray = [

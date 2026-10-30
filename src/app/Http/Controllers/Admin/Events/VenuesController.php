@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Events;
 
+use Helpers;
+
 use Session;
 
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -71,7 +73,7 @@ class VenuesController extends Controller
         $validCountry = false;
         $countryCode = null;
         $country = null;
-        foreach (json_decode(file_get_contents("http://country.io/names.json"), true) as $thisCountryCode => $thisCountry) {
+        foreach (Helpers::getCountries() as $thisCountryCode => $thisCountry) {
             if (strtolower($thisCountry) == strtolower($request->address_country) || strtolower($thisCountryCode) == strtolower($request->address_country)) {
                 $validCountry = true;
                 $countryCode = $thisCountryCode;
@@ -169,7 +171,7 @@ class VenuesController extends Controller
             $validCountry = false;
             $countryCode = null;
             $country = null;
-            foreach (json_decode(file_get_contents("http://country.io/names.json"), true) as $thisCountryCode => $thisCountry) {
+            foreach (Helpers::getCountries() as $thisCountryCode => $thisCountry) {
                 if (strtolower($thisCountry) == strtolower($request->address_country) || strtolower($thisCountryCode) == strtolower($request->address_country)) {
                     $validCountry = true;
                     $countryCode = $thisCountryCode;
@@ -237,6 +239,9 @@ class VenuesController extends Controller
      */
     public function destroyImage(EventVenue $venue, Media $image)
     {
+        if ($image->model_type !== $venue->getMorphClass() || $image->model_id != $venue->id) {
+            abort(404);
+        }
         if (!$image->delete()) {
             Session::flash('alert-danger', 'Cannot delete Image!');
             return Redirect::back();

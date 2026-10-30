@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Events;
 
 use Auth;
+use DB;
 use Session;
 use Illuminate\Support\Str;
 use App\Models\EventParticipant;
@@ -85,16 +86,23 @@ class ParticipantsController extends Controller
         $user = Auth::user();
         if ($user) {
             $code = $request->query('url');
-            $participant = null;
+            $result = null;
             if (is_string($code) && $code !== '') {
+                // Lock the row so two people using the same link at once can't both take the ticket.
                 // The code is cleared when a gift is accepted or revoked
-                $participant = EventParticipant::where('gift_accepted_url', $code)->first();
+                $result = DB::transaction(function () use ($code, $user) {
+                    $participant = EventParticipant::where('gift_accepted_url', $code)->lockForUpdate()->first();
+                    if ($participant == null) {
+                        return null;
+                    }
+                    $participant->gift_accepted = true;
+                    $participant->user_id = $user->id;
+                    $participant->gift_accepted_url = null;
+                    return $participant->save();
+                });
             }
-            if ($participant != null) {
-                $participant->gift_accepted = true;
-                $participant->user_id = $user->id;
-                $participant->gift_accepted_url = null;
-                if ($participant->save()) {
+            if ($result !== null) {
+                if ($result) {
                     $request->session()->flash(
                         'alert-success',
                         'Gift Successfully accepted! Please visit the event page to pick a seat'

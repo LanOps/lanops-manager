@@ -162,7 +162,7 @@ Route::group(['middleware' => ['web']], function () {
 /**
  * Admin
  */
-Route::group(['middleware' => ['web', 'admin']], function () {
+Route::group(['middleware' => ['web', 'admin', 'banned']], function () {
 
     /**
      * Index Page

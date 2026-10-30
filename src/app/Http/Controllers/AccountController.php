@@ -25,7 +25,7 @@ class AccountController extends Controller
 
         $state = bin2hex(openssl_random_pseudo_bytes(12));
         Session::put('discordoauth', $state);
-        $discordLinkUrl = 'https://discordapp.com/oauth2/authorize?response_type=code&client_id=' . config('app.discord_client_id') . '&redirect_uri=' . config('app.discord_redirect_url') . '&scope=' . config('app.discord_scope') . "&state=" . $state;
+        $discordLinkUrl = 'https://discordapp.com/oauth2/authorize?response_type=code&client_id=' . config('app.discord_client_id') . '&redirect_uri=' . urlencode(config('app.discord_redirect_url')) . '&scope=' . urlencode(config('app.discord_scope')) . "&state=" . $state;
 
         return view("accounts.index")
             ->withUser($user)
