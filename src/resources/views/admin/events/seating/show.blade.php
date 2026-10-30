@@ -264,7 +264,7 @@
 		clearSeatForm.style.display = 'none';
 		participantSelect.value = '';
 		document.getElementById('participant_id_modal').value = '';
-		if(participant_id != null){
+		if (participant_id) {
 			//we have a user - Fill in extra
 			seatNumber.readOnly = true;
 			participantLink.href = '/admin/events/{{ $event->slug }}/participants/' + participant_id;

@@ -118,7 +118,8 @@ class Event extends Model
         return [
             'slug' => [
                 'source' => 'nice_name',
-                'onUpdate' => true
+                // Renaming an event keeps its address, so links already shared keep working
+                'onUpdate' => false
             ]
         ];
     }
@@ -165,9 +166,15 @@ class Event extends Model
     public function getTicketSalesCount()
     {
         $total = 0;
+        $discountedPurchases = [];
         foreach ($this->eventParticipants as $participant) {
             if ($participant->purchase && $participant->ticket) {
-                $total = ($total + $participant->ticket->price) - $participant->purchase->referral_discount_total;
+                $total += $participant->ticket->price;
+                // A referral discount is taken off the whole purchase, not off each ticket in it
+                if (!in_array($participant->purchase_id, $discountedPurchases)) {
+                    $total -= $participant->purchase->referral_discount_total;
+                    $discountedPurchases[] = $participant->purchase_id;
+                }
             }
         }
         return $total;
