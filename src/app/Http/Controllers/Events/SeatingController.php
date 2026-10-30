@@ -112,4 +112,49 @@ class SeatingController extends Controller
         Session::flash('alert-success', 'You have been successfully seated in seat ' . $seat->seat . '!');
         return Redirect::back();
     }
+
+    /**
+     * Remove Seat
+     * @param  Event            $event
+     * @param  EventSeatingPlan $seatingPlan
+     * @param  Request          $request
+     * @return Redirect
+     */
+    public function destroy(Event $event, EventSeatingPlan $seatingPlan, Request $request)
+    {
+        $this->validate($request, [
+            'participant_id' => 'required',
+        ]);
+
+        if (!$event->seatingPlans()->whereKey($seatingPlan->id)->exists()) {
+            abort(404);
+        }
+
+        if ($seatingPlan->locked) {
+            Session::flash('alert-danger', 'Seating is locked for this event');
+            return Redirect::back();
+        }
+
+        // Only your own tickets can be unseated
+        if (!$participant = $event->EventParticipants()
+            ->where('id', $request->participant_id)
+            ->where('user_id', Auth::id())
+            ->first()
+        ) {
+            Session::flash('alert-danger', 'Event Participant not found');
+            return Redirect::back();
+        }
+
+        $removed = EventSeating::where('event_seating_plan_id', $seatingPlan->id)
+            ->where('event_participant_id', $participant->id)
+            ->update(['event_participant_id' => null]);
+
+        if (!$removed) {
+            Session::flash('alert-danger', 'That ticket is not seated on this plan');
+            return Redirect::back();
+        }
+
+        Session::flash('alert-success', 'Your seat has been removed');
+        return Redirect::back();
+    }
 }

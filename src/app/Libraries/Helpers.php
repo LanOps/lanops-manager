@@ -75,9 +75,10 @@ class Helpers
      * @param  integer $limit
      * @param  boolean $future
      * @param  boolean $obj   Return as Object
+     * @param  integer $includeId An event to list even if it is in the past, such as the one already chosen
      * @return Array|Object
      */
-    public static function getEventNames($order = 'DESC', $limit = 0, $future = false, $obj = false)
+    public static function getEventNames($order = 'DESC', $limit = 0, $future = false, $obj = false, $includeId = null)
     {
         $return = array();
         if ($limit != 0) {
@@ -97,6 +98,10 @@ class Helpers
             $return[] = 'None';
         }
         foreach ($events as $event) {
+            $return[$event->id] = $event->display_name;
+        }
+        // Otherwise a form linked to a past event shows "None", and saving it unlinks the event
+        if ($includeId && !array_key_exists($includeId, $return) && $event = \App\Models\Event::find($includeId)) {
             $return[$event->id] = $event->display_name;
         }
         if ($obj) {

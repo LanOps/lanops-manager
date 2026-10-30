@@ -89,9 +89,15 @@ class TicketsController extends Controller
     public function retrieve(EventParticipant $participant)
     {
         $user = Auth::user();
-        if ($user->admin == 1) {
-            return Redirect::to('/admin/events/' . $participant->event_id . '/participants/' . $participant->id); // redirect to site
+        // Event pages are found by slug, not id. Draft and private events are hidden from
+        // non-admins, so look the event up without that, and let its page decide what to show
+        $event = $participant->event()->withoutGlobalScopes()->first();
+        if (!$event) {
+            abort(404);
         }
-        return Redirect::to('/events/' . $participant->event_id); // redirect to site
+        if ($user->admin == 1) {
+            return Redirect::to('/admin/events/' . $event->slug . '/participants/' . $participant->id);
+        }
+        return Redirect::to('/events/' . $event->slug);
     }
 }

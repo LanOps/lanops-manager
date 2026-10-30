@@ -88,7 +88,7 @@ class TicketQrCodeTest extends TestCase
         ])->saveQuietly();
 
         $this->actingAs($admin)->get('/tickets/retrieve/known-token')
-            ->assertRedirect('/admin/events/' . $participant->event_id . '/participants/' . $participant->id);
+            ->assertRedirect('/admin/events/' . $ticket->event->slug . '/participants/' . $participant->id);
         $this->actingAs($admin)->get('/tickets/retrieve/' . $participant->id)->assertNotFound();
     }
 

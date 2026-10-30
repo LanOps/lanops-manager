@@ -55,7 +55,7 @@
 									<td>{{ $slot->desc }}</td>
 								@endif
 								<td width="10%">
-									<button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" onclick="editTimeSlot('{{ $slot->id }}', '{{ $slot->start_time }}', '{{ $slot->name }}', '{{ $slot->desc }}')" data-bs-target="#editTimeSlotModal">Edit</button>
+									<button type="button" class="btn btn-primary btn-sm w-100" data-bs-toggle="modal" onclick="editTimeSlot(@js($slot->id), @js($slot->start_time), @js($slot->name), @js($slot->desc))" data-bs-target="#editTimeSlotModal">Edit</button>
 								</td>
 							</tr>
 						@endforeach

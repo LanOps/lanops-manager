@@ -77,8 +77,8 @@
 			</div>
 			<div class="card-body">
 					{{ html()->label('Poll Link:', 'name') }}
-				<a href="{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/polls/{{ $poll->slug }}">
-					{{ $_SERVER['REQUEST_SCHEME'] }}://{{ $_SERVER['HTTP_HOST'] }}/polls/{{ $poll->slug }}
+				<a href="{{ url('/polls/' . $poll->slug) }}">
+					{{ url('/polls/' . $poll->slug) }}
 				</a>
 				{{ html()->form('POST', url('/admin/polls/' . $poll->slug))->acceptsFiles()->open() }}
 					<div class="mb-3">
@@ -101,7 +101,7 @@
 					</div>
 					<div class="mb-3">
 						{{ html()->label('Link to Event', 'event_id') }}
-						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true), $poll->event_id)->class('form-select') }}
+						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true, false, $poll->event_id), $poll->event_id)->class('form-select') }}
 					</div>
 					<div class="mb-3">
 						{{ html()->label('Allow User to Add Options', 'allow_options_users') }} @if ($poll->allow_options_user) True @else False @endif
