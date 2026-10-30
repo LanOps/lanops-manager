@@ -117,17 +117,29 @@ class Helpers
     }
 
     /**
+     * Get the event that ends soonest, worked out once per request
+     * (the navigation asks for it on every page, several times)
+     * @return \App\Models\Event|null
+     */
+    public static function getNextEvent()
+    {
+        // Kept on the request, so it is fresh for every request (and every request in a test)
+        $attributes = request()->attributes;
+        if (! $attributes->has('next_event')) {
+            $attributes->set('next_event', \App\Models\Event::where('end', '>=', Carbon::now())
+                ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
+                ->first());
+        }
+        return $attributes->get('next_event');
+    }
+
+    /**
      * Get Next Event Name
      * @return String
      */
     public static function getNextEventName()
     {
-        if ($event = \App\Models\Event::where(
-            'end',
-            '>=',
-            Carbon::now()
-        )->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-        ) {
+        if ($event = self::getNextEvent()) {
             if ($event->status == 'DRAFT' || $event->status == 'PREVIEW') {
                 return $event->display_name . ' - ' . $event->status;
             }
@@ -142,12 +154,7 @@ class Helpers
      */
     public static function getNextEventSlug()
     {
-        if ($event = \App\Models\Event::where(
-            'end',
-            '>=',
-            Carbon::now()
-        )->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-        ) {
+        if ($event = self::getNextEvent()) {
             return $event->slug;
         }
         return '#';
@@ -160,12 +167,7 @@ class Helpers
      */
     public static function getNextEventDesc()
     {
-        if ($event = \App\Models\Event::where(
-            'end',
-            '>=',
-            Carbon::now()
-        )->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-        ) {
+        if ($event = self::getNextEvent()) {
             return $event->desc_long;
         }
         return 'Coming soon...';
@@ -177,12 +179,7 @@ class Helpers
      */
     public static function getNextEventStartDate()
     {
-        if ($event = \App\Models\Event::where(
-            'end',
-            '>=',
-            Carbon::now()
-        )->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-        ) {
+        if ($event = self::getNextEvent()) {
             return date("d-m-Y H:i", strtotime($event->start));
         }
         return 'Coming soon...';
@@ -194,12 +191,7 @@ class Helpers
      */
     public static function getNextEventEndDate()
     {
-        if ($event = \App\Models\Event::where(
-            'end',
-            '>=',
-            Carbon::now()
-        )->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-        ) {
+        if ($event = self::getNextEvent()) {
             return date("d-m-Y H:i", strtotime($event->end));
         }
         return 'Coming soon...';

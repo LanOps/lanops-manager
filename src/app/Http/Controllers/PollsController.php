@@ -23,8 +23,9 @@ class PollsController extends Controller
      */
     public function index()
     {
-        $activePolls = Poll::where('end', null)->get();
-        $endedPolls = Poll::where('end', '!=', null)
+        $activePolls = Poll::with('options.votes')->where('end', null)->get();
+        $endedPolls = Poll::with('options.votes')
+            ->where('end', '!=', null)
             ->orWhereBetween('end', ['0000-00-00 00:00:00', date("Y-m-d H:i:s")])
             ->orderBy(DB::raw('ABS(DATEDIFF(polls.end, NOW()))'))
             ->paginate(10, ['*'], 'page');
@@ -39,6 +40,7 @@ class PollsController extends Controller
      */
     public function show(Poll $poll)
     {
+        $poll->load('options.votes');
         $poll->sortOptions();
         return view("polls.show")
             ->withPoll($poll);
