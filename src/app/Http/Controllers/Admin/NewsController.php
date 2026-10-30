@@ -108,7 +108,9 @@ class NewsController extends Controller
         $newsArticle->title     = $request->title;
         $newsArticle->article   = $request->article;
 
-        if (!$newsArticle->storeTags(explode(',', $request->tags)) && !$newsArticle->save()) {
+        // Save the article before the tags; storeTags() returns true on success, so
+        // checking it first with && skipped the save and only the tags changed
+        if (!$newsArticle->save() || !$newsArticle->storeTags(explode(',', $request->tags))) {
             Session::flash('alert-danger', 'Cannot Update News Article!');
             return Redirect::to('admin/news/' . $newsArticle->slug);
         }
