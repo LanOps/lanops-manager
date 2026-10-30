@@ -123,4 +123,22 @@ class PerformanceTest extends TestCase
         $this->assertSame($show, $this->countQueries('/polls/' . $poll->slug));
         $this->get('/polls')->assertSee('Votes: 11');
     }
+
+    public function testAdminDashboardChartsOnlyTheLastTwelveMonths()
+    {
+        $ticket = $this->createEventWithTicket();
+        foreach (['-2 years', '-2 days'] as $when) {
+            $participant = EventParticipant::withoutEvents(fn () => EventParticipant::create([
+                'user_id'   => $this->createUser()->id,
+                'event_id'  => $ticket->event_id,
+                'ticket_id' => $ticket->id,
+            ]));
+            $participant->forceFill(['created_at' => now()->modify($when)])->saveQuietly();
+        }
+
+        $this->actingAs($this->createUser(['admin' => 1]))->get('/admin')
+            ->assertOk()
+            ->assertSee("month: '" . now()->subDays(2)->format('Y-m') . "', value: 1", false)
+            ->assertDontSee("month: '" . now()->subYears(2)->format('Y-m') . "'", false);
+    }
 }
