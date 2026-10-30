@@ -106,3 +106,35 @@ body.admin {
 .admin-main .card-header .huge {
 	font-size: 40px;
 }
+
+// Stat cards (components/admin-stat-card): icon beside a number that never
+// wraps. The icon and number scale with the card width (cqi), and the number
+// also by its length (--stat-length), so values like "£12,077.90" still fit
+// on one line in narrow columns.
+.stat-card {
+	.card-header {
+		flex: 1 0 auto;
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		container-type: inline-size;
+	}
+
+	.stat-card-icon {
+		flex: none;
+		font-size: min(3.5rem, 22cqi);
+	}
+
+	.stat-card-text {
+		flex: 1 1 auto;
+		min-width: 0;
+		text-align: end;
+	}
+
+	.card-header .stat-card-value {
+		font-size: min(40px, calc(120cqi / var(--stat-length, 1)));
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}

@@ -15,74 +15,33 @@
 	</div>
 </div>
 
-<div class="row">
-	<div class="col-lg-3 col-md-6">
-		<div class="card border-primary">
-			<div class="card-header text-bg-primary">
-				<div class="row">
-					<div class="col-3">
-						<i class="fa fa-comments fa-5x"></i>
-					</div>
-					<div class="col-9 text-end">
-						<div class="huge">{{ $comments->count() }}</div>
-						<div>New Comments!</div>
-					</div>
-				</div>
-			</div>
-			<a href="/admin/news">
-				<div class="card-footer">
-					<span class="float-start">View Details</span>
-					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
-					<div class="clearfix"></div>
-				</div>
-			</a>
-		</div>
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3 mb-3">
+	<div class="col">
+		<x-admin-stat-card
+			icon="fa-comments"
+			:value="$comments->count()"
+			colour="primary"
+			label="New Comments!"
+			href="/admin/news"
+		/>
 	</div>
-	
-	<div class="col-lg-3 col-md-6">
-		<div class="card border-success">
-				<div class="card-header text-bg-success">
-					<div class="row">
-						<div class="col-3">
-							<i class="fa fa-list-check fa-5x"></i>
-						</div>
-						<div class="col-9 text-end">
-							<div class="huge">{{ $votes->count() }}</div>
-							<div>New Votes!</div>
-						</div>
-					</div>
-			</div>
-			<a href="/admin/polls">
-				<div class="card-footer">
-					<span class="float-start">View Details</span>
-					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
-					<div class="clearfix"></div>
-				</div>
-			</a>
-		</div>
+	<div class="col">
+		<x-admin-stat-card
+			icon="fa-list-check"
+			:value="$votes->count()"
+			colour="success"
+			label="New Votes!"
+			href="/admin/polls"
+		/>
 	</div>
-	
-	<div class="col-lg-3 col-md-6">
-		<div class="card border-danger">
-			<div class="card-header text-bg-danger">
-				<div class="row">
-					<div class="col-3">
-						<i class="fa fa-life-ring fa-5x"></i>
-					</div>
-					<div class="col-9 text-end">
-						<div class="huge">{{ $participants->count() }}</div>
-						<div>New Participants!</div>
-					</div>
-				</div>
-			</div>
-			<a href="/admin/events">
-				<div class="card-footer">
-					<span class="float-start">View Details</span>
-					<span class="float-end"><i class="fa fa-circle-arrow-right"></i></span>
-					<div class="clearfix"></div>
-				</div>
-			</a>
-		</div>
+	<div class="col">
+		<x-admin-stat-card
+			icon="fa-life-ring"
+			:value="$participants->count()"
+			colour="danger"
+			label="New Participants!"
+			href="/admin/events"
+		/>
 	</div>
 </div>
 
