@@ -88,7 +88,7 @@
 						<div class="row">
 							<div class="col-lg-6 col-sm-12 mb-3">
 								{{ html()->label('Start Date', 'start_date') }}
-								{{ html()->text('start_date', '')->class('form-control') }}
+								{{ html()->date('start_date')->class('form-control') }}
 							</div>
 							<div class="col-lg-6 col-sm-12 mb-3">
 								{{ html()->label('Start  Time', 'start_time') }}
@@ -98,7 +98,7 @@
 						<div class="row">
 							<div class="col-lg-6 col-sm-12 mb-3">
 								{{ html()->label('End Date', 'end_date') }}
-								{{ html()->text('end_date', '')->class('form-control') }}
+								{{ html()->date('end_date')->class('form-control') }}
 							</div>
 							<div class="col-lg-6 col-sm-12 mb-3">
 								{{ html()->label('End Time', 'end_time') }}
@@ -136,13 +136,5 @@
 
 	</div>
 </div>
-
-<!-- JavaScript-->
-<script type="text/javascript">
-	$( function() {
-		$( "#start_date" ).datepicker();
-		$( "#end_date" ).datepicker();
-	});
-</script>
 
 @endsection

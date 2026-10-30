@@ -91,11 +91,11 @@
 								<div class="col-md-6 col-sm-12">
 									<div class="mb-3">
 										{{ html()->label('Start Date', 'start_date') }}
-										{{ html()->text('start_date', date('m/d/Y', strtotime($event->start)))->class('form-control') }}
+										{{ html()->date('start_date', date('Y-m-d', strtotime($event->start)))->class('form-control') }}
 									</div>
 									<div class="mb-3">
 										{{ html()->label('End Date', 'end_date') }}
-										{{ html()->text('end_date', date('m/d/Y', strtotime($event->end)))->class('form-control') }}
+										{{ html()->date('end_date', date('Y-m-d', strtotime($event->end)))->class('form-control') }}
 									</div>
 								</div>
 								<div class="col-md-6 col-sm-12">
@@ -448,15 +448,6 @@
 	</div>
 </div>
 
-<script>
-	function editAnnouncement(announcement_id, message)
-	{
-		$("#editAnnouncementForm").prop('action', '/admin/events/{{ $event->slug }}/announcements/' + announcement_id);
-		$("#deleteAnnouncementForm").prop('action', '/admin/events/{{ $event->slug }}/announcements/' + announcement_id);
-		$('#edit_announcement').val(message);
-	}
-</script>
-
 <div class="modal fade" id="addEventInformationModal" tabindex="-1" role="dialog" aria-labelledby="addEventInformationModalLabel" aria-hidden="true">
 	<div class="modal-dialog">
 		<div class="modal-content">
@@ -490,13 +481,5 @@
 		</div>
 	</div>
 </div>
-
-<!-- JavaScript-->
-<script type="text/javascript">
-	$( function() {
-		$( "#start_date" ).datepicker();
-		$( "#end_date" ).datepicker();
-	});
-</script>
 
 @endsection

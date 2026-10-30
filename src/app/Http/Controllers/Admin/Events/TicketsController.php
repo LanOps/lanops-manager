@@ -51,9 +51,9 @@ class TicketsController extends Controller
         $rules = [
             'name'              => 'required',
             'price'             => 'required|numeric',
-            'sale_start_date'   => 'date_format:m/d/Y',
+            'sale_start_date'   => 'date_format:Y-m-d',
             'sale_start_time'   => 'date_format:H:i',
-            'sale_end_date'     => 'date_format:m/d/Y',
+            'sale_end_date'     => 'date_format:Y-m-d',
             'sale_end_time'     => 'date_format:H:i',
             'type'              => 'required',
             'seatable'          => 'boolean',
@@ -63,9 +63,9 @@ class TicketsController extends Controller
             'name.required'                 => 'A Ticket Name is required',
             'price.numeric'                 => 'Price must be a number',
             'price.required'                => 'A Price is required',
-            'sale_start_date.date'          => 'Sale Start Date must be m/d/Y format',
+            'sale_start_date.date_format'   => 'Sale Start Date must be Y-m-d format',
             'sale_start_time.date_format'   => 'Sale Start Time must be H:i format',
-            'sale_end_date.date'            => 'Sale End Date must be m/d/Y format',
+            'sale_end_date.date_format'     => 'Sale End Date must be Y-m-d format',
             'sale_end_time.date_format'     => 'Sale End Time must be H:i format',
             'seatable.boolen'               => 'Seatable must be True/False',
             'quantity.numeric'              => 'Quantity must be a number',
@@ -76,7 +76,7 @@ class TicketsController extends Controller
             $saleStart = date(
                 "Y-m-d H:i:s",
                 strtotime(
-                    $request->sale_start_date . $request->sale_start_time
+                    $request->sale_start_date . ' ' . $request->sale_start_time
                 )
             );
         }
@@ -85,7 +85,7 @@ class TicketsController extends Controller
             $saleEnd = date(
                 "Y-m-d H:i:s",
                 strtotime(
-                    $request->sale_end_date . $request->sale_end_time
+                    $request->sale_end_date . ' ' . $request->sale_end_time
                 )
             );
         }
@@ -133,9 +133,9 @@ class TicketsController extends Controller
         $messages = [
             'price|numeric'                 => 'Price must be a number',
             'name|filled'                   => 'Name cannot be empty',
-            'sale_start_date.date'          => 'Sale Start Date must be m/d/Y format',
+            'sale_start_date.date'          => 'Sale Start Date must be a date',
             'sale_start_time.date_format'   => 'Sale Start Time must be H:i format',
-            'sale_end_date.date'            => 'Sale End Date must be m/d/Y format',
+            'sale_end_date.date'            => 'Sale End Date must be a date',
             'sale_end_time.date_format'     => 'Sale End Time must be H:i format',
             'seatable|boolen'               => 'Seatable must be True/False',
             'quantity|numeric'              => 'Quantity must be a number',
@@ -160,7 +160,7 @@ class TicketsController extends Controller
                 $saleStart = date(
                     "Y-m-d H:i:s",
                     strtotime(
-                        $request->sale_start_date . $request->sale_start_time
+                        $request->sale_start_date . ' ' . $request->sale_start_time
                     )
                 );
             }
@@ -171,7 +171,7 @@ class TicketsController extends Controller
                 $saleEnd = date(
                     "Y-m-d H:i:s",
                     strtotime(
-                        $request->sale_end_date . $request->sale_end_time
+                        $request->sale_end_date . ' ' . $request->sale_end_time
                     )
                 );
             }

@@ -58,9 +58,9 @@ class EventsController extends Controller
             'event_name'    => 'required|unique:events,display_name',
             'desc_short'    => 'required',
             'desc_long'     => 'required',
-            'end_date'      => 'required|date_format:m/d/Y',
+            'end_date'      => 'required|date_format:Y-m-d',
             'end_time'      => 'required|date_format:H:i',
-            'start_date'    => 'required|date_format:m/d/Y',
+            'start_date'    => 'required|date_format:Y-m-d',
             'start_time'    => 'required|date_format:H:i',
             'capacity'      => 'required|integer',
             'venue'         => 'exists:event_venues,id',
@@ -71,9 +71,9 @@ class EventsController extends Controller
             'start_time.required'       => 'Start date is required',
             'end_date.required'         => 'End date is required',
             'end_time.required'         => 'End date is required',
-            'end_date.date_format'      => 'End Date must be m/d/Y format',
+            'end_date.date_format'      => 'End Date must be Y-m-d format',
             'end_time.date_format'      => 'End Time must be H:i format',
-            'start_date.date_format'    => 'Start Date must be m/d/Y format',
+            'start_date.date_format'    => 'Start Date must be Y-m-d format',
             'start_time.date_format'    => 'Start Time must be H:i format',
             'desc_short.required'       => 'Short Description is required',
             'desc_long.required'        => 'Long Description is required',
@@ -87,8 +87,8 @@ class EventsController extends Controller
         $event                      = new Event();
         $event->display_name        = $request->event_name;
         $event->nice_name           = strtolower(str_replace(' ', '-', $request->event_name));
-        $event->start               = date("Y-m-d H:i:s", strtotime($request->start_date . $request->start_time));
-        $event->end                 = date("Y-m-d H:i:s", strtotime($request->end_date . $request->end_time));
+        $event->start               = date("Y-m-d H:i:s", strtotime($request->start_date . ' ' . $request->start_time));
+        $event->end                 = date("Y-m-d H:i:s", strtotime($request->end_date . ' ' . $request->end_time));
         $event->desc_long           = $request->desc_long;
         $event->desc_short          = $request->desc_short;
         $event->event_venue_id      = @$request->venue;
@@ -112,9 +112,9 @@ class EventsController extends Controller
     {
         $rules = [
             'event_name'        => 'filled',
-            'end_date'          => 'filled|date_format:m/d/Y',
+            'end_date'          => 'filled|date_format:Y-m-d',
             'end_time'          => 'filled|date_format:H:i',
-            'start_date'        => 'filled|date_format:m/d/Y',
+            'start_date'        => 'filled|date_format:Y-m-d',
             'start_time'        => 'filled|date_format:H:i',
             'status'            => 'in:draft,preview,published,private',
             'capacity'          => 'filled|integer',
@@ -124,13 +124,13 @@ class EventsController extends Controller
         $messages = [
             'event_name.filled'         => 'Event Name cannot be empty',
             'end_date.filled'           => 'A End Date cannot be empty',
-            'end_date.date_format'      => 'A End Date must be m/d/Y format',
+            'end_date.date_format'      => 'A End Date must be Y-m-d format',
             'end_time.filled'           => 'A End Time cannot be empty',
             'end_time.date_format'      => 'A End Time must be H:i formate',
             'start_date.filled'         => 'A Start Date cannut be empty',
-            'end_date.date_format'      => 'A Start Date must be m/d/Y format',
+            'start_date.date_format'    => 'A Start Date must be Y-m-d format',
             'start_time.filled'         => 'A Start Time cannot be empty',
-            'end_time.date_format'      => 'A Start Time must be H:i format',
+            'start_time.date_format'    => 'A Start Time must be H:i format',
             'status.in'                 => 'Status must be draft, preview, published or private',
             'capacity.filled'           => 'Capacity is required',
             'capacity.integer'          => 'Capacity must be a integer',
@@ -146,7 +146,7 @@ class EventsController extends Controller
         }
 
         if (isset($request->start_date)) {
-            $start = $request->start_date . date("H:i:s", strtotime($event->start));
+            $start = $request->start_date . ' ' . date("H:i:s", strtotime($event->start));
             $event->start           = date("Y-m-d H:i:s", strtotime($start));
         }
 
@@ -156,7 +156,7 @@ class EventsController extends Controller
         }
 
         if (isset($request->end_date)) {
-            $end = $request->end_date . date("H:i:s", strtotime($event->end));
+            $end = $request->end_date . ' ' . date("H:i:s", strtotime($event->end));
             $event->end             = date("Y-m-d H:i:s", strtotime($end));
         }
 

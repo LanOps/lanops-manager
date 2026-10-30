@@ -249,26 +249,28 @@
 <script>
 	function editSeating(seat, participant_id = null)
 	{
+		var seatNumber = document.getElementById('seat_number_modal');
+		var participantSelect = document.getElementById('participant_select_modal');
+		var participantLink = document.getElementById('participant_link');
+		var clearSeatForm = document.getElementById('clear_seat_form');
 		seat = seat.trim();
-		$("#seat_number_modal").val(seat);
-		$("#seat_number_clear").val(seat);
-		$("#seat_number_disable").val(seat);
-		var orginal_participant_id = $("#participant_id_modal").val();
+		seatNumber.value = seat;
+		document.getElementById('seat_number_clear').value = seat;
+		document.getElementById('seat_number_disable').value = seat;
 		//Reset all inputs
-		$("#seat_number_modal").prop('readonly', '');
-		$("#participant_link").prop('href', '');
-		$("#participant_link").hide();
-		$("#clear_seat_form").hide();
-		$("#participant_select_modal").val('');
-		$("#participant_id_modal").val('');
-		$('#participant_select_modal option[value="' + orginal_participant_id + '"]').attr("selected",false);
+		seatNumber.readOnly = false;
+		participantLink.href = '';
+		participantLink.style.display = 'none';
+		clearSeatForm.style.display = 'none';
+		participantSelect.value = '';
+		document.getElementById('participant_id_modal').value = '';
 		if(participant_id != null){
 			//we have a user - Fill in extra
-			$("#seat_number_modal").prop('readonly', 'readonly');
-			$("#participant_link").prop('href', '/admin/events/{{ $event->slug }}/participants/' + participant_id);
-			$("#participant_link").show();
-			$("#clear_seat_form").show();
-			$('#participant_select_modal').val(participant_id);
+			seatNumber.readOnly = true;
+			participantLink.href = '/admin/events/{{ $event->slug }}/participants/' + participant_id;
+			participantLink.style.display = '';
+			clearSeatForm.style.display = '';
+			participantSelect.value = participant_id;
 		}
 	}
 </script>
