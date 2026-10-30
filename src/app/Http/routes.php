@@ -128,6 +128,7 @@ Route::group(['middleware' => ['web']], function () {
      */
     Route::group(['middleware' => ['auth', 'banned', 'verified']], function () {
         Route::post('/events/{event}/seating/{seatingPlan}', 'Events\SeatingController@update');
+        Route::delete('/events/{event}/seating/{seatingPlan}', 'Events\SeatingController@destroy');
     });
 
     /**
