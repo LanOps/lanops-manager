@@ -104,6 +104,11 @@
 						{{ html()->select('event_id', Helpers::getEventNames('DESC', 0, true, false, $poll->event_id), $poll->event_id)->class('form-select') }}
 					</div>
 					<div class="mb-3">
+						{{ html()->label('Voting Ends', 'end') }}
+						{{ html()->input('datetime-local', 'end', $poll->end ? date('Y-m-d\TH:i', strtotime($poll->end)) : '')->class('form-control') }}
+						<div class="form-text">Leave empty to keep the poll open until you end it. Clear it to reopen an ended poll.</div>
+					</div>
+					<div class="mb-3">
 						{{ html()->label('Allow User to Add Options', 'allow_options_users') }} @if ($poll->allow_options_user) True @else False @endif
 						<br>
 						{{ html()->label('Allow User to Select Multiple Options', 'allow_options_multi') }} @if ($poll->allow_options_multi) True @else False @endif
@@ -115,7 +120,7 @@
 				@if (!$poll->hasEnded())
 					<div class="mb-3">
 						{{ html()->form('POST', url('/admin/polls/' . $poll->slug . '/end'))->open() }}
-							<button type="submit" class="btn btn-primary w-100">End Poll</button>
+							<button type="submit" class="btn btn-warning w-100">End Poll Now</button>
 						</form>
 					</div>
 				@endif
