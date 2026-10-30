@@ -189,10 +189,10 @@
 <script>
 	function editTimeSlot(id, timestamp, name, desc)
 	{
-		$("#editTimeSlotForm").prop('action', '/admin/events/{{ $event->slug }}/timetables/{{ $timetable->slug }}/data/' + id);
-		$('#editTimetableStart').val(timestamp);
-		$('#editTimetableGame').val(name);
-		$('#editTimetableDesc').val(desc);
+		document.getElementById('editTimeSlotForm').action = '/admin/events/{{ $event->slug }}/timetables/{{ $timetable->slug }}/data/' + id;
+		document.getElementById('editTimetableStart').value = timestamp;
+		document.getElementById('editTimetableGame').value = name;
+		document.getElementById('editTimetableDesc').value = desc;
 	}
 </script>
 

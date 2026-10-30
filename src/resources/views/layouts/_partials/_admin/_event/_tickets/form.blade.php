@@ -65,10 +65,10 @@
 	<div class="mb-3 col-sm-6 col-12">
 		{{ html()->label('Start Date', 'sale_start_date') }}
 		@if (@$empty)
-			{{ html()->text('sale_start_date')->class('form-control') 
+			{{ html()->date('sale_start_date')->class('form-control') 
 			}}
 		@else
-			{{ html()->text('sale_start_date', (@$ticket->sale_start ? date('d-m-Y', strtotime($ticket->sale_start)) : null))->class('form-control') 
+			{{ html()->date('sale_start_date', (@$ticket->sale_start ? date('Y-m-d', strtotime($ticket->sale_start)) : null))->class('form-control') 
 			}}
 		@endif
 		<small>If no start leave blank</small>
@@ -90,11 +90,11 @@
 		{{ html()->label('End Date', 'sale_end_date') }}
 		@if(@$empty)
 			{{ 
-				html()->text('sale_end_date')->class('form-control')
+				html()->date('sale_end_date')->class('form-control')
 			}}
 		@else
 			{{ 
-				html()->text('sale_end_date', (@$ticket->sale_end ? date('d-m-Y', strtotime($ticket->sale_end)) : null))->class('form-control')
+				html()->date('sale_end_date', (@$ticket->sale_end ? date('Y-m-d', strtotime($ticket->sale_end)) : null))->class('form-control')
 			}}
 		@endif
 		<small>If no end leave blank</small>
@@ -116,11 +116,3 @@
 </div>
 <hr>
 <button type="submit" class="btn btn-success w-100">Submit</button>
-
-<!-- JavaScript-->
-<script type="text/javascript">
-	$( function() {
-		$( "#sale_start_date" ).datepicker();
-		$( "#sale_end_date" ).datepicker();
-	});
-</script>
