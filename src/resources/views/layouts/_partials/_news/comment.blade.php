@@ -63,8 +63,7 @@
 <script>
 	function editComment(comment, comment_id)
 	{
-		console.log(comment_id);
-		$("#comment_modal").val(comment);
-		$("#edit_comment_modal_form").prop('action', '/news/{{ $newsArticle->slug }}/comments/' + comment_id);
+		document.getElementById('comment_modal').value = comment;
+		document.getElementById('edit_comment_modal_form').action = '/news/{{ $newsArticle->slug }}/comments/' + comment_id;
 	}
 </script>
