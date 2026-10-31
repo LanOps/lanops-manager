@@ -311,6 +311,7 @@ Route::group(['middleware' => ['web', 'admin', 'banned']], function () {
      */
     Route::get('/admin/purchases', 'Admin\PurchasesController@index');
     Route::get('/admin/purchases/{purchase}', 'Admin\PurchasesController@show');
+    Route::post('/admin/purchases/{purchase}/refund', 'Admin\PurchasesController@refund');
 
     /**
      * Tournaments

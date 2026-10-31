@@ -60,7 +60,12 @@
 									@endif
 								</td>
 								<td>{{ $purchase->user->firstname }} {{ $purchase->user->surname }}</td>
-								<td>{{ $purchase->status }}</td>
+								<td>
+									{{ $purchase->status }}
+									@if ($purchase->getRefundStatus())
+										<br><span class="badge text-bg-warning">{{ $purchase->getRefundStatus() }}</span>
+									@endif
+								</td>
 								<td>{{ $purchase->type }}</td>
 								<td>{{ $purchase->paypal_email }}</td>
 								<td>{{ $purchase->transaction_id }}</td>

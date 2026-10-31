@@ -127,9 +127,11 @@
 							<button type="submit" class="btn btn-success w-100">Sign in</button>
 						</div>
 					</form>
+				@endif
+				@if ($participant->purchase)
 					<hr>
 					<div class="mb-3">
-						<button type="submit" class="btn btn-danger w-100" disabled>Refund - <small>Coming soon</small></button>
+						<a href="/admin/purchases/{{ $participant->purchase->id }}#refund" class="btn btn-danger w-100">Refund / Cancel</a>
 					</div>
 				@endif
 			</div>
