@@ -64,6 +64,6 @@ class TournamentParticipant extends Model
         if (!$this->tournament->hasEvent()) {
             return null;
         }
-        return $this->tournament->event->eventParticipants()->where('user_id', $this->user_id)->first()->seat;
+        return $this->tournament->event->eventParticipants()->where('user_id', $this->user_id)->first()?->seat;
     }
 }

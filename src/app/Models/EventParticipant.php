@@ -12,10 +12,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\WebhookServer\WebhookCall;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class EventParticipant extends Model implements HasMedia
 {
     use InteractsWithMedia;
+    // A refunded ticket is cancelled by soft deleting it (see cancel())
+    use SoftDeletes;
 
     /**
      * The name of the table.
@@ -137,6 +141,46 @@ class EventParticipant extends Model implements HasMedia
     public function seat()
     {
         return $this->hasOne('App\Models\EventSeating');
+    }
+    public function refund()
+    {
+        return $this->belongsTo('App\Models\PurchaseRefund', 'purchase_refund_id');
+    }
+
+    /**
+     * Cancel this ticket after a refund: free its seat, stop its QR code
+     * working and give its place back to the event. The row is soft
+     * deleted so the purchase still shows what was bought.
+     * @param PurchaseRefund $refund
+     */
+    public function cancel(PurchaseRefund $refund)
+    {
+        $this->purchase_refund_id = $refund->id;
+        $this->save();
+        EventSeating::where('event_participant_id', $this->id)->update(['event_participant_id' => null]);
+        $this->delete();
+
+        $user = $this->user;
+        $event = $this->event;
+        // Take them out of the event's Discord role, unless they still hold another ticket for it
+        if (config('app.discord_bot_url') != '' &&
+            $user && $user->discord_id &&
+            $event && $event->discord_link_enabled &&
+            !self::where('event_id', $event->id)->where('user_id', $user->id)->exists()
+        ) {
+            DB::afterCommit(function () use ($user, $event) {
+                WebhookCall::create()
+                    ->url(config('app.discord_bot_url') . '/participants/remove')
+                    ->payload([
+                        'username' => $user->username,
+                        'discord_id' => $user->discord_id,
+                        'channel_id' => $event->discord_channel_id,
+                        'role_id' => $event->discord_role_id,
+                    ])
+                    ->useSecret(config('app.discord_bot_secret'))
+                    ->dispatch();
+            });
+        }
     }
 
     /**

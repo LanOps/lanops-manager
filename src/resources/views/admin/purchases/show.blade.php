@@ -36,8 +36,8 @@
 							</tr>
 						</thead>
 						<tbody>
-							@if (!$purchase->participants->isEmpty())
-								@foreach ($purchase->participants as $participant)
+							@if (!$purchase->allParticipants->isEmpty())
+								@foreach ($purchase->allParticipants as $participant)
 									<tr>
 										<td>
 											{{ $participant->ticket->name }} for {{ $participant->event->display_name }}
@@ -58,6 +58,7 @@
 				@endif
 			</div>  
 		</div>
+		@include ('admin.purchases._refund')
 	</div>
 	<div class="col-12 col-sm-4">
 		<div class="card">
@@ -112,6 +113,14 @@
 					</li>
 					<li class="list-group-item list-group-item-info"><strong>Name: <span class="float-end">{{ $purchase->user->firstname }} {{ $purchase->user->surname }}</span></strong></li>
 					<li class="list-group-item @if (strtolower($purchase->status) != 'success') list-group-item-danger @else list-group-item-success @endif"><strong>Status: <span class="float-end">{{ $purchase->status }}</span></strong></li>
+					@if ($purchase->getRefundStatus())
+						<li class="list-group-item list-group-item-warning">
+							<strong>
+								{{ $purchase->getRefundStatus() }}:
+								<span class="float-end">{{ config('app.currency_symbol') }}{{ number_format((float) $purchase->refunded_total, 2) }}</span>
+							</strong>
+						</li>
+					@endif
 					<li class="list-group-item list-group-item-info"><strong>Type: <span class="float-end">{{ $purchase->type }}</span></strong></li>
 					@if ($purchase->paypal_email != null)
 						<li class="list-group-item list-group-item-info">
@@ -121,11 +130,13 @@
 					<li class="list-group-item list-group-item-info"><strong>Transaction ID: <span class="float-end">{{ $purchase->transaction_id }}</span></strong></li>
 					<li class="list-group-item list-group-item-info"><strong>Timestamp: <span class="float-end">{{ $purchase->created_at }}</span></strong></li>
 				</ul>
-				@if (count($purchase->participants) > 0)
-					@foreach ($purchase->participants as $participant)
-						<a href="/admin/events/{{ $participant->event->slug }}/participants/{{ $participant->id }}"><button class="btn w-100 btn-success">View Participant - {{ $participant->user->username }}</button></a>
-					@endforeach
-				@endif
+				@foreach ($purchase->allParticipants as $participant)
+					@if ($participant->trashed())
+						<button class="btn w-100 btn-outline-secondary mt-1" disabled>Cancelled - {{ $participant->user->username }}</button>
+					@else
+						<a href="/admin/events/{{ $participant->event->slug }}/participants/{{ $participant->id }}" class="btn w-100 btn-success mt-1">View Participant - {{ $participant->user->username }}</a>
+					@endif
+				@endforeach
 			</div>  
 		</div>
 		<div class="card">
