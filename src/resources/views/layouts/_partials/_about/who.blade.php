@@ -5,7 +5,6 @@
                 <td>
                     <h4>Management Team:</h4>
                     <ul>
-                        <li>Th0rn0</li>
                         <li>Shlee</li>
                         <li>Alan Johnson</li>
                     </ul>
