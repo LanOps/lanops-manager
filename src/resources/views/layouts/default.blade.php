@@ -32,6 +32,17 @@
 		@include ('layouts._partials.navigation')
 		<div class="container" style="margin-top:30px;">
 			<div class='row'>
+				@if (isset($user) && $user && !request()->is('account/tickets/*') && ($liveTicket = $user->getLiveTicket()))
+					{{-- The event is on and they haven't been let in yet: their ticket is one tap away --}}
+					{{-- Sits over the top of the page, like the messages below, so it is not hidden behind a header image --}}
+					<div class="col-12" style="margin-top:30px; margin-bottom:-40px; position:relative; z-index:2;">
+						<div class="alert alert-info alert-dismissible d-flex flex-wrap align-items-center gap-2">
+							<span class="me-auto"><strong>{{ $liveTicket->event->display_name }}</strong> is on now.</span>
+							<a href="/account/tickets/{{ $liveTicket->id }}" class="btn btn-primary btn-sm">Show my ticket</a>
+							<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+						</div>
+					</div>
+				@endif
 				@foreach (['danger', 'warning', 'success', 'info'] as $msg)
 					@if (Session::has('alert-' . $msg))
 						<div class="col-12" style="margin-top:30px; margin-bottom:-40px;">

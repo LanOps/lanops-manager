@@ -166,9 +166,54 @@
 							@foreach ($eventParticipants as $participant)
 								@include ('layouts._partials._tickets.index')
 							@endforeach
-							{{ $eventParticipants->links() }}
 						@else
-							You currently have no tickets.
+							<p class="mb-0">You have no tickets for upcoming events.</p>
+						@endif
+						@if ($pastEventParticipants->total())
+							{{-- Folded away unless they are paging through it --}}
+							@php $showPast = request()->has('ti'); @endphp
+							<div class="mt-3">
+								<button class="btn btn-outline-secondary btn-sm {{ $showPast ? '' : 'collapsed' }}" type="button" data-bs-toggle="collapse" data-bs-target="#pastTickets" aria-expanded="{{ $showPast ? 'true' : 'false' }}" aria-controls="pastTickets">
+									Past events' tickets ({{ $pastEventParticipants->total() }})
+								</button>
+								<div class="collapse {{ $showPast ? 'show' : '' }}" id="pastTickets">
+									<div class="table-responsive mt-3">
+										<table class="table table-striped mb-0">
+											<thead>
+												<tr>
+													<th>Event</th>
+													<th>Ticket</th>
+													<th>Seat</th>
+												</tr>
+											</thead>
+											<tbody>
+												@foreach ($pastEventParticipants as $participant)
+													<tr>
+														<td>{{ $participant->event->display_name }}</td>
+														<td>
+															@if ($participant->ticket)
+																{{ $participant->ticket->name }}
+															@elseif ($participant->staff)
+																Staff Ticket
+															@else
+																Free Ticket
+															@endif
+														</td>
+														<td>
+															@if ($participant->seat)
+																{{ $participant->seat->seat }}@if ($participant->seat->seatingPlan) <small class="text-body-secondary">in {{ $participant->seat->seatingPlan->name }}</small>@endif
+															@else
+																-
+															@endif
+														</td>
+													</tr>
+												@endforeach
+											</tbody>
+										</table>
+									</div>
+									{{ $pastEventParticipants->fragment('pastTickets')->links() }}
+								</div>
+							</div>
 						@endif
 					</div>
 				</div>

@@ -64,6 +64,44 @@ class UsersController extends Controller
     }
 
     /**
+     * Change a user's email address, e.g. to fix a typo that stops them verifying
+     * @param  User    $user
+     * @param  Request $request
+     * @return Redirect
+     */
+    public function updateEmail(User $user, Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+        ], [
+            'email.required' => 'Email is required.',
+            'email.email'    => 'Email must be a valid Email Address.',
+            'email.unique'   => 'That Email Address is already in use.',
+        ]);
+
+        if ($request->email === $user->email) {
+            Session::flash('alert-info', 'That is already their email address.');
+            return Redirect::back();
+        }
+
+        $sendVerification = $request->boolean('send_verification');
+        $user->email = $request->email;
+        // Either the user proves the new address by clicking the link, or the admin vouches for it
+        $user->email_verified_at = $sendVerification ? null : now();
+        if (!$user->save()) {
+            Session::flash('alert-danger', 'Cannot update email address!');
+            return Redirect::back();
+        }
+        if ($sendVerification) {
+            $user->sendEmailVerificationNotification();
+            Session::flash('alert-success', 'Email address changed. A verification link has been sent to the new address.');
+            return Redirect::back();
+        }
+        Session::flash('alert-success', 'Email address changed and marked as verified.');
+        return Redirect::back();
+    }
+
+    /**
      * Grant User Admin
      * @param  User  $user
      * @return View
