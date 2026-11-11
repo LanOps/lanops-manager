@@ -31,34 +31,37 @@ steps:
       - |
         curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint & Test Started!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
 
-  - name: lint
-    image: php:8.4-cli
+  - name: composer
+    image: lanopsdev/lanops-manager:ci-php8.4
+    pull: always
     commands:
-      - apt-get update -q && apt-get install -yq git unzip libfreetype-dev libjpeg62-turbo-dev libpng-dev
-      - docker-php-ext-configure gd --with-freetype --with-jpeg
-      - docker-php-ext-install bcmath exif gd
-      - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
       - cd /drone/src/src && composer install --no-interaction --prefer-dist --no-progress
-      - vendor/bin/phpcs
+      # composer install runs "artisan optimize", which caches production config and would make phpunit ignore phpunit.xml
+      - php artisan optimize:clear
+
+  - name: lint
+    image: lanopsdev/lanops-manager:ci-php8.4
+    depends_on:
+      - composer
+    commands:
+      - cd /drone/src/src && vendor/bin/phpcs
 
   - name: test
-    image: php:8.4-cli
+    image: lanopsdev/lanops-manager:ci-php8.4
+    depends_on:
+      - composer
     environment:
       DB_HOST: database
     commands:
-      - apt-get update -q && apt-get install -yq libfreetype-dev libjpeg62-turbo-dev libpng-dev libmagickwand-dev
-      - docker-php-ext-configure gd --with-freetype --with-jpeg
-      - docker-php-ext-install bcmath exif gd pdo_mysql
-      # imagick renders the PNG ticket QR codes (same version as the app image)
-      - pecl install imagick-3.8.0 && docker-php-ext-enable imagick
       - cd /drone/src/src
-      # composer install in the lint step runs "artisan optimize", which caches production config and would make phpunit ignore phpunit.xml
-      - php artisan optimize:clear
       - php -r 'for ($i = 0; $i < 30; $i++) { try { new PDO("mysql:host=database;dbname=lanops_test", "lanops", "secret"); exit(0); } catch (PDOException $e) { sleep(2); } } exit(1);'
       - vendor/bin/phpunit
 
   - name: discord-lint-success
     image: curlimages/curl:8.7.1
+    depends_on:
+      - lint
+      - test
     failure: ignore
     environment:
       DISCORD_WEBHOOK_URL:
@@ -72,6 +75,9 @@ steps:
 
   - name: discord-lint-failure
     image: curlimages/curl:8.7.1
+    depends_on:
+      - lint
+      - test
     failure: ignore
     environment:
       DISCORD_WEBHOOK_URL:
@@ -89,6 +95,9 @@ steps:
 
   - name: discord-build-start
     image: curlimages/curl:8.7.1
+    depends_on:
+      - lint
+      - test
     failure: ignore
     environment:
       DISCORD_WEBHOOK_URL:
@@ -106,6 +115,9 @@ steps:
 
   - name: build-push-nginx
     image: plugins/docker
+    depends_on:
+      - lint
+      - test
     settings:
       repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/nginx/Dockerfile
@@ -123,9 +135,14 @@ steps:
 
   - name: build-push-app
     image: plugins/docker
+    depends_on:
+      - lint
+      - test
     settings:
       repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/php/Dockerfile
+      # php-composer (the last stage) adds composer and git, which production doesn't need
+      target: php-base
       username:
         from_secret: dockerhub_username
       password:
@@ -140,6 +157,9 @@ steps:
 
   - name: build-push-nginx-release
     image: plugins/docker
+    depends_on:
+      - lint
+      - test
     settings:
       repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/nginx/Dockerfile
@@ -155,9 +175,14 @@ steps:
 
   - name: build-push-app-release
     image: plugins/docker
+    depends_on:
+      - lint
+      - test
     settings:
       repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/php/Dockerfile
+      # php-composer (the last stage) adds composer and git, which production doesn't need
+      target: php-base
       username:
         from_secret: dockerhub_username
       password:
@@ -170,6 +195,11 @@ steps:
 
   - name: discord-build-success
     image: curlimages/curl:8.7.1
+    depends_on:
+      - build-push-nginx
+      - build-push-app
+      - build-push-nginx-release
+      - build-push-app-release
     failure: ignore
     environment:
       DISCORD_WEBHOOK_URL:
@@ -189,6 +219,11 @@ steps:
 
   - name: discord-build-failure
     image: curlimages/curl:8.7.1
+    depends_on:
+      - build-push-nginx
+      - build-push-app
+      - build-push-nginx-release
+      - build-push-app-release
     failure: ignore
     environment:
       DISCORD_WEBHOOK_URL:
@@ -205,3 +240,27 @@ steps:
         - tag
       status:
         - failure
+
+---
+# Builds the image the lint and test steps run in (resources/docker/ci/Dockerfile).
+# Only runs when started by hand: Drone "New Build" on any branch. Run it after changing that file.
+kind: pipeline
+type: docker
+name: ci-image
+
+trigger:
+  event:
+    - custom
+
+steps:
+  - name: build-push-ci
+    image: plugins/docker
+    settings:
+      repo: lanopsdev/lanops-manager
+      dockerfile: resources/docker/ci/Dockerfile
+      username:
+        from_secret: dockerhub_username
+      password:
+        from_secret: dockerhub_token
+      tags:
+        - ci-php8.4
