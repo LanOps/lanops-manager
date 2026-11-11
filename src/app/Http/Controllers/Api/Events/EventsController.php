@@ -114,12 +114,12 @@ class EventsController extends Controller
                 'long' => $event->desc_long,
             ],
             'address' => [
-                'line_1' => $event->venue->address_1,
-                'line_2' => $event->venue->address_2,
-                'street' => $event->venue->address_street,
-                'city' => $event->venue->address_city,
-                'postcode' => $event->venue->address_postcode,
-                'country' => $event->venue->address_country,
+                'line_1' => $event->venue?->address_1,
+                'line_2' => $event->venue?->address_2,
+                'street' => $event->venue?->address_street,
+                'city' => $event->venue?->address_city,
+                'postcode' => $event->venue?->address_postcode,
+                'country' => $event->venue?->address_country,
             ],
             'url' => [
                 'base' => config('app.url') . '/events/' . $event->slug,

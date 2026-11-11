@@ -36,7 +36,7 @@
 							{{ $participant->event->display_name }} @if ($participant->ticket && $participant->ticket->seatable) - Seat: @if ($participant->seat) {{$participant->seat->seat}} @if ($participant->seat->seatingPlan) <small>in {{$participant->seat->seatingPlan->name}}</small> @endif @else Not Seated @endif @endif
 						</strong>
 					</div>
-					@if ($participant->gift != 1 && $participant->gift_accepted != 1)
+					@if ($participant->gift != 1 && $participant->gift_accepted != 1 && !$participant->signed_in)
 						<button class="btn btn-md btn-success w-100" onclick="giftTicket('{{ $participant->id }}')" data-bs-toggle="modal" data-bs-target="#giftTicketModal">
 							Gift Ticket
 						</button>

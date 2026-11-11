@@ -265,14 +265,15 @@ class EventsController extends Controller
 
     public function linkDiscord(Request $request, Event $event)
     {
-        $address = [
-            $event->venue->address_1,
-            $event->venue->address_2,
-            $event->venue->address_street,
-            $event->venue->address_city,
-            $event->venue->address_postcode,
-            $event->venue->address_country,
-        ];
+        // Venue is optional on an event; skip blank lines so the address has no stray commas
+        $address = array_filter([
+            $event->venue?->address_1,
+            $event->venue?->address_2,
+            $event->venue?->address_street,
+            $event->venue?->address_city,
+            $event->venue?->address_postcode,
+            $event->venue?->address_country,
+        ]);
         $response = Http::withBasicAuth(
             config('app.discord_bot_user'),
             config('app.discord_bot_pass')

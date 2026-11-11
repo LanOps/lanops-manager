@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HidesFromNonAdmins;
 use Auth;
 use App\Models\PollOption;
 
@@ -13,6 +14,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class Poll extends Model
 {
+    use HidesFromNonAdmins;
     use Sluggable;
 
     /**
@@ -48,21 +50,15 @@ class Poll extends Model
             return true;
         });
 
-        $admin = false;
-        if (Auth::user() && Auth::user()->getAdmin()) {
-            $admin = true;
-        }
-        if (!$admin) {
-            static::addGlobalScope('statusDraft', function (Builder $builder) {
-                $builder->where('status', '!=', 'DRAFT');
-            });
-            static::addGlobalScope('statusPreview', function (Builder $builder) {
-                $builder->where('status', '!=', 'PREVIEW');
-            });
-            static::addGlobalScope('statusPublished', function (Builder $builder) {
-                $builder->where('status', 'PUBLISHED');
-            });
-        }
+        static::addNonAdminScope('statusDraft', function (Builder $builder) {
+            $builder->where('status', '!=', 'DRAFT');
+        });
+        static::addNonAdminScope('statusPreview', function (Builder $builder) {
+            $builder->where('status', '!=', 'PREVIEW');
+        });
+        static::addNonAdminScope('statusPublished', function (Builder $builder) {
+            $builder->where('status', 'PUBLISHED');
+        });
     }
 
     /*
