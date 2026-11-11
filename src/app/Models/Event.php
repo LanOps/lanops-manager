@@ -7,6 +7,7 @@ use Auth;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 
@@ -44,8 +45,15 @@ class Event extends Model
      */
     protected $hidden = array(
         'created_at',
-        'updated_at'
+        'updated_at',
+        'private_key',
     );
+
+    /**
+     * Session key holding the Private events this visitor has opened the secret link for,
+     * as [event id => key], so the rest of the site (tickets, checkout, seating) lets them in too.
+     */
+    public const PRIVATE_SESSION_KEY = 'private_events';
 
     public static $typeLan = 'LAN';
 
@@ -59,8 +67,121 @@ class Event extends Model
             $builder->where('status', '!=', 'DRAFT');
         });
         static::addNonAdminScope('statusPublished', function (Builder $builder) {
-            $builder->where('status', 'PUBLISHED');
+            $builder->where(function (Builder $query) {
+                $query->where('status', 'PUBLISHED')
+                    ->orWhere(function (Builder $query) {
+                        Event::whereAccessiblePrivate($query);
+                    });
+            });
         });
+
+        static::saving(function (Event $event) {
+            // A Private event always has a secret link to share
+            if (strtoupper((string) $event->status) == 'PRIVATE' && empty($event->private_key)) {
+                $event->private_key = static::generatePrivateKey();
+            }
+        });
+    }
+
+    /**
+     * Limit a query to the Private events the current visitor may see: ones they have a ticket
+     * for, and ones they have opened the (still current) secret link for in this session.
+     * @param  Builder $query
+     * @return void
+     */
+    protected static function whereAccessiblePrivate(Builder $query)
+    {
+        $query->where('status', 'PRIVATE')->where(function (Builder $query) {
+            // Never matches, so a visitor with neither a ticket nor a link sees nothing
+            $query->whereRaw('1 = 0');
+            if ($userId = Auth::id()) {
+                $query->orWhereIn(
+                    'events.id',
+                    EventParticipant::select('event_id')->where('user_id', $userId)
+                );
+            }
+            foreach (static::unlockedPrivateKeys() as $eventId => $key) {
+                // The key is checked too, so a regenerated link shuts out old sessions
+                $query->orWhere(function (Builder $query) use ($eventId, $key) {
+                    $query->where('events.id', (int) $eventId)->where('events.private_key', (string) $key);
+                });
+            }
+        });
+    }
+
+    /**
+     * The Private event keys stored in this visitor's session
+     * @return array
+     */
+    protected static function unlockedPrivateKeys()
+    {
+        $request = request();
+        if (!$request || !$request->hasSession()) {
+            return [];
+        }
+        $keys = $request->session()->get(static::PRIVATE_SESSION_KEY, []);
+        return is_array($keys) ? $keys : [];
+    }
+
+    /**
+     * Let this visitor into a Private event for the rest of their session
+     * @return void
+     */
+    public function unlockForSession()
+    {
+        $keys = static::unlockedPrivateKeys();
+        $keys[$this->id] = $this->private_key;
+        request()->session()->put(static::PRIVATE_SESSION_KEY, $keys);
+    }
+
+    /**
+     * Find the Private event a secret link belongs to
+     * @param  string $key
+     * @return Event|null
+     */
+    public static function findByPrivateKey($key)
+    {
+        if (!is_string($key) || strlen($key) < 16) {
+            return null;
+        }
+        $event = static::withoutGlobalScopes()->where('status', 'PRIVATE')->where('private_key', $key)->first();
+        // The database match may ignore case, so check the key exactly as well
+        if (!$event || !hash_equals((string) $event->private_key, $key)) {
+            return null;
+        }
+        return $event;
+    }
+
+    /**
+     * @return string
+     */
+    public static function generatePrivateKey()
+    {
+        return Str::random(32);
+    }
+
+    /**
+     * The secret link for a Private event
+     * @return string|null
+     */
+    public function getPrivateUrl()
+    {
+        if ($this->status != 'PRIVATE' || empty($this->private_key)) {
+            return null;
+        }
+        return url('/e/' . $this->private_key);
+    }
+
+    /**
+     * Events that belong in public lists (events page, home page, menus, API).
+     * Private events are left out for everyone, admins included: they are only
+     * reached through their secret link, a ticket, or the admin pages.
+     * @param  Builder $query
+     * @return Builder
+     */
+    public function scopeListed(Builder $query)
+    {
+        return $query->where('events.status', '!=', 'PRIVATE');
     }
 
     /*

@@ -22,7 +22,8 @@ class SitemapController extends Controller
         $sitemap->add(url('gallery'), '2012-08-26T12:30:00+02:00', '0.9', 'monthly');
         $sitemap->add(url('info'), '2012-08-26T12:30:00+02:00', '0.9', 'monthly');
 
-        $events = \DB::table('events')->orderBy('start')->get();
+        // Only events anyone can open: not drafts, previews or Private events
+        $events = \DB::table('events')->where('status', 'PUBLISHED')->orderBy('start')->get();
 
         $sitemap->setCache('laravel.sitemap', 30);
     

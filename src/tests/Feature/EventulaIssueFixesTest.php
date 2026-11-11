@@ -57,8 +57,9 @@ class EventulaIssueFixesTest extends TestCase
 
     public function testUnpublishedEventPageIsStillHiddenFromItsTicketHolders()
     {
+        // Private events are different: ticket holders can see them (see PrivateEventsTest)
         $user = $this->createUser();
-        $ticket = $this->createEventWithTicket(['status' => 'PRIVATE']);
+        $ticket = $this->createEventWithTicket(['status' => 'PREVIEW']);
         $this->createParticipant($user, $ticket);
         $slug = Event::withoutGlobalScopes()->find($ticket->event_id)->slug;
 

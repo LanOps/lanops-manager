@@ -76,6 +76,8 @@ Route::group(['middleware' => ['web']], function () {
      */
     Route::get('/events', 'Events\EventsController@index');
     Route::get('/events/{event}', 'Events\EventsController@show');
+    // Secret link to a Private event
+    Route::get('/e/{key}', 'Events\EventsController@showPrivate')->middleware('throttle:30,1');
 
     /**
      * Misc Pages
@@ -185,6 +187,7 @@ Route::group(['middleware' => ['web', 'admin', 'banned']], function () {
     Route::post('/admin/events/{event}/discord/link', 'Admin\Events\EventsController@linkDiscord');
     Route::post('/admin/events/{event}/discord/unlink', 'Admin\Events\EventsController@unlinkDiscord');
     Route::post('/admin/events/{event}/duplicate', 'Admin\Events\EventsController@duplicate');
+    Route::post('/admin/events/{event}/private-link', 'Admin\Events\EventsController@regeneratePrivateLink');
     
     /**
      * Seating

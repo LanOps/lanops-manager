@@ -215,6 +215,34 @@
 	</div>
 	<div class="col-lg-4">
 
+		@if ($event->status == 'PRIVATE')
+			<div class="card">
+				<div class="card-header">
+					<i class="fa fa-lock fa-fw"></i> Private Link
+				</div>
+				<div class="card-body">
+					<p class="small text-body-secondary">
+						This event is hidden from the website. Share this link with the people you want to invite:
+						anyone with it can see the event and buy tickets. People with a ticket can always see it.
+					</p>
+					@if ($event->getPrivateUrl())
+						<div class="input-group mb-3">
+							<input type="text" class="form-control" id="private-event-link" value="{{ $event->getPrivateUrl() }}" readonly aria-label="Private link">
+							<button type="button" class="btn btn-primary" data-copy-target="#private-event-link">
+								<i class="fa fa-copy fa-fw"></i> Copy
+							</button>
+						</div>
+					@endif
+					{{ html()->form('POST', url('/admin/events/' . $event->slug . '/private-link'))->open() }}
+						<button type="submit" class="btn btn-outline-danger btn-sm w-100"
+							@if ($event->getPrivateUrl()) onclick="return confirm('Make a new link? The old link stops working, for anyone who has not bought a ticket yet.');" @endif>
+							<i class="fa fa-refresh fa-fw"></i> {{ $event->getPrivateUrl() ? 'Make a new link' : 'Make a link' }}
+						</button>
+					</form>
+				</div>
+			</div>
+		@endif
+
 		@if (config('app.discord_bot_url') != '')
 			<div class="card">
 				<div class="card-header">

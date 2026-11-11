@@ -131,7 +131,7 @@ class Helpers
         // Kept on the request, so it is fresh for every request (and every request in a test)
         $attributes = request()->attributes;
         if (! $attributes->has('next_event')) {
-            $attributes->set('next_event', \App\Models\Event::where('end', '>=', Carbon::now())
+            $attributes->set('next_event', \App\Models\Event::listed()->where('end', '>=', Carbon::now())
                 ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
                 ->first());
         }
