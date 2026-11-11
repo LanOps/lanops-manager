@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HidesFromNonAdmins;
 use DateTime;
 use Auth;
 
@@ -14,6 +15,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class EventTimetable extends Model
 {
+    use HidesFromNonAdmins;
     use Sluggable;
 
     protected $table = 'event_timetables';
@@ -27,18 +29,12 @@ class EventTimetable extends Model
     {
         parent::boot();
 
-        $admin = false;
-        if (Auth::user() && Auth::user()->getAdmin()) {
-            $admin = true;
-        }
-        if (!$admin) {
-            static::addGlobalScope('statusDraft', function (Builder $builder) {
-                $builder->where('status', '!=', 'DRAFT');
-            });
-            static::addGlobalScope('statusPublished', function (Builder $builder) {
-                $builder->where('status', 'PUBLISHED');
-            });
-        }
+        static::addNonAdminScope('statusDraft', function (Builder $builder) {
+            $builder->where('status', '!=', 'DRAFT');
+        });
+        static::addNonAdminScope('statusPublished', function (Builder $builder) {
+            $builder->where('status', 'PUBLISHED');
+        });
 
         self::updated(function ($model) {
             if (config('app.discord_bot_url') != '' && strtolower($model->status) == "published" && $model->event->discord_link_enabled) {

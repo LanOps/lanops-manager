@@ -120,7 +120,11 @@ class EventParticipant extends Model implements HasMedia
      */
     public function event()
     {
-        return $this->belongsTo('App\Models\Event');
+        // A ticket holder always gets their ticket's event, even if it is not
+        // published (draft, preview or private). The event page itself is still
+        // hidden; this only stops their tickets, account page and Discord sync
+        // crashing on a missing event.
+        return $this->belongsTo('App\Models\Event')->withoutGlobalScopes(['statusDraft', 'statusPublished']);
     }
     public function user()
     {

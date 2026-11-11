@@ -67,7 +67,7 @@ class TournamentsController extends Controller
             return Redirect::back();
         }
 
-        if ($tournament->event_id && !$tournament->event->getEventParticipant()) {
+        if ($tournament->event_id && !$tournament->event?->getEventParticipant()) {
             Session::flash('alert-danger', 'You are not signed in to this event.');
             return Redirect::back();
         }
@@ -109,12 +109,7 @@ class TournamentsController extends Controller
             return Redirect::back();
         }
 
-        if ($tournament->event_id && !$tournament->event->getEventParticipant()) {
-            Session::flash('alert-danger', 'You are not signed in to this event.');
-            return Redirect::back();
-        }
-
-        if ($tournament->hasEvent() && !$tournament->event->getEventParticipant()) {
+        if ($tournament->event_id && !$tournament->event?->getEventParticipant()) {
             Session::flash('alert-danger', 'You are not signed in to this event.');
             return Redirect::back();
         }

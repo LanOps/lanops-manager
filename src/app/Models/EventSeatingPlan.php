@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HidesFromNonAdmins;
 use App\Models\EventSeating;
 
 use Auth;
@@ -17,6 +18,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class EventSeatingPlan extends Model implements HasMedia
 {
+    use HidesFromNonAdmins;
     use Sluggable;
     use InteractsWithMedia;
 
@@ -46,18 +48,12 @@ class EventSeatingPlan extends Model implements HasMedia
     {
         parent::boot();
 
-        $admin = false;
-        if (Auth::user() && Auth::user()->getAdmin()) {
-            $admin = true;
-        }
-        if (!$admin) {
-            static::addGlobalScope('statusDraft', function (Builder $builder) {
-                $builder->where('status', '!=', 'DRAFT');
-            });
-            static::addGlobalScope('statusPublished', function (Builder $builder) {
-                $builder->where('status', 'PUBLISHED');
-            });
-        }
+        static::addNonAdminScope('statusDraft', function (Builder $builder) {
+            $builder->where('status', '!=', 'DRAFT');
+        });
+        static::addNonAdminScope('statusPublished', function (Builder $builder) {
+            $builder->where('status', 'PUBLISHED');
+        });
         self::creating(function ($model) {
             $model->headers = $model->formatRowHeaders();
         });

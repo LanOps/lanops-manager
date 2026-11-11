@@ -341,7 +341,7 @@
 						</thead>
 						<tbody>
 							@foreach ($timetable->data as $slot)
-								@if ($slot->name != NULL && $slot->desc != NULL)
+								@if ($slot->name != NULL)
 									<tr>
 										<td>{{ date("D", strtotime($slot->start_time)) }} - {{ date("H:i", strtotime($slot->start_time)) }}</td>
 										<td>{{ $slot->name }}</td>

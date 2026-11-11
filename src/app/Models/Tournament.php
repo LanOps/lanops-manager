@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HidesFromNonAdmins;
 use Auth;
 
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class Tournament extends Model
 {
+    use HidesFromNonAdmins;
     use Sluggable;
 
     /**
@@ -55,15 +57,9 @@ class Tournament extends Model
             $model->status = Tournament::$statusDraft;
         });
 
-        $admin = false;
-        if (Auth::user() && Auth::user()->getAdmin()) {
-            $admin = true;
-        }
-        if (!$admin) {
-            static::addGlobalScope('statusDraft', function (Builder $builder) {
-                $builder->where('status', '!=', Tournament::$statusDraft);
-            });
-        }
+        static::addNonAdminScope('statusDraft', function (Builder $builder) {
+            $builder->where('status', '!=', Tournament::$statusDraft);
+        });
     }
 
     /*

@@ -4,7 +4,7 @@
 			@foreach ($basket as $item)
 				<tr>
 					<td>
-						<strong>{{ $item->event->display_name }}: {{ $item->name }}</strong>
+						<strong>@if ($item->event){{ $item->event->display_name }}: @endif{{ $item->name }}</strong>
 					</td>
 					<td class="text-end">
 						x {{ $item->quantity }}
