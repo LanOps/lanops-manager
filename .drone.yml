@@ -243,7 +243,8 @@ steps:
 
 ---
 # Builds the image the lint and test steps run in (resources/docker/ci/Dockerfile).
-# Only runs when started by hand: Drone "New Build" on any branch. Run it after changing that file.
+# Runs when started by hand (Drone "New Build" on any branch; do this after changing that file)
+# and from a Drone cron job, so PHP and Debian security updates reach CI without anyone remembering.
 kind: pipeline
 type: docker
 name: ci-image
@@ -251,6 +252,7 @@ name: ci-image
 trigger:
   event:
     - custom
+    - cron
 
 steps:
   - name: build-push-ci
