@@ -43,6 +43,7 @@ Route::group(['middleware' => ['web']], function () {
 
     Route::group(['middleware' => ['auth', 'banned', 'verified']], function () {
         Route::get('/account', 'AccountController@index')->name('accounts');
+        Route::get('/account/tickets/{participant}', 'AccountController@showTicket');
         Route::post('/account', 'AccountController@update');
         Route::get('/account/discord/callback', 'AccountController@linkDiscord');
         Route::post('/account/discord/unlink', 'AccountController@unlinkDiscord');
@@ -273,6 +274,7 @@ Route::group(['middleware' => ['web', 'admin', 'banned']], function () {
     Route::post('/admin/users/referralcodes', 'Admin\UsersController@generalReferralCodes');
     Route::get('/admin/users/{user}', 'Admin\UsersController@show');
     Route::post('/admin/users/{user}', 'Admin\UsersController@update');
+    Route::post('/admin/users/{user}/email', 'Admin\UsersController@updateEmail');
     Route::post('/admin/users/{user}/admin', 'Admin\UsersController@grantAdmin');
     Route::delete('/admin/users/{user}/admin', 'Admin\UsersController@removeAdmin');
     Route::post('/admin/users/{user}/ban', 'Admin\UsersController@ban');

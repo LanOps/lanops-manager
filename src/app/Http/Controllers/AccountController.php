@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use App\Models\EventParticipant;
 use Session;
 
 use Illuminate\Http\Request;
@@ -21,7 +22,16 @@ class AccountController extends Controller
     {
         $user = Auth::user();
         $purchases = $user->purchases()->latest()->paginate(5, ['*'], 'pu');
-        $tickets = $user->eventParticipants()->latest()->paginate(5, ['*'], 'ti');
+        // Tickets for events still to come (or on now) are shown in full; past ones are folded away
+        $tickets = $user->eventParticipants()
+            ->whereHas('event', fn ($query) => $query->where('end', '>=', now()))
+            ->latest()
+            ->get();
+        $pastTickets = $user->eventParticipants()
+            ->whereHas('event', fn ($query) => $query->where('end', '<', now()))
+            ->with(['event', 'ticket', 'seat.seatingPlan'])
+            ->latest()
+            ->paginate(10, ['*'], 'ti');
 
         $state = bin2hex(openssl_random_pseudo_bytes(12));
         Session::put('discordoauth', $state);
@@ -31,6 +41,7 @@ class AccountController extends Controller
             ->withUser($user)
             ->withPurchases($purchases)
             ->withEventParticipants($tickets)
+            ->withPastEventParticipants($pastTickets)
             ->withDiscordLinkUrl($discordLinkUrl)
         ;
     }
@@ -164,6 +175,19 @@ class AccountController extends Controller
             Auth::logoutOtherDevices($request->password1);
         }
         return Redirect::back()->withSuccess('Account successfully updated!');
+    }
+
+    /**
+     * A phone-friendly page with just the ticket's QR code, to show at the door
+     * @param  EventParticipant $participant
+     * @return View
+     */
+    public function showTicket(EventParticipant $participant)
+    {
+        if ($participant->user_id != Auth::id()) {
+            abort(404);
+        }
+        return view('accounts.ticket')->withParticipant($participant);
     }
 
     /**

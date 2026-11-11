@@ -12,8 +12,12 @@ use Spatie\WebhookServer\WebhookCall;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-
     use Notifiable;
+
+    /**
+     * @var array Per-request cache for getLiveTicket()
+     */
+    protected $liveTicketCache = [];
 
     /**
      * The attributes that are mass assignable.
@@ -234,6 +238,30 @@ class User extends Authenticatable implements MustVerifyEmail
             $nextEvents = array_unique($nextEvents);
         }
         return $nextEvents;
+    }
+
+    /**
+     * The ticket this user will want to show at the door: one for an event that
+     * is on right now, not yet signed in, and not waiting to be taken as a gift.
+     * Looked up once per request, as the layout asks on every page.
+     *
+     * @return EventParticipant|null
+     */
+    public function getLiveTicket()
+    {
+        if (!array_key_exists('liveTicket', $this->liveTicketCache)) {
+            $this->liveTicketCache['liveTicket'] = $this->eventParticipants()
+                ->where('signed_in', false)
+                ->where(function ($query) {
+                    $query->whereNull('gift')->orWhere('gift', false)->orWhere('gift_accepted', true);
+                })
+                ->whereHas('event', function ($query) {
+                    $query->where('start', '<=', now())->where('end', '>=', now());
+                })
+                ->with('event')
+                ->first();
+        }
+        return $this->liveTicketCache['liveTicket'];
     }
 
     /**

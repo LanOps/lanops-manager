@@ -40,7 +40,14 @@
 								Admin: @if ($userShow->admin) Yes @else No @endif
 							</li>
 							@if ($userShow->email != null)
-								<li class="list-group-item">Email: {{ $userShow->email }}</li>
+								<li class="list-group-item">
+									Email: {{ $userShow->email }}
+									@if ($userShow->email_verified_at)
+										<span class="badge text-bg-success">Verified</span>
+									@else
+										<span class="badge text-bg-warning">Not verified</span>
+									@endif
+								</li>
 							@endif
 							<li class="list-group-item">Referral Discounts Unclaimed: {{ $userShow->getReferralsUnclaimedCount() }}</li>
 							<li class="list-group-item">Referral Discounts Used: {{ $userShow->getReferralsRedeemedCount() }}</li>
@@ -161,6 +168,21 @@
 						{{ html()->text('username', $userShow->username)->class('form-control') }}
 					</div>
 					<button type="submit" class="btn btn-success w-100">Submit</button>
+				</form>
+				<br>
+				<h4>Change Email</h4>
+				<hr>
+				{{ html()->form('POST', url('/admin/users/' . $userShow->id . '/email'))->open() }}
+					<div class="mb-3">
+						{{ html()->label('Email Address', 'email')->class('form-label') }}
+						{{ html()->email('email', $userShow->email)->class('form-control')->required() }}
+					</div>
+					<div class="form-check mb-3">
+						{{ html()->checkbox('send_verification', true, '1')->class('form-check-input')->id('send_verification') }}
+						{{ html()->label('Send a verification link to the new address', 'send_verification')->class('form-check-label') }}
+						<div class="form-text">Untick to mark it as verified without sending an email.</div>
+					</div>
+					<button type="submit" class="btn btn-success w-100">Change Email</button>
 				</form>
 				<br>
 				<h4>Danger Zone</h4>
