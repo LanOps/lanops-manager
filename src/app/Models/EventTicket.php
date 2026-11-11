@@ -50,6 +50,10 @@ class EventTicket extends Model
      */
     public function soldOutMessage($quantity)
     {
+        // The event is hidden from visitors (unpublished since the ticket went in the basket)
+        if (!$this->event) {
+            return $this->name . ' is no longer on sale.';
+        }
         if ($this->event->capacity < $this->event->eventParticipants()->count() + $quantity) {
             return $this->event->display_name . ' has sold out!';
         }

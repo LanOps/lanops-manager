@@ -27,6 +27,11 @@ class ParticipantsController extends Controller
             $request->session()->flash('alert-danger', 'This is not your ticket to gift.');
             return Redirect::back();
         }
+        // Once a ticket has been scanned in at the door it can't be passed on
+        if ($participant->signed_in) {
+            $request->session()->flash('alert-danger', 'This ticket has already been signed in at the event, so it cannot be gifted.');
+            return Redirect::back();
+        }
         if ($participant->gift != true && $participant->gift_sendee == null) {
             $participant->gift = true;
             $participant->gift_accepted = false;
@@ -95,11 +100,22 @@ class ParticipantsController extends Controller
                     if ($participant == null) {
                         return null;
                     }
+                    // The gift link may have been made before the ticket was scanned in at the door
+                    if ($participant->signed_in) {
+                        return 'signed_in';
+                    }
                     $participant->gift_accepted = true;
                     $participant->user_id = $user->id;
                     $participant->gift_accepted_url = null;
                     return $participant->save();
                 });
+            }
+            if ($result === 'signed_in') {
+                $request->session()->flash(
+                    'alert-danger',
+                    'This ticket has already been signed in at the event, so the gift can no longer be accepted.'
+                );
+                return Redirect::to('account');
             }
             if ($result !== null) {
                 if ($result) {

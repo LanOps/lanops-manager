@@ -155,6 +155,24 @@ class PaymentsTest extends TestCase
             ->assertSee('Thank you for your Payment!');
     }
 
+    public function testTicketForAHiddenEventIsNotCharged()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket([], ['price' => 30]);
+        $gateway = $this->stripeGateway();
+        $gateway->shouldNotReceive('purchase');
+        $this->fakeGateway($gateway);
+        // An admin unpublishes the event while the buyer is on the card page
+        \App\Models\Event::withoutGlobalScopes()->whereKey($ticket->event_id)->update(['status' => 'DRAFT']);
+
+        $this->actingAs($user)
+            ->withSession($this->basketFor($ticket) + $this->termsAccepted())
+            ->post('/payment/post', $this->cardDetails())
+            ->assertSessionHas('alert-danger', $ticket->name . ' is no longer on sale.');
+
+        $this->assertSame(0, Purchase::count());
+    }
+
     public function testDeclinedCardPaymentRecordsNothing()
     {
         $user = $this->createUser();
@@ -240,6 +258,21 @@ class PaymentsTest extends TestCase
             ->assertRedirect('/payment/successful/' . Purchase::firstOrFail()->id);
 
         $this->assertSame(1, EventParticipant::count());
+    }
+
+    public function testThreeDSecureReturnStillIssuesTicketsIfTheEventWasHidden()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket([], ['price' => 30]);
+        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 30));
+        // The card has been charged by the time the buyer comes back from 3D Secure
+        \App\Models\Event::withoutGlobalScopes()->whereKey($ticket->event_id)->update(['status' => 'DRAFT']);
+
+        $this->actingAs($user)
+            ->withSession($this->awaitingThreeDSecure($ticket))
+            ->get('/payment/callback?gate=stripe&type=return&payment_intent=pi_3ds_123');
+
+        $this->assertSame([$ticket->event_id], EventParticipant::pluck('event_id')->all());
     }
 
     public function testCardNeedingThreeDSecureRemembersItsPaymentIntent()

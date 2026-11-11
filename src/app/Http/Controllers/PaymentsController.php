@@ -52,17 +52,14 @@ class PaymentsController extends Controller
         Session::forget('payment_terms_accepted');
         $nextEventFlag = true;
         if (array_key_exists('tickets', $basket)) {
+            $nextEvent = Event::where('end', '>=', \Carbon\Carbon::now())
+                ->orderBy(\DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
+                ->first();
             foreach ($basket['tickets'] as $ticketId => $quantity) {
-                if (EventTicket::where('id', $ticketId)
-                    ->first()
-                    ->event
-                    ->id
-                    !=
-                    Event::where('end', '>=', \Carbon\Carbon::now())
-                    ->orderBy(\DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
-                    ->first()
-                    ->id
-                ) {
+                // Either can be missing (no upcoming event, or the ticket's event
+                // is hidden from visitors), which used to crash the review page
+                $ticketEventId = EventTicket::where('id', $ticketId)->value('event_id');
+                if (!$nextEvent || $ticketEventId != $nextEvent->id) {
                     $nextEventFlag = false;
                 }
             }
@@ -437,7 +434,9 @@ class PaymentsController extends Controller
                     //Add Participant to database
                     $participant = [
                         'user_id'       => $user->id,
-                        'event_id'      => $ticket->event->id,
+                        // event_id, not event->id: the event may have been hidden since the
+                        // basket was filled, and the payment has already been taken by now
+                        'event_id'      => $ticket->event_id,
                         'ticket_id'     => $ticket->id,
                         'purchase_id'   => $purchaseId,
                     ];
