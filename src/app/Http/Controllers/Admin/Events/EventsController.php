@@ -174,7 +174,7 @@ class EventsController extends Controller
         }
 
         if (isset($request->status)) {
-            $event->status          = $request->status;
+            $event->status          = strtoupper($request->status);
         }
 
         if (isset($request->capacity)) {
@@ -192,6 +192,26 @@ class EventsController extends Controller
         }
 
         Session::flash('alert-success', 'Successfully updated Event!');
+        return Redirect::to('admin/events/' . $event->slug);
+    }
+
+    /**
+     * Make a new secret link for a Private event; the old link stops working
+     * @param  Event  $event
+     * @return Redirect
+     */
+    public function regeneratePrivateLink(Event $event)
+    {
+        if ($event->status != 'PRIVATE') {
+            Session::flash('alert-danger', 'Only Private events have a private link.');
+            return Redirect::to('admin/events/' . $event->slug);
+        }
+        $event->private_key = Event::generatePrivateKey();
+        if (!$event->save()) {
+            Session::flash('alert-danger', 'Cannot make a new private link!');
+            return Redirect::to('admin/events/' . $event->slug);
+        }
+        Session::flash('alert-success', 'Made a new private link. The old link no longer works.');
         return Redirect::to('admin/events/' . $event->slug);
     }
 

@@ -22,7 +22,7 @@ class GalleryController extends Controller
             ->description('Browse photo galleries from ' . config('app.name') . ' events.')
             ->url(url('/gallery'));
 
-        $event = Event::where('start', '>=', date("Y-m-d 00:00:00"))->first();
+        $event = Event::listed()->where('start', '>=', date("Y-m-d 00:00:00"))->first();
         // Newest first, by the album's event date (or the album's own date if it has no event)
         // Only the first photo of each album is needed, for its cover
         $albums = GalleryAlbum::with([

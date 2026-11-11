@@ -24,10 +24,25 @@ class EventsController extends Controller
             ->image(config('app.url') . '/images/events-og-image.jpg');
 
         return view('events.index')->withEvents(
-            Event::with(['seatingPlans.seats', 'eventParticipants', 'venue', 'tickets'])->orderByDesc('start')->get()
+            Event::listed()->with(['seatingPlans.seats', 'eventParticipants', 'venue', 'tickets'])->orderByDesc('start')->get()
         );
     }
     
+    /**
+     * Open a Private event from its secret link, and remember the link for the
+     * rest of the visit so buying tickets, checkout and seating work too
+     * @param  string $key
+     * @return Redirect
+     */
+    public function showPrivate($key)
+    {
+        if (!$event = Event::findByPrivateKey($key)) {
+            abort(404);
+        }
+        $event->unlockForSession();
+        return redirect('/events/' . $event->slug);
+    }
+
     /**
      * Show Event Page
      * @param  Event $event
@@ -71,6 +86,11 @@ class EventsController extends Controller
                 $poll->sortOptions();
             }
         }
-        return view('events.show')->withEvent($event);
+        $response = response(view('events.show')->withEvent($event));
+        if ($event->status == 'PRIVATE') {
+            // Keep it out of search engines, even if the link is shared somewhere public
+            $response->header('X-Robots-Tag', 'noindex, nofollow');
+        }
+        return $response;
     }
 }

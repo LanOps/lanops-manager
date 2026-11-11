@@ -15,7 +15,7 @@ class EventsController extends Controller
     public function index()
     {
         $return = array();
-        foreach (Event::all() as $event) {
+        foreach (Event::listed()->get() as $event) {
             $return[] = $this->formatResponse($event);
         }
         return $return;
@@ -29,9 +29,9 @@ class EventsController extends Controller
     public function show($event)
     {
         if (is_numeric($event)) {
-            $event = Event::where('id', $event)->first();
+            $event = Event::listed()->where('id', $event)->first();
         } else {
-            $event = Event::where('slug', $event)->first();
+            $event = Event::listed()->where('slug', $event)->first();
         }
 
         if (!$event) {
@@ -48,7 +48,7 @@ class EventsController extends Controller
     public function showUpcoming()
     {
         $return = array();
-        foreach (Event::where('start', '>', \Carbon\Carbon::today())->get() as $event) {
+        foreach (Event::listed()->where('start', '>', \Carbon\Carbon::today())->get() as $event) {
             $return[] = $this->formatResponse($event);
         }
         return $return;
@@ -60,7 +60,7 @@ class EventsController extends Controller
      */
     public function showNext()
     {
-        $event = Event::where('start', '>', \Carbon\Carbon::today())->first();
+        $event = Event::listed()->where('start', '>', \Carbon\Carbon::today())->first();
         
         if (!$event) {
             abort(404);

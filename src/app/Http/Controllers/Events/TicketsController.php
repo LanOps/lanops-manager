@@ -25,7 +25,7 @@ class TicketsController extends Controller
     {
         $user = Auth::user();
 
-        // PRIVATE events are hidden from non-admins (see Event::boot), so their tickets can't be bought
+        // Hidden events (drafts, previews, Private events without the secret link) can't be bought from
         if (!$ticket->event) {
             abort(404);
         }

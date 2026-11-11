@@ -22,7 +22,7 @@ class HomeController extends Controller
             $sliderFiles
         );
 
-        $nextLan = Event::where('end', '>=', \Carbon\Carbon::now())
+        $nextLan = Event::listed()->where('end', '>=', \Carbon\Carbon::now())
             ->where('type', Event::$typeLan)
             ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
             ->first();
@@ -48,13 +48,13 @@ class HomeController extends Controller
             ->withNextEvent(\App\Libraries\Helpers::getNextEvent())
             ->withNextEventLan($nextLan)
             ->withNextEventTabletop(
-                Event::where('end', '>=', \Carbon\Carbon::now())
+                Event::listed()->where('end', '>=', \Carbon\Carbon::now())
                     ->where('type', Event::$typeTabletop)
                     ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
             )
             ->withNewsArticles(NewsArticle::limit(4)->orderBy('created_at', 'desc')->get())
             // Only upcoming events are shown in the calendar
-            ->withEvents(Event::where('start', '>', \Carbon\Carbon::today())->orderBy('created_at', 'DESC')->get())
+            ->withEvents(Event::listed()->where('start', '>', \Carbon\Carbon::today())->orderBy('created_at', 'DESC')->get())
             ->withSliderVideos($sliderVideos)
         ;
     }
