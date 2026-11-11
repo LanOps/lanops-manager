@@ -114,13 +114,18 @@ steps:
         - tag
 
   - name: build-push-nginx
-    image: plugins/docker
+    image: plugins/buildx:1
+    # buildx runs its own Docker daemon, so it needs privileged mode (repo marked Trusted in Drone)
+    privileged: true
     depends_on:
       - lint
       - test
     settings:
       repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/nginx/Dockerfile
+      # Reuse layers from earlier builds (npm ci, Vite build) stored on Docker Hub
+      cache_from: type=registry,ref=lanopsdev/lanops-manager:cache-nginx
+      cache_to: type=registry,ref=lanopsdev/lanops-manager:cache-nginx,mode=max
       username:
         from_secret: dockerhub_username
       password:
@@ -134,7 +139,9 @@ steps:
         - push
 
   - name: build-push-app
-    image: plugins/docker
+    image: plugins/buildx:1
+    # buildx runs its own Docker daemon, so it needs privileged mode (repo marked Trusted in Drone)
+    privileged: true
     depends_on:
       - lint
       - test
@@ -143,6 +150,9 @@ steps:
       dockerfile: resources/docker/php/Dockerfile
       # php-composer (the last stage) adds composer and git, which production doesn't need
       target: php-base
+      # Reuse layers from earlier builds (apt, PHP extensions, npm ci, composer) stored on Docker Hub
+      cache_from: type=registry,ref=lanopsdev/lanops-manager:cache-app
+      cache_to: type=registry,ref=lanopsdev/lanops-manager:cache-app,mode=max
       username:
         from_secret: dockerhub_username
       password:
@@ -156,13 +166,17 @@ steps:
         - push
 
   - name: build-push-nginx-release
-    image: plugins/docker
+    image: plugins/buildx:1
+    # buildx runs its own Docker daemon, so it needs privileged mode (repo marked Trusted in Drone)
+    privileged: true
     depends_on:
       - lint
       - test
     settings:
       repo: lanopsdev/lanops-manager
       dockerfile: resources/docker/nginx/Dockerfile
+      # Reuse layers from earlier builds (npm ci, Vite build) stored on Docker Hub
+      cache_from: type=registry,ref=lanopsdev/lanops-manager:cache-nginx
       username:
         from_secret: dockerhub_username
       password:
@@ -174,7 +188,9 @@ steps:
         - tag
 
   - name: build-push-app-release
-    image: plugins/docker
+    image: plugins/buildx:1
+    # buildx runs its own Docker daemon, so it needs privileged mode (repo marked Trusted in Drone)
+    privileged: true
     depends_on:
       - lint
       - test
@@ -183,6 +199,8 @@ steps:
       dockerfile: resources/docker/php/Dockerfile
       # php-composer (the last stage) adds composer and git, which production doesn't need
       target: php-base
+      # Reuse layers from earlier builds (apt, PHP extensions, npm ci, composer) stored on Docker Hub
+      cache_from: type=registry,ref=lanopsdev/lanops-manager:cache-app
       username:
         from_secret: dockerhub_username
       password:
