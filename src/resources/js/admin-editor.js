@@ -11,6 +11,11 @@ export async function initAdminEditors() {
     const { default: $ } = await import('jquery');
     window.jQuery = window.$ = $;
 
+    // jQuery 4 removed $.now and $.nodeName, which Summernote 0.9 still calls
+    // ($.now when an editor starts, $.nodeName when switching list type)
+    $.now ??= Date.now;
+    $.nodeName ??= (elem, name) => elem.nodeName?.toLowerCase() === name.toLowerCase();
+
     // Summernote's Bootstrap 5 build opens its dialogs and tooltips through the
     // jQuery plugins, which Bootstrap only adds when jQuery is there at page load
     for (const plugin of [Dropdown, Modal, Tooltip]) {

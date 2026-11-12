@@ -32,7 +32,8 @@ RUN apt-get update && apt-get install -y \
         libxml2-dev \
         libonig-dev \
         libmagickwand-dev \
-        cron
+        cron \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg
 
@@ -68,7 +69,7 @@ ENTRYPOINT ["/entrypoint-php.sh"]
 
 FROM php-base AS php-composer
 
-RUN apt install -y git curl wget
+RUN apt-get update && apt-get install -y git curl wget && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://raw.githubusercontent.com/composer/getcomposer.org/76a7060ccb93902cd7576b67264ad91c8a2700e2/web/installer -O - -q | php -- --quiet
 
