@@ -83,7 +83,6 @@ return [
         Illuminate\View\ViewServiceProvider::class,
         SocialiteProviders\Manager\ServiceProvider::class,
         Cviebrock\EloquentSluggable\ServiceProvider::class,
-        Ignited\LaravelOmnipay\LaravelOmnipayServiceProvider::class,
         Mews\Captcha\CaptchaServiceProvider::class,
         /*
          * Application Service Providers...
@@ -139,7 +138,6 @@ return [
         'Validator'             => Illuminate\Support\Facades\Validator::class,
         'View'                  => Illuminate\Support\Facades\View::class,
         'Socialize'             => Laravel\Socialite\Facades\Socialite::class,
-        'Omnipay'               => Ignited\LaravelOmnipay\Facades\OmnipayFacade::class,
         'Helpers'               => App\Libraries\Helpers::class,
         'Captcha'               => Mews\Captcha\Facades\Captcha::class,
         'Sentry'                => Sentry\Laravel\Facade::class,

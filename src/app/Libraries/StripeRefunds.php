@@ -9,9 +9,8 @@ use App\Exceptions\RefundException;
 /**
  * Refunds a Stripe payment through the Stripe API.
  *
- * Omnipay's Stripe refund request needs a charge id and is built for the
- * older Charges API, so this calls the Refunds endpoint directly with the
- * PaymentIntent the purchase was paid with.
+ * Calls the Refunds endpoint with the PaymentIntent the purchase was paid
+ * with (or the charge, for old purchases), through Laravel's HTTP client.
  */
 class StripeRefunds
 {
@@ -40,7 +39,7 @@ class StripeRefunds
         }
 
         try {
-            $response = Http::withToken(config('laravel-omnipay.gateways.stripe.credentials.secret'))
+            $response = Http::withToken(config('services.stripe.secret'))
                 ->withHeaders(['Idempotency-Key' => $idempotencyKey])
                 ->asForm()
                 ->timeout(30)

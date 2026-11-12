@@ -94,7 +94,7 @@
 @if ($paymentGateway == 'stripe')
 	<script src="https://js.stripe.com/v3/"></script>
 	<script>
-		const stripe = Stripe( "{!! config('laravel-omnipay.gateways.stripe.credentials.public') !!}" );
+		const stripe = Stripe( "{!! config('services.stripe.key') !!}" );
 		const elements = stripe.elements();
 
 		// Stripe draws the card fields in iframes, so copy the text colours from a normal
