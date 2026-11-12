@@ -33,12 +33,6 @@ class AppServiceProvider extends ServiceProvider
         ) {
             $availablePaymentGateways[] = 'stripe';
         }
-        if (config('laravel-omnipay.gateways.paypal_express.credentials.username') != '' &&
-            config('laravel-omnipay.gateways.paypal_express.credentials.password') != '' &&
-            config('laravel-omnipay.gateways.paypal_express.credentials.signature') != ''
-        ) {
-            $availablePaymentGateways[] = 'paypal_express';
-        }
         \Config::set('laravel-omnipay.gateways.available_payment_gateways', $availablePaymentGateways);
 
         seo()

@@ -3,7 +3,10 @@
 namespace App\Models;
 
 use Auth;
-use QrCode;
+use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Support\Str;
 
 use Spatie\MediaLibrary\HasMedia;
@@ -247,7 +250,9 @@ class EventParticipant extends Model implements HasMedia
      */
     public function generateQRCode()
     {
-        $qr = (string) QrCode::format('png')->size(300)->generate($this->getTicketUrl());
+        // 300px PNG with no quiet zone, as simple-qrcode made them before
+        $writer = new Writer(new ImageRenderer(new RendererStyle(300, 0), new ImagickImageBackEnd()));
+        $qr = $writer->writeString($this->getTicketUrl(), 'UTF-8');
         if ($this->hasMedia('qr')) {
             $this->clearMediaCollection('qr');
         }
