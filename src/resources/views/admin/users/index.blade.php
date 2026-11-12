@@ -23,6 +23,22 @@
 				<i class="fa fa-users fa-fw"></i> Users
 			</div>
 			<div class="card-body">
+				<form method="GET" action="/admin/users" class="mb-3" role="search">
+					<div class="input-group">
+						<span class="input-group-text"><i class="fa fa-search fa-fw"></i></span>
+						<input type="search" name="search" class="form-control" value="{{ $search }}"
+							placeholder="Search username, name, email, Discord or Steam ID" aria-label="Search users">
+						<button type="submit" class="btn btn-primary">Search</button>
+						@if ($search !== '')
+							<a href="/admin/users" class="btn btn-outline-secondary">Clear</a>
+						@endif
+					</div>
+				</form>
+				@if ($search !== '')
+					<p class="text-muted small">
+						{{ $users->total() }} {{ Str::plural('user', $users->total()) }} matching "{{ $search }}"
+					</p>
+				@endif
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
 						<thead>
@@ -65,6 +81,11 @@
 									</td>
 								</tr>
 							@endforeach
+							@if ($users->isEmpty())
+								<tr>
+									<td colspan="5" class="text-center text-muted py-4">No users found.</td>
+								</tr>
+							@endif
 						</tbody>
 					</table>
 					{{ $users->links() }}

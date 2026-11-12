@@ -15,14 +15,34 @@ use Illuminate\Support\Facades\Redirect;
 class UsersController extends Controller
 {
     /**
-     * Show Users Index Page
+     * Show Users Index Page, optionally filtered by ?search=
+     * @param  Request $request
      * @return View
      */
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->query('search', ''));
+        $users = User::query();
+        if ($search !== '') {
+            // Escape LIKE wildcards so "%" and "_" match literally
+            $like = '%' . addcslashes($search, '\\%_') . '%';
+            $users->where(function ($query) use ($like, $search) {
+                $query->where('username', 'like', $like)
+                    ->orWhere('email', 'like', $like)
+                    ->orWhere('firstname', 'like', $like)
+                    ->orWhere('surname', 'like', $like)
+                    ->orWhereRaw("CONCAT(COALESCE(firstname, ''), ' ', COALESCE(surname, '')) LIKE ?", [$like])
+                    ->orWhere('discord_username', 'like', $like);
+                if (ctype_digit($search)) {
+                    $query->orWhere('steamid', $search);
+                }
+            });
+        }
+
         return view('admin.users.index')
             ->withUser(Auth::user())
-            ->withUsers(User::paginate(20));
+            ->withSearch($search)
+            ->withUsers($users->orderBy('id')->paginate(20)->withQueryString());
     }
 
     /**
