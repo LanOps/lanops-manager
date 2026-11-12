@@ -20,7 +20,7 @@ RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --no-
 COPY src/ ./
 RUN composer dump-autoload --optimize --no-dev --no-scripts
 
-FROM php:8.4-fpm AS php-base
+FROM php:8.5-fpm AS php-base
 LABEL maintainer="Thornton Phillis (dev@th0rn0.co.uk)"
 
 RUN apt-get update && apt-get install -y \
@@ -39,7 +39,7 @@ RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg
 RUN docker-php-ext-install mysqli pdo_mysql gd bcmath intl zip xml mbstring exif
 
 # imagick is needed by simplesoftwareio/simple-qrcode 2+ for PNG ticket QR codes
-RUN pecl install imagick-3.8.0 && docker-php-ext-enable imagick
+RUN pecl install imagick-3.8.1 && docker-php-ext-enable imagick
 
 COPY src/ /var/www/html
 COPY --from=composer-builder /app/vendor /var/www/html/vendor

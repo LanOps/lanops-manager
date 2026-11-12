@@ -32,7 +32,7 @@ steps:
         curl -s -X POST "$DISCORD_WEBHOOK_URL" -H "Content-Type: application/json" -d "{\"embeds\":[{\"title\":\"$DRONE_REPO - $DRONE_SOURCE_BRANCH - Lint & Test Started!\",\"url\":\"$DRONE_BUILD_LINK\"}]}"
 
   - name: composer
-    image: lanopsdev/lanops-manager:ci-php8.4
+    image: lanopsdev/lanops-manager:ci-php8.5
     pull: always
     commands:
       - cd /drone/src/src && composer install --no-interaction --prefer-dist --no-progress
@@ -40,14 +40,14 @@ steps:
       - php artisan optimize:clear
 
   - name: lint
-    image: lanopsdev/lanops-manager:ci-php8.4
+    image: lanopsdev/lanops-manager:ci-php8.5
     depends_on:
       - composer
     commands:
       - cd /drone/src/src && vendor/bin/phpcs
 
   - name: test
-    image: lanopsdev/lanops-manager:ci-php8.4
+    image: lanopsdev/lanops-manager:ci-php8.5
     depends_on:
       - composer
     environment:
@@ -283,4 +283,4 @@ steps:
       password:
         from_secret: dockerhub_token
       tags:
-        - ci-php8.4
+        - ci-php8.5
