@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Concerns\HidesFromNonAdmins;
 use App\Models\EventSeating;
 
@@ -18,6 +19,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class EventSeatingPlan extends Model implements HasMedia
 {
+    use HasFactory;
     use HidesFromNonAdmins;
     use Sluggable;
     use InteractsWithMedia;

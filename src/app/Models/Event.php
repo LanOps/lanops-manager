@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Concerns\HidesFromNonAdmins;
 use Auth;
 
@@ -13,6 +14,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class Event extends Model
 {
+    use HasFactory;
     use HidesFromNonAdmins;
     use Sluggable;
 

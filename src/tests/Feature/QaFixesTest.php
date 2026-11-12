@@ -37,7 +37,7 @@ class QaFixesTest extends TestCase
 
     protected function createSeatingPlan(EventTicket $ticket, array $attributes = []): EventSeatingPlan
     {
-        $plan = factory(EventSeatingPlan::class)->make();
+        $plan = EventSeatingPlan::factory()->make();
         $plan->forceFill(array_merge(['event_id' => $ticket->event_id, 'status' => 'PUBLISHED'], $attributes));
         $plan->save();
 

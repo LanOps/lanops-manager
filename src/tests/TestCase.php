@@ -43,7 +43,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected function createUser(array $attributes = []): User
     {
-        $user = factory(User::class)->make();
+        $user = User::factory()->make();
         $user->forceFill(array_merge([
             'email_verified_at' => now(),
             'referral_code'     => User::generateReferralCode(),
@@ -58,13 +58,13 @@ abstract class TestCase extends BaseTestCase
      */
     protected function createEventWithTicket(array $eventAttributes = [], array $ticketAttributes = []): EventTicket
     {
-        $venue = factory(EventVenue::class)->create();
+        $venue = EventVenue::factory()->create();
 
-        $event = factory(Event::class)->make();
+        $event = Event::factory()->make();
         $event->forceFill(array_merge(['capacity' => 100, 'event_venue_id' => $venue->id], $eventAttributes));
         $event->save();
 
-        $ticket = factory(EventTicket::class)->make();
+        $ticket = EventTicket::factory()->make();
         $ticket->forceFill(array_merge(['event_id' => $event->id], $ticketAttributes));
         $ticket->save();
 

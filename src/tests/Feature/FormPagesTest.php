@@ -51,14 +51,14 @@ class FormPagesTest extends TestCase
             'transferred_event_id' => 0, 'created_at' => $now, 'updated_at' => $now,
         ]);
 
-        $seatingPlan = factory(EventSeatingPlan::class)->make();
+        $seatingPlan = EventSeatingPlan::factory()->make();
         $seatingPlan->forceFill(['event_id' => $event->id, 'name_short' => 'Main'])->save();
         DB::table('event_seating')->insert([
             'seat' => 'A1', 'event_seating_plan_id' => $seatingPlan->id, 'event_participant_id' => $participantId,
             'gifted' => 0, 'created_at' => $now, 'updated_at' => $now,
         ]);
 
-        $timetable = factory(EventTimetable::class)->make();
+        $timetable = EventTimetable::factory()->make();
         $timetable->forceFill(['event_id' => $event->id])->save();
         DB::table('event_timetable_data')->insert([
             'event_timetable_id' => $timetable->id, 'name' => 'Doors open', 'start_time' => $event->start,
@@ -98,7 +98,7 @@ class FormPagesTest extends TestCase
             'status' => 'PUBLISHED', 'created_at' => $now, 'updated_at' => $now,
         ]);
 
-        $article = factory(NewsArticle::class)->create(['user_id' => $this->admin->id]);
+        $article = NewsArticle::factory()->create(['user_id' => $this->admin->id]);
         DB::table('news_feed_comments')->insert([
             'comment' => 'Nice', 'reviewed' => 1, 'reviewed_by' => $this->admin->id, 'approved' => 1,
             'approved_by' => $this->admin->id, 'news_feed_id' => $article->id, 'user_id' => $this->member->id,
@@ -182,7 +182,7 @@ class FormPagesTest extends TestCase
     public function testTextareaEscapesItsContents()
     {
         $this->seedSite();
-        $article = factory(NewsArticle::class)->create([
+        $article = NewsArticle::factory()->create([
             'user_id' => $this->admin->id,
             'article' => '<p>Fish &amp; chips</p></textarea>',
         ]);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\NewsTag;
 
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class NewsArticle extends Model
 {
+    use HasFactory;
     use Sluggable;
 
     /**

@@ -25,7 +25,7 @@ class DiscordWebhookTest extends TestCase
             'discord_link_enabled' => true,
             'discord_channel_id'   => '1234',
         ])->event;
-        $timetable = factory(EventTimetable::class)->make(['status' => 'draft']);
+        $timetable = EventTimetable::factory()->make(['status' => 'draft']);
         $timetable->event_id = $event->id;
         $timetable->save();
 

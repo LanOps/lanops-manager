@@ -42,7 +42,7 @@ class PerformanceTest extends TestCase
 
     protected function createPlan(EventTicket $ticket): EventSeatingPlan
     {
-        $plan = factory(EventSeatingPlan::class)->make();
+        $plan = EventSeatingPlan::factory()->make();
         $plan->forceFill(['event_id' => $ticket->event_id, 'status' => 'PUBLISHED'])->save();
 
         return $plan->fresh();

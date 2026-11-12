@@ -48,8 +48,8 @@ class AdminSafetyTest extends TestCase
     public function testVenueImageFromAnotherVenueIsNotDeleted()
     {
         $admin = $this->createUser(['admin' => 1]);
-        $venue = factory(EventVenue::class)->create();
-        $image = $this->addImage(factory(EventVenue::class)->create());
+        $venue = EventVenue::factory()->create();
+        $image = $this->addImage(EventVenue::factory()->create());
 
         $this->actingAs($admin)->delete('/admin/venues/' . $venue->slug . '/' . $image->id)->assertNotFound();
         $this->assertNotNull(Media::find($image->id));
