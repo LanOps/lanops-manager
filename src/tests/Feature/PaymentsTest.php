@@ -426,6 +426,36 @@ class PaymentsTest extends TestCase
             ->assertRedirect('/');
     }
 
+    public function testSuccessPageShowsEachTicketsQrCodeAndLink()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket();
+        $purchase = Purchase::create([
+            'user_id'        => $user->id,
+            'type'           => 'Stripe',
+            'transaction_id' => 'ch_qr',
+            'token'          => 'pi_qr',
+            'status'         => 'Success',
+            'basket'         => $this->basketFor($ticket)[config('app.basket_name')],
+        ]);
+        // Without events: the QR image is added by hand below, so imagick isn't needed
+        [$ready, $waiting] = EventParticipant::withoutEvents(fn () => [
+            EventParticipant::create(['user_id' => $user->id, 'event_id' => $ticket->event_id, 'ticket_id' => $ticket->id, 'purchase_id' => $purchase->id]),
+            EventParticipant::create(['user_id' => $user->id, 'event_id' => $ticket->event_id, 'ticket_id' => $ticket->id, 'purchase_id' => $purchase->id]),
+        ]);
+        $ready->addMediaFromString('png')->usingFileName('readyqr.png')->toMediaCollection('qr');
+
+        $this->actingAs($user)
+            ->withSession(['params' => ['amount' => 30.0]])
+            ->get('/payment/successful/' . $purchase->id)
+            ->assertOk()
+            ->assertDontSee('QR Codes Generating')
+            ->assertSee($ready->fresh()->getFirstMediaUrl('qr'), false)
+            ->assertSee('href="/account/tickets/' . $ready->id . '"', false)
+            ->assertSee('href="/account/tickets/' . $waiting->id . '"', false)
+            ->assertSee("Your QR code isn't ready yet", false);
+    }
+
     public function testCancelledCallbackRecordsNothing()
     {
         $user = $this->createUser();

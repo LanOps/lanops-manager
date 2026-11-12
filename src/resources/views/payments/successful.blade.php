@@ -30,7 +30,15 @@
 							<div class="card-body">
 								<h5>{{ $participant->event->display_name }}</h5>
 								<h5>{{ $participant->ticket->name }}</h5>
-								<p>QR Codes Generating</p>
+								@if ($qr = $participant->getFirstMediaUrl('qr'))
+									{{-- White box so the code scans in dark mode too --}}
+									<div class="bg-white p-2 rounded d-inline-block mb-2">
+										<img class="img-fluid" src="{{ $qr }}" alt="Ticket QR code" width="200" height="200">
+									</div>
+								@else
+									<p class="text-body-secondary">Your QR code isn't ready yet. It will be on your ticket shortly.</p>
+								@endif
+								<div><a href="/account/tickets/{{ $participant->id }}" class="btn btn-primary btn-sm">View ticket</a></div>
 							</div>
 						</div>
 					</div>
