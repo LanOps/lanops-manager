@@ -23,7 +23,7 @@
         <env name="DB_DATABASE" force="true" value="lanops_test"/>
         <env name="DB_USERNAME" force="true" value="lanops"/>
         <env name="DB_PASSWORD" force="true" value="secret"/>
-        <env name="MAIL_DRIVER" value="array"/>
+        <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_DRIVER" value="sync"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

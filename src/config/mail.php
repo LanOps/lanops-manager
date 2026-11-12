@@ -4,108 +4,57 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Mail Driver
+    | Default Mailer
     |--------------------------------------------------------------------------
     |
-    | Laravel supports both SMTP and PHP's "mail" function as drivers for the
-    | sending of e-mail. You may specify which one you're using throughout
-    | your application here. By default, Laravel is setup for SMTP mail.
-    |
-    | Supported: "smtp", "mail", "sendmail", "mailgun", "mandrill", "ses", "log"
+    | "smtp" sends real email using the MAIL_HOST settings below. "log" only
+    | writes emails to the log, which is the default so a dev setup never
+    | sends anything by accident. Production needs MAIL_MAILER=smtp.
     |
     */
 
-    'driver' => env('MAIL_DRIVER', 'mail'),
+    'default' => env('MAIL_MAILER', 'log'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | SMTP Host Address
-    |--------------------------------------------------------------------------
-    |
-    | Here you may provide the host address of the SMTP server used by your
-    | applications. A default option is provided that is compatible with
-    | the Mailgun mail service which will provide reliable deliveries.
-    |
-    */
+    'mailers' => [
 
-    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
+        'smtp' => [
+            'transport' => 'smtp',
+            // "smtps" for implicit TLS (port 465). Leave empty on 587: STARTTLS is used automatically.
+            'scheme' => env('MAIL_SCHEME'),
+            'url' => env('MAIL_URL'),
+            'host' => env('MAIL_HOST', '127.0.0.1'),
+            'port' => env('MAIL_PORT', 587),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
+        ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | SMTP Host Port
-    |--------------------------------------------------------------------------
-    |
-    | This is the SMTP port used by your application to deliver e-mails to
-    | users of the application. Like the host we have set this value to
-    | stay compatible with the Mailgun e-mail application by default.
-    |
-    */
+        'sendmail' => [
+            'transport' => 'sendmail',
+            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+        ],
 
-    'port' => env('MAIL_PORT', 587),
+        'log' => [
+            'transport' => 'log',
+            'channel' => env('MAIL_LOG_CHANNEL'),
+        ],
+
+        'array' => [
+            'transport' => 'array',
+        ],
+
+    ],
 
     /*
     |--------------------------------------------------------------------------
     | Global "From" Address
     |--------------------------------------------------------------------------
-    |
-    | You may wish for all e-mails sent by your application to be sent from
-    | the same address. Here, you may specify a name and address that is
-    | used globally for all e-mails that are sent by your application.
-    |
     */
 
-    'from' => ['address' => env('APP_EMAIL', 'no-reply@localhost'), 'name' => null],
-
-    /*
-    |--------------------------------------------------------------------------
-    | E-Mail Encryption Protocol
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the encryption protocol that should be used when
-    | the application send e-mail messages. A sensible default using the
-    | transport layer security protocol should provide great security.
-    |
-    */
-
-    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | SMTP Server Username
-    |--------------------------------------------------------------------------
-    |
-    | If your SMTP server requires a username for authentication, you should
-    | set it here. This will get used to authenticate with your server on
-    | connection. You may also set the "password" value below this one.
-    |
-    */
-
-    'username' => env('MAIL_USERNAME'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | SMTP Server Password
-    |--------------------------------------------------------------------------
-    |
-    | Here you may set the password required by your SMTP server to send out
-    | messages from your application. This will be given to the server on
-    | connection so that the application will be able to send messages.
-    |
-    */
-
-    'password' => env('MAIL_PASSWORD'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Sendmail System Path
-    |--------------------------------------------------------------------------
-    |
-    | When using the "sendmail" driver to send e-mails, we will need to know
-    | the path to where Sendmail lives on this server. A default path has
-    | been provided here, which will work well on most of your systems.
-    |
-    */
-
-    'sendmail' => '/usr/sbin/sendmail -bs',
+    'from' => [
+        'address' => env('APP_EMAIL', 'no-reply@localhost'),
+        'name' => env('APP_NAME', 'LanOps'),
+    ],
 
 ];

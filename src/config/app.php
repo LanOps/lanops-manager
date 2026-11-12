@@ -32,7 +32,7 @@ return [
     'bsky_link'         => env('BSKY_LINK'),
 
     'currency'          => env('APP_CURRENCY', 'GBP'),
-    'currency_symbol'   => env('APP_CURRENCY', '£'),
+    'currency_symbol'   => env('APP_CURRENCY_SYMBOL', '£'),
 
     'discord_bot_url'   => env('DISCORD_BOT_URL', ''),
     'discord_bot_user' => env('DISCORD_BOT_USER', ''),

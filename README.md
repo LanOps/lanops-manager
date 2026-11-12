@@ -155,8 +155,10 @@ All settings go in `src/.env`. `src/.env.example` has a starting point for local
 | APP_TAGLINE                  | True     | Lans in South Yorkshire! |                                                                         |
 | APP_URL                      | True     | localhost               | Full URL including `https://`. Used in emails, QR codes and Steam login  |
 | APP_EMAIL                    | False    | no-reply@localhost      | From address on emails                                                   |
-| REFER_A_FRIEND_DISCOUNT      | False    | 10                      | Referral discount, in pounds                                             |
+| REFER_A_FRIEND_DISCOUNT      | False    | 10                      | Referral discount, in the site currency                                  |
 | CAPTCHA_DISABLE              | False    | false                   | Turns off the captcha on registration                                    |
+| APP_CURRENCY                 | False    | GBP                     | Currency code sent to Stripe                                             |
+| APP_CURRENCY_SYMBOL          | False    | £                       | Symbol shown next to prices                                              |
 
 ### Database
 
@@ -187,9 +189,12 @@ Used for password resets and email verification.
 |------------------------------|----------|-------------------------|--------------------------------------------------------------------------|
 | MAIL_MAILER                  | False    | log                     | Set to `smtp` to actually send email; `log` only writes it to the log    |
 | MAIL_HOST                    | False    | 127.0.0.1               |                                                                          |
-| MAIL_PORT                    | False    | 2525                    |                                                                          |
+| MAIL_PORT                    | False    | 587                     | STARTTLS is used automatically when the server offers it                 |
+| MAIL_SCHEME                  | False    |                         | Set to `smtps` for implicit TLS on port 465                              |
 | MAIL_USERNAME                | False    |                         |                                                                          |
 | MAIL_PASSWORD                | False    |                         |                                                                          |
+
+Emails are sent from `APP_EMAIL`, with `APP_NAME` as the sender name. The old `MAIL_DRIVER` and `MAIL_ENCRYPTION` settings are no longer read.
 
 ### Discord
 
