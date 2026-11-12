@@ -131,12 +131,8 @@ class PaymentsController extends Controller
             return Redirect::to('/payment/checkout');
         }
         
-        $offSitePaymentGateways = [
-            'paypal_express',
-        ];
-        // Check if the card details have been submitted but allow off site payment gateways to continue
-        if (!in_array($paymentGateway, $offSitePaymentGateways) &&
-            !isset($request->card_first_name) &&
+        // Check if the card details have been submitted
+        if (!isset($request->card_first_name) &&
             !isset($request->card_last_name) &&
             !isset($request->stripe_token)
         ) {
@@ -171,22 +167,6 @@ class PaymentsController extends Controller
                 );
                 $gateway = Omnipay::create('Stripe\PaymentIntents');
                 $gateway->setApiKey(config('laravel-omnipay.gateways.stripe.credentials.secret'));
-                break;
-            case 'paypal_express':
-                //Paypal Post Params
-                $params = array(
-                    'cancelUrl'     => $this->getCallbackCancelUrl($paymentGateway),
-                    'returnUrl'     => $this->getCallbackReturnUrl($paymentGateway),
-                    'name'          => config('app.name') . ' - Tickets Purchase',
-                    'description'   => 'Purchase for ' . config('app.name'),
-                    'amount'        => (float)Helpers::formatBasket($basket)->total,
-                    'quantity'      => (string)count($basket),
-                    'currency'      => config('app.currency'),
-                );
-                $gateway = Omnipay::create('PayPal_Express');
-                $gateway->setUsername(config('laravel-omnipay.gateways.paypal_express.credentials.username'));
-                $gateway->setPassword(config('laravel-omnipay.gateways.paypal_express.credentials.password'));
-                $gateway->setSignature(config('laravel-omnipay.gateways.paypal_express.credentials.signature'));
                 break;
         }
         Session::put('params', $params);
@@ -323,35 +303,6 @@ class PaymentsController extends Controller
                         'transaction_id'            => $response->getTransactionReference(),
                         'token'                     => $response->getPaymentIntentReference(),
                         'status'                    => 'Success',
-                        'basket'                    => $basket,
-                    ];
-                    $successful = true;
-                }
-                break;
-            case 'paypal_express':
-                $gateway = Omnipay::create('PayPal_Express');
-                $gateway->setUsername(config('laravel-omnipay.gateways.paypal_express.credentials.username'));
-                $gateway->setPassword(config('laravel-omnipay.gateways.paypal_express.credentials.password'));
-                $gateway->setSignature(config('laravel-omnipay.gateways.paypal_express.credentials.signature'));
-                $gateway->setTestMode($this->sandbox);
-                //Complete Purchase
-                $gateway->completePurchase($params)->send();
-                $response = $gateway->fetchCheckout($params)->send(); // this is the raw response object
-                $paypalResponse = $response->getData();
-                if (isset($paypalResponse['ACK'], $paypalResponse['TOKEN']) &&
-                    $paypalResponse['ACK'] === 'Success' &&
-                    isset($paypalResponse['PAYMENTREQUEST_0_TRANSACTIONID']) &&
-                    $this->paypalAmountMatches($paypalResponse, $params) &&
-                    !Purchase::where('token', $paypalResponse['TOKEN'])->exists()
-                ) {
-                    //Add Purchase to database
-                    $purchaseParams = [
-                        'user_id'                   => Auth::id(),
-                        'type'                      => 'PayPal Express',
-                        'transaction_id'            => $paypalResponse['PAYMENTREQUEST_0_TRANSACTIONID'],
-                        'token'                     => $paypalResponse['TOKEN'],
-                        'status'                    => $paypalResponse['ACK'],
-                        'paypal_email'              => $paypalResponse['EMAIL'],
                         'basket'                    => $basket,
                     ];
                     $successful = true;
@@ -503,19 +454,6 @@ class PaymentsController extends Controller
         return isset($paymentIntent['amount'], $paymentIntent['currency']) &&
             (int) $paymentIntent['amount'] === (int) round($params['amount'] * 100) &&
             strtolower($paymentIntent['currency']) === strtolower($params['currency']);
-    }
-
-    /**
-     * Check PayPal took the amount and currency this payment was started for
-     * @param  array $paypalResponse
-     * @param  array $params
-     * @return Boolean
-     */
-    private function paypalAmountMatches($paypalResponse, $params)
-    {
-        return isset($paypalResponse['PAYMENTREQUEST_0_AMT'], $paypalResponse['PAYMENTREQUEST_0_CURRENCYCODE']) &&
-            (int) round($paypalResponse['PAYMENTREQUEST_0_AMT'] * 100) === (int) round($params['amount'] * 100) &&
-            strtolower($paypalResponse['PAYMENTREQUEST_0_CURRENCYCODE']) === strtolower($params['currency']);
     }
 
     public function applyDiscountCode(Request $request)

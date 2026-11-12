@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\EventParticipant;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Tests\TestCase;
 
 class TicketQrCodeTest extends TestCase
@@ -39,7 +38,6 @@ class TicketQrCodeTest extends TestCase
 
     public function testRegeneratingReplacesTheOldQrCode(): void
     {
-        QrCode::shouldReceive('format->size->generate')->andReturn('new-qr');
         $ticket = $this->createEventWithTicket();
         $participant = new EventParticipant();
         $participant->forceFill([
@@ -54,6 +52,9 @@ class TicketQrCodeTest extends TestCase
         $media = $participant->fresh()->getMedia('qr');
         $this->assertCount(1, $media);
         $this->assertNotSame('oldqr.png', $media->first()->file_name);
+        // A real 300px PNG, the size ticket scanners were used to
+        $size = getimagesize($media->first()->getPath());
+        $this->assertSame([300, 300, 'image/png'], [$size[0], $size[1], $size['mime']]);
     }
 
     public function testTicketUrlUsesARandomTokenNotTheId(): void

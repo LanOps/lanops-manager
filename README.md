@@ -79,9 +79,6 @@ To run them locally you need a MariaDB database called `lanops_test` that the us
 | DB_HOST                      | True     |                  |                                                                                     |
 | DB_CONNECTION                | False    | mysql            |                                                                                     |
 | DB_PORT                      | False    | 3306             |                                                                                     |
-| PAYPAL_USERNAME              | False    |                  |                                                                                     |
-| PAYPAL_PASSWORD              | False    |                  |                                                                                     |
-| PAYPAL_SIGNATURE             | False    |                  |                                                                                     |
 | STRIPE_SECRET_KEY            | False    |                  |                                                                                     |
 | STRIPE_PUBLIC_KEY            | False    |                  |                                                                                     |
 | STEAM_API_KEY                | False    |                  | Used for Steam Login                                                                |
