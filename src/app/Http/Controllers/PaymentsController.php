@@ -18,12 +18,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Session;
 
-use Omnipay\Omnipay as Omnipay;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\CardException;
+use Stripe\PaymentIntent;
+use Stripe\StripeClient;
 
 class PaymentsController extends Controller
 {
-    protected $sandbox = false;
-
     /**
      * Checkout Page
      * @return View
@@ -35,7 +36,7 @@ class PaymentsController extends Controller
         }
         return view('payments.checkout')
             ->withBasket(Helpers::formatBasket(Session::get(config('app.basket_name'))))
-            ->withActivePaymentGateways(config('laravel-omnipay.gateways.available_payment_gateways'))
+            ->withActivePaymentGateways(config('payments.available_gateways'))
         ;
     }
 
@@ -139,90 +140,69 @@ class PaymentsController extends Controller
             return Redirect::to('/payment/details/' . $paymentGateway);
         }
 
-        $processPaymentSkip = false;
-
-        switch ($paymentGateway) {
-            case 'stripe':
-                // Stripe Post Params
-                $rules = [
-                    'card_first_name'   => 'required',
-                    'card_last_name'    => 'required',
-                    'stripe_token'      => 'required|filled',
-                ];
-                $messages = [
-                    'card_first_name.required'      => 'Card First Name is Required',
-                    'card_last_name.required'       => 'Card Last Name is Required',
-                    'stripe_token.required'         => 'Stripe Token is Required',
-                    'stripe_token.filled'           => 'Stripe Token cannot be empty',
-                ];
-                $this->validate($request, $rules, $messages);
-                $params = array(
-                    'cancelUrl'     => $this->getCallbackCancelUrl($paymentGateway),
-                    'returnUrl'     => $this->getCallbackReturnUrl($paymentGateway),
-                    'amount'        => (float)Helpers::formatBasket($basket)->total,
-                    'description'   => 'Purchase for ' . config('app.name'),
-                    'currency'      => config('app.currency'),
-                    'paymentMethod' => $request->stripe_token,
-                    'confirm'       => true,
-                );
-                $gateway = Omnipay::create('Stripe\PaymentIntents');
-                $gateway->setApiKey(config('laravel-omnipay.gateways.stripe.credentials.secret'));
-                break;
-        }
+        // Stripe Post Params
+        $rules = [
+            'card_first_name'   => 'required',
+            'card_last_name'    => 'required',
+            'stripe_token'      => 'required|filled',
+        ];
+        $messages = [
+            'card_first_name.required'      => 'Card First Name is Required',
+            'card_last_name.required'       => 'Card Last Name is Required',
+            'stripe_token.required'         => 'Stripe Token is Required',
+            'stripe_token.filled'           => 'Stripe Token cannot be empty',
+        ];
+        $this->validate($request, $rules, $messages);
+        // Kept in the session: the 3D Secure return checks Stripe charged this amount
+        $params = [
+            'amount'   => (float) Helpers::formatBasket($basket)->total,
+            'currency' => config('app.currency'),
+        ];
         Session::put('params', $params);
         // Tickets are issued from this copy of the basket, so changing the
         // basket in another tab during 3D Secure changes nothing
         Session::put('payment_basket', $basket);
         Session::forget('payment_intent');
         Session::save();
-        if (!$processPaymentSkip) {
-            if (config('app.debug')) {
-                $this->sandbox = true;
-            }
-            $gateway->setTestMode($this->sandbox);
 
-            // Send Payment
-            try {
-                $response = $gateway->purchase($params)->send();
-            } catch (\Exception $e) {
-                Session::flash('alert-danger', $e->getMessage());
-                return Redirect::back();
-            }
+        // Charge the card: create the PaymentIntent and confirm it in one call
+        try {
+            $paymentIntent = app(StripeClient::class)->paymentIntents->create([
+                'amount'               => (int) round($params['amount'] * 100),
+                'currency'             => strtolower($params['currency']),
+                'payment_method'       => $request->stripe_token,
+                'payment_method_types' => ['card'],
+                'confirm'              => true,
+                'description'          => 'Purchase for ' . config('app.name'),
+                'return_url'           => $this->getCallbackReturnUrl($paymentGateway),
+                'metadata'             => ['user_id' => Auth::id()],
+            ]);
+        } catch (CardException $e) {
+            // Declined: Stripe answers with an error rather than a failed PaymentIntent
+            Session::flash('alert-danger', 'Payment was UNSUCCESSFUL! - Please try again. ' . $e->getMessage());
+            return Redirect::to('/payment/failed');
+        } catch (ApiErrorException $e) {
+            Session::flash('alert-danger', $e->getMessage());
+            return Redirect::back();
         }
 
-        if ($response->isSuccessful()) {
-            // Payment was successful (purchase was sent with confirm): update database
-            $purchaseParams = [
-                'user_id'                   => Auth::id(),
-                'type'                      => 'Stripe',
-                'transaction_id'            => $response->getTransactionReference(),
-                'token'                     => $response->getPaymentIntentReference(),
-                'status'                    => 'Success',
-                'basket'                    => $basket,
-            ];
-            $purchase = Purchase::create($purchaseParams);
+        if ($paymentIntent->status === PaymentIntent::STATUS_SUCCEEDED) {
+            $purchase = Purchase::create($this->stripePurchaseParams($paymentIntent, $basket));
             $this->processBasket($basket, $purchase->id);
             return Redirect::to('/payment/successful/' . $purchase->id);
-        } elseif ($response->isRedirect()) {
-            // Payment Requires redirect; only this payment may complete on return
-            if ($paymentGateway == 'stripe') {
-                Session::put('payment_intent', $response->getPaymentIntentReference());
-                Session::save();
-            }
-            try {
-                $response->redirect();
-            } catch (\Exception $e) {
-                Session::flash('alert-danger', $e->getMessage());
-                return Redirect::back();
-            }
+        }
+        if ($paymentIntent->status === PaymentIntent::STATUS_REQUIRES_ACTION &&
+            ($paymentIntent->next_action->type ?? null) === 'redirect_to_url'
+        ) {
+            // 3D Secure: off to the bank; only this payment may complete on return
+            Session::put('payment_intent', $paymentIntent->id);
+            Session::save();
+            return Redirect::away($paymentIntent->next_action->redirect_to_url->url);
         }
 
         //Failed transaction
-        $message = '';
-        if (!$processPaymentSkip) {
-            $message = $response->getMessage();
-        }
-        Session::flash('alert-danger', 'Payment was UNSUCCESSFUL! - Please try again.' . $message);
+        $message = $paymentIntent->last_payment_error->message ?? '';
+        Session::flash('alert-danger', 'Payment was UNSUCCESSFUL! - Please try again. ' . $message);
         return Redirect::to('/payment/failed');
     }
 
@@ -246,9 +226,6 @@ class PaymentsController extends Controller
         }
         $params = Session::get('params');
         $basket = Session::get('payment_basket');
-        if (config('app.debug')) {
-            $this->sandbox = true;
-        }
         // The same return can arrive several times at once (double click, reload,
         // or on purpose). Lock the buyer's row so only one request at a time can
         // check, confirm and record the payment; the rest then see it recorded.
@@ -276,43 +253,52 @@ class PaymentsController extends Controller
      */
     private function recordCallbackPayment(Request $request, $paymentGateway, $params, $basket)
     {
-        $successful = false;
-        switch ($paymentGateway) {
-            case 'stripe':
-                $paymentIntent = $request->get('payment_intent');
-                if (!$paymentIntent ||
-                    $paymentIntent !== Session::get('payment_intent') ||
-                    Purchase::where('token', $paymentIntent)->exists()
-                ) {
-                    break;
-                }
-                $gateway = Omnipay::create('Stripe\PaymentIntents');
-                $gateway->setApiKey(config('laravel-omnipay.gateways.stripe.credentials.secret'));
-
-                //Complete Purchase
-                $response = $gateway->confirm([
-                    'paymentIntentReference' => $paymentIntent,
-                    'returnUrl'     => $this->getCallbackReturnUrl($paymentGateway),
-                ])->send();
-
-                if ($response->isSuccessful() && $this->chargedAmountMatches($response->getData(), $params)) {
-                    //Add Purchase to database
-                    $purchaseParams = [
-                        'user_id'                   => Auth::id(),
-                        'type'                      => 'Stripe',
-                        'transaction_id'            => $response->getTransactionReference(),
-                        'token'                     => $response->getPaymentIntentReference(),
-                        'status'                    => 'Success',
-                        'basket'                    => $basket,
-                    ];
-                    $successful = true;
-                }
-                break;
-        }
-        if (!$successful) {
+        $paymentIntentId = $request->get('payment_intent');
+        if ($paymentGateway !== 'stripe' ||
+            !$paymentIntentId ||
+            $paymentIntentId !== Session::get('payment_intent') ||
+            Purchase::where('token', $paymentIntentId)->exists()
+        ) {
             return null;
         }
-        return Purchase::create($purchaseParams);
+        try {
+            $stripe = app(StripeClient::class);
+            $paymentIntent = $stripe->paymentIntents->retrieve($paymentIntentId);
+            // Payments started before the move off Omnipay used manual confirmation,
+            // so after 3D Secure they still need confirming here
+            if ($paymentIntent->status === PaymentIntent::STATUS_REQUIRES_CONFIRMATION) {
+                $paymentIntent = $stripe->paymentIntents->confirm($paymentIntentId, [
+                    'return_url' => $this->getCallbackReturnUrl($paymentGateway),
+                ]);
+            }
+        } catch (ApiErrorException $e) {
+            return null;
+        }
+        if ($paymentIntent->status !== PaymentIntent::STATUS_SUCCEEDED ||
+            !$this->chargedAmountMatches($paymentIntent, $params)
+        ) {
+            return null;
+        }
+        return Purchase::create($this->stripePurchaseParams($paymentIntent, $basket));
+    }
+
+    /**
+     * Purchase record for a successful Stripe PaymentIntent
+     * @param  PaymentIntent $paymentIntent
+     * @param  array $basket
+     * @return array
+     */
+    private function stripePurchaseParams(PaymentIntent $paymentIntent, $basket)
+    {
+        $charge = $paymentIntent->latest_charge;
+        return [
+            'user_id'        => Auth::id(),
+            'type'           => 'Stripe',
+            'transaction_id' => is_string($charge) ? $charge : ($charge->id ?? $paymentIntent->id),
+            'token'          => $paymentIntent->id,
+            'status'         => 'Success',
+            'basket'         => $basket,
+        ];
     }
 
     /**
@@ -404,7 +390,7 @@ class PaymentsController extends Controller
      */
     private function checkParams($paymentGateway, $basket)
     {
-        $acceptedPaymentGateways = config('laravel-omnipay.gateways.available_payment_gateways') ?: [];
+        $acceptedPaymentGateways = config('payments.available_gateways') ?: [];
         if (in_array(strtolower($paymentGateway), $acceptedPaymentGateways)) {
             $paymentGateway = strtolower($paymentGateway);
         } else {
@@ -434,26 +420,16 @@ class PaymentsController extends Controller
     }
 
     /**
-     * Get Callback Cancel Url
-     * @param  $paymentGateway
-     * @return String
-     */
-    private function getCallbackCancelUrl($paymentGateway)
-    {
-        return rtrim(config('app.url'), '/') . '/payment/callback?gate=' . $paymentGateway . '&type=cancel';
-    }
-
-    /**
      * Check Stripe charged the amount and currency this payment was started for
-     * @param  array $paymentIntent
+     * @param  PaymentIntent $paymentIntent
      * @param  array $params
      * @return Boolean
      */
     private function chargedAmountMatches($paymentIntent, $params)
     {
-        return isset($paymentIntent['amount'], $paymentIntent['currency']) &&
-            (int) $paymentIntent['amount'] === (int) round($params['amount'] * 100) &&
-            strtolower($paymentIntent['currency']) === strtolower($params['currency']);
+        return isset($paymentIntent->amount, $paymentIntent->currency) &&
+            (int) $paymentIntent->amount === (int) round($params['amount'] * 100) &&
+            strtolower($paymentIntent->currency) === strtolower($params['currency']);
     }
 
     public function applyDiscountCode(Request $request)

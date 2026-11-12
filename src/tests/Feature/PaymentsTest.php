@@ -6,17 +6,12 @@ use App\Models\EventParticipant;
 use App\Models\EventTicket;
 use App\Models\Purchase;
 use Illuminate\Support\Facades\DB;
-use Mockery;
-use Omnipay\Common\GatewayFactory;
-use Omnipay\Common\GatewayInterface;
-use Omnipay\Common\Message\RedirectResponseInterface;
-use Omnipay\Common\Message\RequestInterface;
-use Omnipay\Common\Message\ResponseInterface;
-use Omnipay\Omnipay;
+use Stripe\ApiRequestor;
+use Tests\Support\FakeStripeApi;
 use Tests\TestCase;
 
 /**
- * The Stripe checkout path. The gateway is mocked: everything after the
+ * The Stripe checkout path. Stripe's API is faked: everything after the
  * charge (purchase, participants, QR code) runs for real, because a failure
  * there means a customer is charged without getting a ticket.
  */
@@ -24,49 +19,36 @@ class PaymentsTest extends TestCase
 {
     protected function tearDown(): void
     {
-        Omnipay::setFactory(null);
+        ApiRequestor::setHttpClient(null);
 
         parent::tearDown();
     }
 
     /**
-     * Swap Omnipay's gateway factory for one that returns the given gateway.
+     * Answer Stripe API calls from the test instead of api.stripe.com.
+     * A call the test did not set up fails the request.
      */
-    protected function fakeGateway(GatewayInterface $gateway): void
+    protected function fakeStripe(): FakeStripeApi
     {
-        $factory = Mockery::mock(GatewayFactory::class);
-        $factory->shouldReceive('create')->with('Stripe\PaymentIntents')->andReturn($gateway);
-        Omnipay::setFactory($factory);
+        $stripe = new FakeStripeApi();
+        ApiRequestor::setHttpClient($stripe);
+
+        return $stripe;
     }
 
-    protected function stripeResponse(bool $successful, bool $redirect = false, string $message = '', array $data = [], string $intent = 'pi_test_123'): ResponseInterface
+    /**
+     * A PaymentIntent as Stripe returns it
+     */
+    protected function paymentIntent(string $status, float $amount, string $id = 'pi_test_123', array $extra = []): array
     {
-        $response = Mockery::mock($redirect ? RedirectResponseInterface::class : ResponseInterface::class);
-        $response->shouldReceive('isSuccessful')->andReturn($successful);
-        $response->shouldReceive('isRedirect')->andReturn($redirect);
-        $response->shouldReceive('getMessage')->andReturn($message);
-        $response->shouldReceive('getTransactionReference')->andReturn('ch_test_123');
-        $response->shouldReceive('getPaymentIntentReference')->andReturn($intent);
-        $response->shouldReceive('getData')->andReturn($data);
-
-        return $response;
-    }
-
-    protected function sends(ResponseInterface $response): RequestInterface
-    {
-        $request = Mockery::mock(RequestInterface::class);
-        $request->shouldReceive('send')->andReturn($response);
-
-        return $request;
-    }
-
-    protected function stripeGateway(): Mockery\MockInterface
-    {
-        $gateway = Mockery::mock(GatewayInterface::class);
-        $gateway->shouldReceive('setApiKey')->with('sk_test_dummy');
-        $gateway->shouldReceive('setTestMode');
-
-        return $gateway;
+        return array_merge([
+            'id'            => $id,
+            'object'        => 'payment_intent',
+            'status'        => $status,
+            'amount'        => (int) round($amount * 100),
+            'currency'      => 'gbp',
+            'latest_charge' => 'ch_test_123',
+        ], $extra);
     }
 
     protected function cardDetails(): array
@@ -115,20 +97,22 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldReceive('purchase')->once()
-            ->with(Mockery::on(fn ($params) => $params['amount'] == 60.0
-                && $params['currency'] == config('app.currency')
-                && $params['paymentMethod'] == 'pm_card_visa'
-                && $params['confirm'] === true))
-            ->andReturn($this->sends($this->stripeResponse(true)));
-        // purchase is sent with confirm, so a second confirm is not needed
-        $gateway->shouldNotReceive('confirm');
-        $this->fakeGateway($gateway);
+        $stripe = $this->fakeStripe()->respond('POST', '/v1/payment_intents', $this->paymentIntent('succeeded', 60));
 
         $response = $this->actingAs($user)
             ->withSession($this->basketFor($ticket, 2) + $this->termsAccepted())
             ->post('/payment/post', $this->cardDetails());
+
+        // One call creates and confirms the payment, with the card from Stripe.js
+        $sent = $stripe->sent('POST', '/v1/payment_intents');
+        $this->assertCount(1, $sent);
+        $this->assertSame(6000, $sent[0]['params']['amount']);
+        $this->assertSame(strtolower(config('app.currency')), $sent[0]['params']['currency']);
+        $this->assertSame('pm_card_visa', $sent[0]['params']['payment_method']);
+        $this->assertSame('true', $sent[0]['params']['confirm']);
+        $this->assertStringEndsWith('/payment/callback?gate=stripe&type=return', $sent[0]['params']['return_url']);
+        $this->assertSame($user->id, $sent[0]['params']['metadata']['user_id']);
+        $this->assertCount(1, $stripe->requests);
 
         $purchase = Purchase::first();
         $this->assertNotNull($purchase, 'No purchase was recorded for a successful charge');
@@ -159,9 +143,8 @@ class PaymentsTest extends TestCase
     {
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
-        $gateway = $this->stripeGateway();
-        $gateway->shouldNotReceive('purchase');
-        $this->fakeGateway($gateway);
+        // Any call to Stripe fails the test
+        $stripe = $this->fakeStripe();
         // An admin unpublishes the event while the buyer is on the card page
         \App\Models\Event::withoutGlobalScopes()->whereKey($ticket->event_id)->update(['status' => 'DRAFT']);
 
@@ -178,16 +161,18 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket();
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldReceive('purchase')->once()
-            ->andReturn($this->sends($this->stripeResponse(false, false, 'Your card was declined.')));
-        $gateway->shouldNotReceive('confirm');
-        $this->fakeGateway($gateway);
+        // Stripe answers a declined card with a card_error
+        $this->fakeStripe()->respond('POST', '/v1/payment_intents', ['error' => [
+            'type'    => 'card_error',
+            'code'    => 'card_declined',
+            'message' => 'Your card was declined.',
+        ]], 402);
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket) + $this->termsAccepted())
             ->post('/payment/post', $this->cardDetails())
-            ->assertRedirect('/payment/failed');
+            ->assertRedirect('/payment/failed')
+            ->assertSessionHas('alert-danger', 'Payment was UNSUCCESSFUL! - Please try again. Your card was declined.');
 
         $this->assertSame(0, Purchase::count());
         $this->assertSame(0, EventParticipant::count());
@@ -198,9 +183,10 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket();
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldReceive('purchase')->andThrow(new \RuntimeException('Stripe is down'));
-        $this->fakeGateway($gateway);
+        $this->fakeStripe()->respond('POST', '/v1/payment_intents', ['error' => [
+            'type'    => 'api_error',
+            'message' => 'Stripe is down',
+        ]], 400);
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket) + $this->termsAccepted())
@@ -227,22 +213,11 @@ class PaymentsTest extends TestCase
     }
 
     /**
-     * A gateway whose confirm of the given payment intent charged this amount.
+     * Stripe after 3D Secure: the given PaymentIntent charged this amount.
      */
-    protected function confirmingGateway(string $intent, float $amount, bool $successful = true): Mockery\MockInterface
+    protected function stripeAfterThreeDSecure(string $intent, float $amount, string $status = 'succeeded'): FakeStripeApi
     {
-        $gateway = $this->stripeGateway();
-        $gateway->shouldReceive('confirm')->once()
-            ->with(Mockery::on(fn ($params) => $params['paymentIntentReference'] == $intent))
-            ->andReturn($this->sends($this->stripeResponse(
-                $successful,
-                false,
-                '',
-                ['amount' => (int) round($amount * 100), 'currency' => 'gbp'],
-                $intent
-            )));
-
-        return $gateway;
+        return $this->fakeStripe()->respond('GET', '/v1/payment_intents/' . $intent, $this->paymentIntent($status, $amount, $intent));
     }
 
     public function testThreeDSecureReturnCompletesThePurchase()
@@ -250,7 +225,7 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
 
-        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 30));
+        $this->stripeAfterThreeDSecure('pi_3ds_123', 30);
 
         $this->actingAs($user)
             ->withSession($this->awaitingThreeDSecure($ticket))
@@ -260,11 +235,62 @@ class PaymentsTest extends TestCase
         $this->assertSame(1, EventParticipant::count());
     }
 
+    public function testThreeDSecureReturnConfirmsAPaymentStartedBeforeTheUpdate()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket([], ['price' => 30]);
+        // Omnipay made PaymentIntents with manual confirmation, so one that was
+        // at 3D Secure during the deploy comes back needing a confirm
+        $stripe = $this->stripeAfterThreeDSecure('pi_3ds_123', 30, 'requires_confirmation')
+            ->respond('POST', '/v1/payment_intents/pi_3ds_123/confirm', $this->paymentIntent('succeeded', 30, 'pi_3ds_123'));
+
+        $this->actingAs($user)
+            ->withSession($this->awaitingThreeDSecure($ticket))
+            ->get('/payment/callback?gate=stripe&type=return&payment_intent=pi_3ds_123')
+            ->assertRedirect('/payment/successful/' . Purchase::firstOrFail()->id);
+
+        $this->assertCount(1, $stripe->sent('POST', '/v1/payment_intents/pi_3ds_123/confirm'));
+        $this->assertSame(1, EventParticipant::count());
+    }
+
+    public function testFailedThreeDSecureRecordsNothing()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket([], ['price' => 30]);
+        // The bank turned the payment down, so Stripe wants another card
+        $this->stripeAfterThreeDSecure('pi_3ds_123', 30, 'requires_payment_method');
+
+        $this->actingAs($user)
+            ->withSession($this->awaitingThreeDSecure($ticket))
+            ->get('/payment/callback?gate=stripe&type=return&payment_intent=pi_3ds_123')
+            ->assertRedirect('/payment/failed');
+
+        $this->assertSame(0, Purchase::count());
+        $this->assertSame(0, EventParticipant::count());
+    }
+
+    public function testPaymentIntentThatDidNotSucceedRecordsNothing()
+    {
+        $user = $this->createUser();
+        $ticket = $this->createEventWithTicket();
+        $this->fakeStripe()->respond('POST', '/v1/payment_intents', $this->paymentIntent('requires_payment_method', 30, 'pi_test_123', [
+            'last_payment_error' => ['type' => 'card_error', 'message' => 'Your card has insufficient funds.'],
+        ]));
+
+        $this->actingAs($user)
+            ->withSession($this->basketFor($ticket) + $this->termsAccepted())
+            ->post('/payment/post', $this->cardDetails())
+            ->assertRedirect('/payment/failed')
+            ->assertSessionHas('alert-danger', 'Payment was UNSUCCESSFUL! - Please try again. Your card has insufficient funds.');
+
+        $this->assertSame(0, Purchase::count());
+    }
+
     public function testThreeDSecureReturnStillIssuesTicketsIfTheEventWasHidden()
     {
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
-        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 30));
+        $this->stripeAfterThreeDSecure('pi_3ds_123', 30);
         // The card has been charged by the time the buyer comes back from 3D Secure
         \App\Models\Event::withoutGlobalScopes()->whereKey($ticket->event_id)->update(['status' => 'DRAFT']);
 
@@ -280,15 +306,17 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket();
 
-        $response = $this->stripeResponse(false, true);
-        $response->shouldReceive('redirect');
-        $gateway = $this->stripeGateway();
-        $gateway->shouldReceive('purchase')->once()->andReturn($this->sends($response));
-        $this->fakeGateway($gateway);
+        $this->fakeStripe()->respond('POST', '/v1/payment_intents', $this->paymentIntent('requires_action', 60, 'pi_test_123', [
+            'next_action' => [
+                'type'            => 'redirect_to_url',
+                'redirect_to_url' => ['url' => 'https://hooks.stripe.com/3d_secure/test', 'return_url' => 'https://localhost'],
+            ],
+        ]));
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket, 2) + $this->termsAccepted())
             ->post('/payment/post', $this->cardDetails())
+            ->assertRedirect('https://hooks.stripe.com/3d_secure/test')
             ->assertSessionHas('payment_intent', 'pi_test_123')
             ->assertSessionHas('payment_basket.tickets', [$ticket->id => 2]);
 
@@ -300,7 +328,7 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
 
-        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 30));
+        $this->stripeAfterThreeDSecure('pi_3ds_123', 30);
 
         // Paid for 1, then raised the basket to 2 in another tab
         $session = array_merge($this->awaitingThreeDSecure($ticket, 1), $this->basketFor($ticket, 2));
@@ -318,9 +346,8 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket();
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldNotReceive('confirm');
-        $this->fakeGateway($gateway);
+        // Any call to Stripe fails the test
+        $stripe = $this->fakeStripe();
 
         $this->actingAs($user)
             ->withSession($this->awaitingThreeDSecure($ticket))
@@ -335,9 +362,8 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket();
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldNotReceive('confirm');
-        $this->fakeGateway($gateway);
+        // Any call to Stripe fails the test
+        $stripe = $this->fakeStripe();
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket) + ['params' => ['amount' => 30.0, 'currency' => 'GBP']])
@@ -352,7 +378,7 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
 
-        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 5));
+        $this->stripeAfterThreeDSecure('pi_3ds_123', 5);
 
         $this->actingAs($user)
             ->withSession($this->awaitingThreeDSecure($ticket))
@@ -368,7 +394,7 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
 
-        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 30));
+        $this->stripeAfterThreeDSecure('pi_3ds_123', 30);
         $session = $this->awaitingThreeDSecure($ticket);
 
         $this->actingAs($user)->withSession($session)
@@ -386,7 +412,7 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket([], ['price' => 30]);
 
-        $this->fakeGateway($this->confirmingGateway('pi_3ds_123', 30));
+        $this->stripeAfterThreeDSecure('pi_3ds_123', 30);
 
         $queries = [];
         DB::listen(function ($query) use (&$queries) {
@@ -474,9 +500,8 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket(['capacity' => 0]);
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldNotReceive('purchase');
-        $this->fakeGateway($gateway);
+        // Any call to Stripe fails the test
+        $stripe = $this->fakeStripe();
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket) + $this->termsAccepted())
@@ -498,9 +523,8 @@ class PaymentsTest extends TestCase
             'ticket_id' => $ticket->id,
         ]);
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldNotReceive('purchase');
-        $this->fakeGateway($gateway);
+        // Any call to Stripe fails the test
+        $stripe = $this->fakeStripe();
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket) + $this->termsAccepted())
@@ -517,9 +541,8 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket(['capacity' => 1]);
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldNotReceive('purchase');
-        $this->fakeGateway($gateway);
+        // Any call to Stripe fails the test
+        $stripe = $this->fakeStripe();
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket, 2) + $this->termsAccepted())
@@ -594,9 +617,8 @@ class PaymentsTest extends TestCase
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket();
 
-        $gateway = $this->stripeGateway();
-        $gateway->shouldNotReceive('purchase');
-        $this->fakeGateway($gateway);
+        // Any call to Stripe fails the test
+        $stripe = $this->fakeStripe();
 
         $this->actingAs($user)
             ->withSession($this->basketFor($ticket))

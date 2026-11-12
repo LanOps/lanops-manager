@@ -28,12 +28,12 @@ class AppServiceProvider extends ServiceProvider
 
         // Read the keys through config, so this still works once config is cached
         $availablePaymentGateways = [];
-        if (config('laravel-omnipay.gateways.stripe.credentials.secret') != '' &&
-            config('laravel-omnipay.gateways.stripe.credentials.public') != ''
+        if (config('services.stripe.secret') != '' &&
+            config('services.stripe.key') != ''
         ) {
             $availablePaymentGateways[] = 'stripe';
         }
-        \Config::set('laravel-omnipay.gateways.available_payment_gateways', $availablePaymentGateways);
+        \Config::set('payments.available_gateways', $availablePaymentGateways);
 
         seo()
             ->site(config('app.name'))
@@ -54,6 +54,12 @@ class AppServiceProvider extends ServiceProvider
     {
         // html() escapes textarea contents, as laravelcollective/html did
         $this->app->singleton(\Spatie\Html\Html::class, \App\Libraries\Html::class);
+
+        // Stripe's API client, with the secret key from config (read when first used)
+        $this->app->bind(\Stripe\StripeClient::class, fn () => new \Stripe\StripeClient([
+            'api_key'            => config('services.stripe.secret'),
+            'max_network_retries' => 2,
+        ]));
 
         // debugbar is a dev dependency, so it is not installed in the production image
         if (config('app.debug') === true && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {

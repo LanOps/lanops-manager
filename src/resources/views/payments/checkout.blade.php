@@ -63,16 +63,16 @@
 							<div class="col-12 col-md-6">
 								<div class="section-header">
 									<h4>
-										{{ config('laravel-omnipay.gateways.'.$gateway.'.options.displayName') }}
+										{{ config('payments.gateways.'.$gateway.'.displayName') }}
 									</h4>
 									<hr>
 								</div>
 								<a href="/payment/review/{{ $gateway }}">
 									<button type="button" class="btn btn-primary w-100">
-										Pay by {{ config('laravel-omnipay.gateways.'.$gateway.'.options.displayName') }}
+										Pay by {{ config('payments.gateways.'.$gateway.'.displayName') }}
 									</button>
 								</a>
-								<p><small>{{ config('laravel-omnipay.gateways.'.$gateway.'.options.note') }}</small></p>
+								<p><small>{{ config('payments.gateways.'.$gateway.'.note') }}</small></p>
 							</div>
 						@endforeach
 					</div>
