@@ -22,7 +22,7 @@ steps:
 # ── Lint & Test ────────────────────────────────────────────────────────────────
 
   - name: discord-lint-start
-    image: curlimages/curl:8.7.1
+    image: curlimages/curl:8.23.0
     failure: ignore
     environment:
       DISCORD_WEBHOOK_URL:
@@ -58,7 +58,7 @@ steps:
       - vendor/bin/phpunit
 
   - name: discord-lint-success
-    image: curlimages/curl:8.7.1
+    image: curlimages/curl:8.23.0
     depends_on:
       - lint
       - test
@@ -74,7 +74,7 @@ steps:
         - success
 
   - name: discord-lint-failure
-    image: curlimages/curl:8.7.1
+    image: curlimages/curl:8.23.0
     depends_on:
       - lint
       - test
@@ -94,7 +94,7 @@ steps:
 # ref (not branch) is used because Drone sets DRONE_BRANCH to the target branch on pull_request builds.
 
   - name: discord-build-start
-    image: curlimages/curl:8.7.1
+    image: curlimages/curl:8.23.0
     depends_on:
       - lint
       - test
@@ -212,7 +212,7 @@ steps:
         - tag
 
   - name: discord-build-success
-    image: curlimages/curl:8.7.1
+    image: curlimages/curl:8.23.0
     depends_on:
       - build-push-nginx
       - build-push-app
@@ -236,7 +236,7 @@ steps:
         - success
 
   - name: discord-build-failure
-    image: curlimages/curl:8.7.1
+    image: curlimages/curl:8.23.0
     depends_on:
       - build-push-nginx
       - build-push-app

@@ -210,14 +210,59 @@ class AuthTest extends TestCase
         // The provider is built per request, so hand it the fake HTTP handler through config
         config(['services.steam.guzzle' => ['handler' => $handler]]);
 
-        $this->get(self::STEAM_RETURN . '&openid.claimed_id='
-            . urlencode('https://steamcommunity.com/openid/id/76561198000000005'))
-            ->assertRedirect('/');
+        $this->get($this->steamAssertion('76561198000000005'))->assertRedirect('/');
 
         $this->assertAuthenticatedAs($user);
         $this->assertSame('https://avatars.example/full.jpg', $user->fresh()->avatar);
         $this->assertSame('https://steamcommunity.com/openid/login', (string) $history[0]['request']->getUri());
         $this->assertStringContainsString('steamids=76561198000000005', (string) $history[1]['request']->getUri());
+    }
+
+    public function testSteamLoginRejectsAReplayedOpenIdResponse()
+    {
+        $user = $this->createUser(['steamid' => '76561198000000006']);
+        config(['services.steam.client_secret' => 'test-steam-key']);
+        $handler = HandlerStack::create(new MockHandler([
+            new Response(200, [], "ns:http://specs.openid.net/auth/2.0\nis_valid:true\n"),
+            new Response(200, [], json_encode(['response' => ['players' => [[
+                'steamid'    => '76561198000000006',
+                'avatarfull' => 'https://avatars.example/full.jpg',
+            ]]]])),
+        ]));
+        config(['services.steam.guzzle' => ['handler' => $handler]]);
+
+        $url = $this->steamAssertion('76561198000000006');
+        $this->get($url)->assertRedirect('/');
+        $this->assertAuthenticatedAs($user);
+
+        // Someone who captured the same Steam response can't use it to log in again
+        auth()->logout();
+        $this->get($url)
+            ->assertRedirect('/login')
+            ->assertSessionHas('alert-danger', 'Steam login failed. Please try again.');
+        $this->assertGuest();
+    }
+
+    /**
+     * A complete signed OpenID response from Steam, as the Steam provider checks it
+     * before asking Steam to confirm the signature.
+     */
+    protected function steamAssertion(string $steamId): string
+    {
+        $claimedId = 'https://steamcommunity.com/openid/id/' . $steamId;
+
+        return '/login/steam?' . http_build_query([
+            'openid.ns'             => 'http://specs.openid.net/auth/2.0',
+            'openid.mode'           => 'id_res',
+            'openid.op_endpoint'    => 'https://steamcommunity.com/openid/login',
+            'openid.claimed_id'     => $claimedId,
+            'openid.identity'       => $claimedId,
+            'openid.return_to'      => 'https://localhost/login/steam',
+            'openid.response_nonce' => gmdate('Y-m-d\\TH:i:s\\Z') . bin2hex(random_bytes(4)),
+            'openid.assoc_handle'   => '1234567890',
+            'openid.signed'         => 'signed,op_endpoint,claimed_id,identity,return_to,response_nonce,assoc_handle',
+            'openid.sig'            => 'sig',
+        ]);
     }
 
     public function testSteamLoginRejectsAFailedOpenIdCheck()
