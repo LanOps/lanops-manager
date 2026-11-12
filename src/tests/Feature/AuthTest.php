@@ -19,6 +19,7 @@ use Mews\Captcha\Facades\Captcha;
 use SocialiteProviders\Manager\OAuth2\User as SocialiteUser;
 use SocialiteProviders\Steam\OpenIDValidationException;
 use Tests\TestCase;
+use Illuminate\Support\Facades\URL;
 
 class AuthTest extends TestCase
 {
@@ -111,7 +112,7 @@ class AuthTest extends TestCase
     {
         $user = $this->createUser(['email_verified_at' => null]);
 
-        $url = \URL::temporarySignedRoute('verification.verify', now()->addMinutes(60), [
+        $url = URL::temporarySignedRoute('verification.verify', now()->addMinutes(60), [
             'id'   => $user->id,
             'hash' => sha1($user->getEmailForVerification()),
         ]);

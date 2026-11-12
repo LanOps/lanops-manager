@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\HidesFromNonAdmins;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Models\PollOption;
 
 use Illuminate\Database\Eloquent\Model;

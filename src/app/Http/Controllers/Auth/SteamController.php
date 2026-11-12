@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
-use Session;
+use Illuminate\Support\Facades\Session;
 
 use App\Models\User;
 

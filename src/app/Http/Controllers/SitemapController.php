@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class SitemapController extends Controller
 {
@@ -23,7 +24,7 @@ class SitemapController extends Controller
         $sitemap->add(url('info'), '2012-08-26T12:30:00+02:00', '0.9', 'monthly');
 
         // Only events anyone can open: not drafts, previews or Private events
-        $events = \DB::table('events')->where('status', 'PUBLISHED')->orderBy('start')->get();
+        $events = DB::table('events')->where('status', 'PUBLISHED')->orderBy('start')->get();
 
         $sitemap->setCache('laravel.sitemap', 30);
     
@@ -31,7 +32,7 @@ class SitemapController extends Controller
             $sitemap->add(url('/') . '/events/' . $event->slug, $event->updated_at, '1.0', 'daily');
         }
 
-        $newsPosts = \DB::table('news_feed')->orderBy('updated_at')->get();
+        $newsPosts = DB::table('news_feed')->orderBy('updated_at')->get();
     
         foreach ($newsPosts as $newsPost) {
             $sitemap->add(url('/') . '/news/' . $newsPost->slug, $newsPost->updated_at, '1.0', 'daily');

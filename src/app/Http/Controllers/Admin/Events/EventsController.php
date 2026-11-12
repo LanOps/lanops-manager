@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin\Events;
 
-use Auth;
-use Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 use App\Models\Event;
 use App\Models\EventTimetable;

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;

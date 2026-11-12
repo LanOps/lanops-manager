@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Helpers;
+use App\Libraries\Helpers;
 
 use App\Exceptions\RefundException;
 use App\Libraries\StripeRefunds;

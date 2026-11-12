@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Session;
+use Illuminate\Support\Facades\Session;
 
 use App\Models\Tournament;
 use App\Models\TournamentTeam;

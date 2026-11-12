@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Models\NewsCommentReport;
 
 use Illuminate\Database\Eloquent\Model;

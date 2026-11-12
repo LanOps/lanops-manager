@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Auth;
-use Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 use App\Models\NewsArticle;
 use App\Models\NewsComment;
