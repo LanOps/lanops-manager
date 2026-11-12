@@ -112,6 +112,8 @@ class PaymentsTest extends TestCase
         $this->assertSame('true', $sent[0]['params']['confirm']);
         $this->assertStringEndsWith('/payment/callback?gate=stripe&type=return', $sent[0]['params']['return_url']);
         $this->assertSame($user->id, $sent[0]['params']['metadata']['user_id']);
+        // Newer Stripe API versions reject payment_method_types (payment methods are set in the Dashboard)
+        $this->assertArrayNotHasKey('payment_method_types', $sent[0]['params']);
         $this->assertCount(1, $stripe->requests);
 
         $purchase = Purchase::first();
