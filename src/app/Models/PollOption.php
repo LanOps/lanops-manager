@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\PollOptionVote as Vote;
 

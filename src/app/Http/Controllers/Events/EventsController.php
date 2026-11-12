@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Events;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\Event;
 use App\Models\EventParticipant;

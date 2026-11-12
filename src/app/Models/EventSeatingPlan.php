@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Concerns\HidesFromNonAdmins;
 use App\Models\EventSeating;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;

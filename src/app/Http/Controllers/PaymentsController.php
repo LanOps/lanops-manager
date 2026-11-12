@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Helpers;
-use Auth;
+use App\Libraries\Helpers;
+use Illuminate\Support\Facades\Auth;
 
 use App\Models\User;
 use App\Models\Purchase;
@@ -54,7 +54,7 @@ class PaymentsController extends Controller
         $nextEventFlag = true;
         if (array_key_exists('tickets', $basket)) {
             $nextEvent = Event::where('end', '>=', \Carbon\Carbon::now())
-                ->orderBy(\DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
+                ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
                 ->first();
             foreach ($basket['tickets'] as $ticketId => $quantity) {
                 // Either can be missing (no upcoming event, or the ticket's event

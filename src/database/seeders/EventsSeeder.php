@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\DB;
 
 class EventsSeeder extends Seeder
 {
@@ -18,11 +19,11 @@ class EventsSeeder extends Seeder
         $faker = Faker::create();
 
         ## House Cleaning
-        \DB::table('events')->delete();
-        \DB::table('event_tickets')->delete();
-        \DB::table('event_timetables')->delete();
-        \DB::table('event_venues')->delete();
-        \DB::table('event_information')->delete();
+        DB::table('events')->delete();
+        DB::table('event_tickets')->delete();
+        DB::table('event_timetables')->delete();
+        DB::table('event_venues')->delete();
+        DB::table('event_information')->delete();
 
         ## Venue
         $venue = \App\Models\EventVenue::factory()->create();

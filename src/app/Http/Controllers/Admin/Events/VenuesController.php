@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Admin\Events;
 
-use Helpers;
+use App\Libraries\Helpers;
 
-use Session;
+use Illuminate\Support\Facades\Session;
 
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 

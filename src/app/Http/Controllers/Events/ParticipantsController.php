@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Events;
 
-use Auth;
-use DB;
-use Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use App\Models\EventParticipant;
 

@@ -5,8 +5,9 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Event;
+use Illuminate\Support\Facades\Config;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
         ) {
             $availablePaymentGateways[] = 'stripe';
         }
-        \Config::set('payments.available_gateways', $availablePaymentGateways);
+        Config::set('payments.available_gateways', $availablePaymentGateways);
 
         seo()
             ->site(config('app.name'))

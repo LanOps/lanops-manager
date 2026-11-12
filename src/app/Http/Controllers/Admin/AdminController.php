@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Auth;
-use Helpers;
+use Illuminate\Support\Facades\Auth;
+use App\Libraries\Helpers;
 use \Carbon\Carbon as Carbon;
 
 use App\Models\User;

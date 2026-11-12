@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Concerns\HidesFromNonAdmins;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;

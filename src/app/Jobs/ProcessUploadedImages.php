@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use Storage;
+use Illuminate\Support\Facades\Storage;
 use App\Models\GalleryAlbum;
 
 use Illuminate\Bus\Queueable;

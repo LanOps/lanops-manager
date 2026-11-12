@@ -3,8 +3,8 @@
 namespace App\Libraries;
 
 use Illuminate\Http\Client\ConnectionException;
-use DB;
-use Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use \Carbon\Carbon as Carbon;
 
