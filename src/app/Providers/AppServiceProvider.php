@@ -43,6 +43,12 @@ class AppServiceProvider extends ServiceProvider
 
         // Where a session that was signed out by a password change ends up
         \Illuminate\Session\Middleware\AuthenticateSession::redirectUsing(fn () => url('/login'));
+
+        // Adds the Steam driver to Socialite
+        \Illuminate\Support\Facades\Event::listen(
+            \SocialiteProviders\Manager\SocialiteWasCalled::class,
+            [\SocialiteProviders\Steam\SteamExtendSocialite::class, 'handle']
+        );
     }
 
     /**
