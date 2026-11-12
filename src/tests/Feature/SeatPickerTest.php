@@ -29,7 +29,7 @@ class SeatPickerTest extends TestCase
 
     protected function createSeatingPlan(EventTicket $ticket): EventSeatingPlan
     {
-        $plan = factory(EventSeatingPlan::class)->make();
+        $plan = EventSeatingPlan::factory()->make();
         $plan->forceFill(['event_id' => $ticket->event_id, 'status' => 'PUBLISHED']);
         $plan->save();
 

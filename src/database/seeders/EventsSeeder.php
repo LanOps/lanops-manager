@@ -25,13 +25,13 @@ class EventsSeeder extends Seeder
         \DB::table('event_information')->delete();
 
         ## Venue
-        $venue = factory(\App\Models\EventVenue::class)->create();
+        $venue = \App\Models\EventVenue::factory()->create();
         foreach (['venue-1.jpg', 'venue-2.jpg', 'venue-3.jpg'] as $image) {
             $venue->addMedia(__DIR__ . '/images/' . $image)->preservingOriginal()->toMediaCollection();
         }
 
         ## Events
-        factory(\App\Models\Event::class)->create([
+        \App\Models\Event::factory()->create([
             'event_venue_id'    => $venue->id,
             'status'            => 'PUBLISHED',
             'capacity'          => 30,
@@ -42,13 +42,13 @@ class EventsSeeder extends Seeder
             'slug'              => strtolower(str_replace(' ', '-', 'Another Awesome LAN Event')),
         ])->each(
             function ($event) {
-                factory(\App\Models\EventTicket::class)->create([
+                \App\Models\EventTicket::factory()->create([
                     'event_id' => $event->id,
                 ]);
-                factory(\App\Models\EventTimetable::class)->create([
+                \App\Models\EventTimetable::factory()->create([
                     'event_id' => $event->id,
                 ]);
-                $information = factory(\App\Models\EventInformation::class, 5)->create([
+                $information = \App\Models\EventInformation::factory()->count(5)->create([
                     'event_id' => $event->id,
                 ]);
                 $infoImages = ['info-a.jpg', 'info-b.jpg', 'info-c.jpg'];
@@ -57,14 +57,14 @@ class EventsSeeder extends Seeder
                         $section->addMedia(__DIR__ . '/images/' . $infoImages[$index])->preservingOriginal()->toMediaCollection();
                     }
                 }
-                $seatingPlan = factory(\App\Models\EventSeatingPlan::class)->create([
+                $seatingPlan = \App\Models\EventSeatingPlan::factory()->create([
                     'event_id' => $event->id,
                 ]);
                 $seatingPlan->addMedia(__DIR__ . '/images/seating-plan.jpg')->preservingOriginal()->toMediaCollection();
             }
         );
 
-        factory(\App\Models\Event::class)->create([
+        \App\Models\Event::factory()->create([
             'event_venue_id'    => $venue->id,
             'status'            => 'PUBLISHED',
             'capacity'          => 30,
@@ -75,13 +75,13 @@ class EventsSeeder extends Seeder
             'slug'              => strtolower(str_replace(' ', '-', 'Another Awesome Tabletop Event')),
         ])->each(
             function ($event) {
-                factory(\App\Models\EventTicket::class)->create([
+                \App\Models\EventTicket::factory()->create([
                     'event_id' => $event->id,
                 ]);
-                factory(\App\Models\EventTimetable::class)->create([
+                \App\Models\EventTimetable::factory()->create([
                     'event_id' => $event->id,
                 ]);
-                $information = factory(\App\Models\EventInformation::class, 5)->create([
+                $information = \App\Models\EventInformation::factory()->count(5)->create([
                     'event_id' => $event->id,
                 ]);
                 $infoImages = ['info-a.jpg', 'info-b.jpg', 'info-c.jpg'];
@@ -90,7 +90,7 @@ class EventsSeeder extends Seeder
                         $section->addMedia(__DIR__ . '/images/' . $infoImages[$index])->preservingOriginal()->toMediaCollection();
                     }
                 }
-                $seatingPlan = factory(\App\Models\EventSeatingPlan::class)->create([
+                $seatingPlan = \App\Models\EventSeatingPlan::factory()->create([
                     'event_id' => $event->id,
                 ]);
                 $seatingPlan->addMedia(__DIR__ . '/images/seating-plan.jpg')->preservingOriginal()->toMediaCollection();

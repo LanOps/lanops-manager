@@ -57,7 +57,7 @@ class SmokeTest extends TestCase
 
     public function testNewsArticlePageRenders()
     {
-        $article = factory(NewsArticle::class)->create();
+        $article = NewsArticle::factory()->create();
 
         $this->get('/news/' . $article->fresh()->slug)
             ->assertOk()
@@ -66,7 +66,7 @@ class SmokeTest extends TestCase
 
     public function testNewsTagPageListsTaggedArticles()
     {
-        $article = factory(NewsArticle::class)->create();
+        $article = NewsArticle::factory()->create();
         $tag = new NewsTag();
         $tag->tag = 'Summer LAN';
         $tag->news_feed_id = $article->id;

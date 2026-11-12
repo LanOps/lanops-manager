@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bc62b37a7b870bb74699d9a0589c623e",
+    "content-hash": "14ee6913f3dcee867f2cf8050cbaf4f2",
     "packages": [
         {
             "name": "archtechx/laravel-seo",
@@ -2153,62 +2153,6 @@
                 "source": "https://github.com/laravel/framework"
             },
             "time": "2026-11-10T15:54:30+00:00"
-        },
-        {
-            "name": "laravel/legacy-factories",
-            "version": "v1.4.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/laravel/legacy-factories.git",
-                "reference": "fdaadc5c7cc656503704ad87a6d5fad961cc5c8a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/laravel/legacy-factories/zipball/fdaadc5c7cc656503704ad87a6d5fad961cc5c8a",
-                "reference": "fdaadc5c7cc656503704ad87a6d5fad961cc5c8a",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/macroable": "^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
-                "php": "^7.3|^8.0",
-                "symfony/finder": "^3.4|^4.0|^5.0|^6.0|^7.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Illuminate\\Database\\Eloquent\\LegacyFactoryServiceProvider"
-                    ]
-                },
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "files": [
-                    "helpers.php"
-                ],
-                "psr-4": {
-                    "Illuminate\\Database\\Eloquent\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Taylor Otwell",
-                    "email": "taylor@laravel.com"
-                }
-            ],
-            "description": "The legacy version of the Laravel Eloquent factories.",
-            "homepage": "http://laravel.com",
-            "support": {
-                "issues": "https://github.com/laravel/framework/issues",
-                "source": "https://github.com/laravel/framework"
-            },
-            "time": "2026-02-21T13:29:40+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -7102,23 +7046,23 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v7.4.23",
+            "version": "v8.1.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "c723f990aefe8c1053b18374faf4231eba84f518"
+                "reference": "a2902e479ba5691d20d51d100a715ea19ad2c837"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/c723f990aefe8c1053b18374faf4231eba84f518",
-                "reference": "c723f990aefe8c1053b18374faf4231eba84f518",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/a2902e479ba5691d20d51d100a715ea19ad2c837",
+                "reference": "a2902e479ba5691d20d51d100a715ea19ad2c837",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.2"
+                "php": ">=8.4.1"
             },
             "require-dev": {
-                "symfony/filesystem": "^6.4|^7.0|^8.0"
+                "symfony/filesystem": "^7.4|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -7146,7 +7090,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v7.4.23"
+                "source": "https://github.com/symfony/finder/tree/v8.1.11"
             },
             "funding": [
                 {
@@ -7166,7 +7110,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-11-02T10:56:49+00:00"
+            "time": "2026-11-02T10:58:30+00:00"
         },
         {
             "name": "symfony/http-foundation",

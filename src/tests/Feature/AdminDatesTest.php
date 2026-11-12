@@ -15,7 +15,7 @@ class AdminDatesTest extends TestCase
     public function testEventIsCreatedFromNativeDateInputs()
     {
         $admin = $this->createUser(['admin' => 1]);
-        $venue = factory(EventVenue::class)->create();
+        $venue = EventVenue::factory()->create();
 
         $this->actingAs($admin)->post('/admin/events', [
             'event_name' => 'Date Test LAN',

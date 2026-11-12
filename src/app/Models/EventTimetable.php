@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Concerns\HidesFromNonAdmins;
 use DateTime;
 use Auth;
@@ -15,6 +16,7 @@ use Cviebrock\EloquentSluggable\Sluggable;
 
 class EventTimetable extends Model
 {
+    use HasFactory;
     use HidesFromNonAdmins;
     use Sluggable;
 

@@ -17,7 +17,7 @@ class AbuseLimitsTest extends TestCase
 {
     protected function article(): NewsArticle
     {
-        return factory(NewsArticle::class)->create(['user_id' => $this->createUser()->id]);
+        return NewsArticle::factory()->create(['user_id' => $this->createUser()->id]);
     }
 
     public function testBannedUserCannotComment()

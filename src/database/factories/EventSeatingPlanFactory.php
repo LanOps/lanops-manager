@@ -1,0 +1,25 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\EventSeatingPlan;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends Factory<EventSeatingPlan>
+ */
+class EventSeatingPlanFactory extends Factory
+{
+    protected $model = EventSeatingPlan::class;
+
+    public function definition(): array
+    {
+        return [
+            'name'    => $this->faker->words(3, true),
+            'columns' => 8,
+            'rows'    => 6,
+            'headers' => 'A,B,C,D,E,F,G,H',
+            'status'  => 'published',
+        ];
+    }
+}

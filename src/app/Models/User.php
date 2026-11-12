@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use \Carbon\Carbon as Carbon;
 
 use Illuminate\Notifications\Notifiable;
@@ -12,6 +13,7 @@ use Spatie\WebhookServer\WebhookCall;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
+    use HasFactory;
     use Notifiable;
 
     /**

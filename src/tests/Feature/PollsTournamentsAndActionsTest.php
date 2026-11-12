@@ -101,7 +101,7 @@ class PollsTournamentsAndActionsTest extends TestCase
     public function testReportingAndDeletingCommentsArePosts()
     {
         $author = $this->createUser();
-        $article = factory(NewsArticle::class)->create();
+        $article = NewsArticle::factory()->create();
         $comment = NewsComment::create(['comment' => 'Hi', 'news_feed_id' => $article->id, 'user_id' => $author->id]);
         $comment->forceFill(['approved' => 1, 'reviewed' => 1])->save();
         $base = '/news/' . $article->slug . '/comments/' . $comment->id;
@@ -116,7 +116,7 @@ class PollsTournamentsAndActionsTest extends TestCase
     public function testAuthorCanDeleteTheirCommentWhileItAwaitsApproval()
     {
         $author = $this->createUser();
-        $article = factory(NewsArticle::class)->create();
+        $article = NewsArticle::factory()->create();
         $comment = NewsComment::create(['comment' => 'Hi', 'news_feed_id' => $article->id, 'user_id' => $author->id]);
         $base = '/news/' . $article->slug . '/comments/' . $comment->id;
 
@@ -133,7 +133,7 @@ class PollsTournamentsAndActionsTest extends TestCase
     public function testCommentWithQuotesCannotBreakOutOfTheEditLink()
     {
         $author = $this->createUser();
-        $article = factory(NewsArticle::class)->create();
+        $article = NewsArticle::factory()->create();
         $comment = NewsComment::create([
             'comment'      => "');alert(1);//",
             'news_feed_id' => $article->id,

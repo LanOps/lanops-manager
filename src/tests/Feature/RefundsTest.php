@@ -170,7 +170,7 @@ class RefundsTest extends TestCase
         $participant = $purchase->participants->first();
         $participant->forceFill(['qr_token' => 'scan-me'])->saveQuietly();
 
-        $plan = factory(EventSeatingPlan::class)->make();
+        $plan = EventSeatingPlan::factory()->make();
         $plan->forceFill(['event_id' => $ticket->event_id, 'status' => 'PUBLISHED'])->save();
         // Creating a plan creates its seats
         $seat = EventSeating::where('event_seating_plan_id', $plan->id)->where('seat', 'A1')->firstOrFail();
