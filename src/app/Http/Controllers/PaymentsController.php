@@ -171,7 +171,6 @@ class PaymentsController extends Controller
                 'amount'               => (int) round($params['amount'] * 100),
                 'currency'             => strtolower($params['currency']),
                 'payment_method'       => $request->stripe_token,
-                'payment_method_types' => ['card'],
                 'confirm'              => true,
                 'description'          => 'Purchase for ' . config('app.name'),
                 'return_url'           => $this->getCallbackReturnUrl($paymentGateway),
