@@ -68,7 +68,10 @@ class TimetablesController extends Controller
             ->sortByDesc(fn ($source) => $source->event->start)
             ->take(20)
             ->map(function ($source) use ($eventStart) {
-                $offset = (int) Carbon::parse($source->event->start)->startOfDay()->diffInDays($eventStart);
+                // Whole days between the two start dates, counted in UTC so a clock
+                // change between the events can't knock it down to a day less
+                $offset = (int) round(Carbon::parse(substr($source->event->start, 0, 10), 'UTC')
+                    ->diffInDays(Carbon::parse($eventStart->format('Y-m-d'), 'UTC')));
                 return [
                     'id'    => $source->id,
                     'label' => $source->event->display_name . ' - ' . $source->name

@@ -160,4 +160,19 @@ class TimetableSlotGridTest extends TestCase
             ->assertSee('<option value="2026-11-13"', false)
             ->assertSee('<option value="2026-11-15"', false);
     }
+
+    public function testCopyingAWinterTimetableIntoASummerEventKeepsTheWeekday()
+    {
+        $admin = $this->createUser(['admin' => 1]);
+        $winter = $this->createEventWithTicket(['start' => '2026-11-13 16:00:00', 'end' => '2026-11-15 18:00:00'])->event;
+        $summer = $this->createEventWithTicket(['start' => '2027-05-14 16:00:00', 'end' => '2027-05-16 18:00:00'])->event;
+        $old = $this->makeTimetable($winter, 'Lan Start');
+        $this->makeSlot($old, '2026-11-14 21:30:00', 'Quiz');
+        $timetable = $this->makeTimetable($summer);
+
+        // Saturday 14 Nov (GMT) moves to Saturday 15 May (BST), same time
+        $this->actingAs($admin)->get($this->page($summer, $timetable))
+            ->assertOk()
+            ->assertSee('"day":"2027-05-15","time":"21:30","name":"Quiz"', false);
+    }
 }

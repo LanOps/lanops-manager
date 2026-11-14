@@ -358,14 +358,56 @@
 
 		<div class="card">
 			<div class="card-header">
-				<i class="fa fa-wrench fa-fw"></i> Duplicate Event TEST
+				<i class="fa fa-clone fa-fw"></i> Duplicate Event
 			</div>
 			<div class="card-body">
+				@php
+					// "LanOps 60" suggests "LanOps 61"
+					$suggestedName = preg_match('/^(.*?)(\d+)\s*$/', $event->display_name, $nameMatch)
+						? $nameMatch[1] . ((int) $nameMatch[2] + 1)
+						: $event->display_name . ' Copy';
+					$duplicateStart = \Carbon\Carbon::parse($event->start);
+				@endphp
+				<p class="small text-muted">
+					Makes a draft copy with the tickets, seating plans and information. The end date, ticket sale dates and timetable move by the same amount as the start.
+				</p>
 				{{ html()->form('POST', url('/admin/events/' . $event->slug . '/duplicate'))->open() }}
-					@method('POST')
-					<button type="submit" class="btn btn-danger w-100">Duplicate</button>
+					@if ($errors->hasAny(['dup_name', 'dup_start_date', 'dup_start_time']))
+						<div class="alert alert-danger">
+							<ul class="mb-0">
+								@foreach (collect(['dup_name', 'dup_start_date', 'dup_start_time'])->flatMap(fn ($key) => $errors->get($key)) as $error)
+									<li>{{ $error }}</li>
+								@endforeach
+							</ul>
+						</div>
+					@endif
+					<div class="mb-3">
+						<label for="duplicate_event_name">New event name</label>
+						<input type="text" id="duplicate_event_name" name="dup_name" class="form-control" required maxlength="255"
+							value="{{ old('dup_name') !== null ? old('dup_name') : $suggestedName }}">
+					</div>
+					<div class="row">
+						<div class="mb-3 col-7">
+							<label for="duplicate_start_date">Starts</label>
+							<input type="date" id="duplicate_start_date" name="dup_start_date" class="form-control" required
+								value="{{ old('dup_name') !== null ? old('dup_start_date') : $duplicateStart->format('Y-m-d') }}">
+						</div>
+						<div class="mb-3 col-5">
+							<label for="duplicate_start_time">At</label>
+							<input type="time" id="duplicate_start_time" name="dup_start_time" class="form-control" required
+								value="{{ old('dup_name') !== null ? old('dup_start_time') : $duplicateStart->format('H:i') }}">
+						</div>
+					</div>
+					<div class="form-check mb-3">
+						<input type="hidden" name="copy_timetables" value="0">
+						<input type="checkbox" class="form-check-input" id="duplicate_copy_timetables" name="copy_timetables" value="1"
+							@checked(old('dup_name') !== null ? old('copy_timetables') : true)>
+						<label class="form-check-label" for="duplicate_copy_timetables">Copy the timetables too</label>
+					</div>
+					<button type="submit" class="btn btn-primary w-100"><i class="fa fa-clone fa-fw"></i> Create copy</button>
 				</form>
 			</div>
+		</div>
 		</div>
 
 	</div>

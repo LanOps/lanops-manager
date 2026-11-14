@@ -15,7 +15,9 @@ use App\Models\EventInformation;
 
 use App\Http\Controllers\Controller;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Http;
 
@@ -356,73 +358,141 @@ class EventsController extends Controller
         return Redirect::to('admin/events/' . $event->slug);
     }
 
+    /**
+     * Duplicate an Event as the next one: new name and start, with every date
+     * (end, ticket sales, timetable slots) moved by the same amount
+     * @param  Request $request
+     * @param  Event   $event
+     * @return Redirect
+     */
     public function duplicate(Request $request, Event $event)
     {
-        $randomNameSuffix = substr(str_shuffle(str_repeat($x='0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', ceil(5/strlen($x)))), 1, 5);
-        $duplicatedEvent = new Event();
-        $duplicatedEvent->display_name        = $event->display_name . " Copy ". $randomNameSuffix;
-        $duplicatedEvent->nice_name           = strtolower(str_replace(' ', '-', $event->display_name . " Copy " . $randomNameSuffix));
-        $duplicatedEvent->start               = $event->start;
-        $duplicatedEvent->end                 = $event->end;
-        $duplicatedEvent->desc_long           = $event->desc_long;
-        $duplicatedEvent->desc_short          = $event->desc_short;
-        $duplicatedEvent->event_venue_id      = @$event->event_venue_id;
-        $duplicatedEvent->capacity            = $event->capacity;
+        $this->validate($request, [
+            'dup_name'      => 'required|string|max:255',
+            'dup_start_date'      => 'required|date_format:Y-m-d',
+            'dup_start_time'      => 'required|date_format:H:i',
+            'copy_timetables' => 'nullable|boolean',
+        ], [
+            'dup_name.required'    => 'The new event needs a name',
+            'dup_start_date.required'    => 'The new event needs a start date',
+            'dup_start_date.date_format' => 'Start date must be Y-m-d format',
+            'dup_start_time.required'    => 'The new event needs a start time',
+            'dup_start_time.date_format' => 'Start time must be H:i format',
+        ]);
 
-        if (!$duplicatedEvent->save()) {
-            Session::flash('alert-danger', 'Cannot save Event!');
-            return Redirect::back();
+        $niceName = strtolower(str_replace(' ', '-', $request->dup_name));
+        if (Event::withoutGlobalScopes()->where('nice_name', $niceName)->exists()) {
+            return Redirect::back()->withInput()->withErrors([
+                'dup_name' => 'There is already an event called ' . $request->dup_name,
+            ]);
         }
 
-        foreach ($event->tickets as $ticket) {
-            $duplicatedTicket             = new EventTicket();
-            $duplicatedTicket->event_id   = $duplicatedEvent->id;
-            $duplicatedTicket->name       = $ticket->name;
-            $duplicatedTicket->type       = $ticket->type;
-            $duplicatedTicket->price      = $ticket->price;
-            $duplicatedTicket->seatable   = $ticket->seatable;
-            $duplicatedTicket->sale_start = $ticket->sale_start;
-            $duplicatedTicket->sale_end   = $ticket->sale_end;
-            $duplicatedTicket->quantity   = $ticket->quantity;
-    
-            if (!$duplicatedTicket->save()) {
-                Session::flash('alert-danger', 'Cannot save Ticket');
-                Redirect::back();
+        // Dates are stored as local wall-clock times: do the sums in UTC so a
+        // clock change between the two events doesn't move anything by an hour
+        $oldStart = Carbon::parse($event->start, 'UTC');
+        $newStart = Carbon::parse($request->dup_start_date . ' ' . $request->dup_start_time, 'UTC');
+        $offset = (int) $oldStart->diffInSeconds($newStart, false);
+        $shift = fn ($date) => $date === null
+            ? null
+            : Carbon::parse($date, 'UTC')->addSeconds($offset)->format('Y-m-d H:i:s');
+
+        $mediaToCopy = [];
+        $duplicatedEvent = DB::transaction(function () use ($request, $event, $niceName, $shift, &$mediaToCopy) {
+            $duplicatedEvent                  = new Event();
+            $duplicatedEvent->display_name    = $request->dup_name;
+            $duplicatedEvent->nice_name       = $niceName;
+            $duplicatedEvent->start           = $shift($event->start);
+            $duplicatedEvent->end             = $shift($event->end);
+            $duplicatedEvent->desc_long       = $event->desc_long;
+            $duplicatedEvent->desc_short      = $event->desc_short;
+            $duplicatedEvent->essential_info  = $event->essential_info;
+            $duplicatedEvent->type            = $event->type;
+            $duplicatedEvent->event_venue_id  = $event->event_venue_id;
+            $duplicatedEvent->capacity        = $event->capacity;
+            $duplicatedEvent->save();
+
+            foreach ($event->tickets as $ticket) {
+                $duplicatedTicket               = new EventTicket();
+                $duplicatedTicket->event_id     = $duplicatedEvent->id;
+                $duplicatedTicket->name         = $ticket->name;
+                $duplicatedTicket->type         = $ticket->type;
+                $duplicatedTicket->price        = $ticket->price;
+                $duplicatedTicket->price_credit = $ticket->price_credit;
+                $duplicatedTicket->seatable     = $ticket->seatable;
+                $duplicatedTicket->sale_start   = $shift($ticket->sale_start);
+                $duplicatedTicket->sale_end     = $shift($ticket->sale_end);
+                $duplicatedTicket->quantity     = $ticket->quantity;
+                $duplicatedTicket->save();
+            }
+
+            foreach (EventSeatingPlan::withoutGlobalScopes()->where('event_id', $event->id)->get() as $seatingPlan) {
+                $duplicatedSeatingPlan              = new EventSeatingPlan();
+                $duplicatedSeatingPlan->event_id    = $duplicatedEvent->id;
+                $duplicatedSeatingPlan->name        = $seatingPlan->name;
+                $duplicatedSeatingPlan->name_short  = $seatingPlan->name_short;
+                $duplicatedSeatingPlan->columns     = $seatingPlan->columns;
+                $duplicatedSeatingPlan->rows        = $seatingPlan->rows;
+                $duplicatedSeatingPlan->status      = $seatingPlan->status;
+                $duplicatedSeatingPlan->save();
+
+                // Seats switched off in the old plan (pillars, the admin desk) stay off
+                $disabledSeats = $seatingPlan->seats()->where('disabled', true)->pluck('seat');
+                if ($disabledSeats->isNotEmpty()) {
+                    $duplicatedSeatingPlan->seats()->whereIn('seat', $disabledSeats)->update(['disabled' => true]);
+                }
+                if ($seatingPlan->hasMedia()) {
+                    $mediaToCopy[] = [$seatingPlan, $duplicatedSeatingPlan];
+                }
+            }
+
+            foreach ($event->information as $information) {
+                $duplicatedInformation               = new EventInformation();
+                $duplicatedInformation->event_id     = $duplicatedEvent->id;
+                $duplicatedInformation->title        = $information->title;
+                $duplicatedInformation->text         = $information->text;
+                $duplicatedInformation->order        = $information->order;
+                $duplicatedInformation->save();
+                if ($information->hasMedia()) {
+                    $mediaToCopy[] = [$information, $duplicatedInformation];
+                }
+            }
+
+            if ($request->boolean('copy_timetables')) {
+                foreach (EventTimetable::withoutGlobalScopes()->with('data')->where('event_id', $event->id)->get() as $timetable) {
+                    $duplicatedTimetable           = new EventTimetable();
+                    $duplicatedTimetable->event_id = $duplicatedEvent->id;
+                    $duplicatedTimetable->name     = $timetable->name;
+                    $duplicatedTimetable->status   = $timetable->status;
+                    $duplicatedTimetable->primary  = $timetable->primary;
+                    $duplicatedTimetable->save();
+                    foreach ($timetable->data as $slot) {
+                        $duplicatedSlot                     = new EventTimetableData();
+                        $duplicatedSlot->event_timetable_id = $duplicatedTimetable->id;
+                        $duplicatedSlot->start_time         = $shift($slot->start_time);
+                        $duplicatedSlot->name               = $slot->name;
+                        $duplicatedSlot->desc               = $slot->desc;
+                        $duplicatedSlot->save();
+                    }
+                }
+            }
+
+            return $duplicatedEvent;
+        });
+
+        // Images are files, so copy them once the database rows are safely in
+        foreach ($mediaToCopy as [$from, $to]) {
+            foreach ($from->getMedia() as $media) {
+                $media->copy($to, $media->collection_name);
             }
         }
 
-        foreach ($event->seatingPlans as $seatingPlan) {
-            $duplicatedSeatingPlan              = new EventSeatingPlan();
-            $duplicatedSeatingPlan->event_id    = $duplicatedEvent->id;
-            $duplicatedSeatingPlan->name        = $seatingPlan->name;
-            $duplicatedSeatingPlan->name_short  = $seatingPlan->name_short;
-            $duplicatedSeatingPlan->columns     = $seatingPlan->columns;
-            $duplicatedSeatingPlan->rows        = $seatingPlan->rows;
-
-            if (!$duplicatedSeatingPlan->save()) {
-                Session::flash('alert-danger', 'Cannot save Seating Plan');
-                Redirect::back();
-            }
-        }
-
-        foreach ($event->information as $information) {
-            $duplicatedInformation               = new EventInformation();
-            $duplicatedInformation->event_id     = $duplicatedEvent->id;
-            $duplicatedInformation->title        = $information->title;
-            $duplicatedInformation->text         = $information->text;
-            $duplicatedInformation->order        = $information->order;
-
-            if (!$duplicatedInformation->save()) {
-                Session::flash('alert-danger', 'Cannot save Information');
-                Redirect::back();
-            }
-
-            if ($information->hasMedia()) {
-                $information->getMedia()->first()->copy($duplicatedInformation);
-            }
-        }
-
-        Session::flash('alert-success', 'Successfully Duplicated Event!');
+        Session::flash(
+            'alert-success',
+            'Created ' . $duplicatedEvent->display_name . ' as a draft, starting '
+                . Carbon::parse($duplicatedEvent->start)->format('D j M Y H:i')
+                . '. Ticket sale dates' . ($request->boolean('copy_timetables') ? ' and the timetable' : '')
+                . ' moved to match.'
+        );
         return Redirect::to('admin/events/' . $duplicatedEvent->slug);
     }
 }
