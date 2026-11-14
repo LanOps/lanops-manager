@@ -10,6 +10,7 @@ use App\Models\EventTimetableData;
 
 use App\Http\Controllers\Controller;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
@@ -40,9 +41,56 @@ class TimetablesController extends Controller
      */
     public function show(Event $event, EventTimetable $timetable)
     {
+        $eventStart = Carbon::parse($event->start)->startOfDay();
+
+        // Days the slot grid offers: every day of the event, plus any day an
+        // existing slot already sits on
+        $days = [];
+        $day = $eventStart->copy();
+        $lastDay = Carbon::parse($event->end)->startOfDay();
+        while ($day <= $lastDay && count($days) < 14) {
+            $days[$day->format('Y-m-d')] = $day->format('D j M');
+            $day->addDay();
+        }
+        foreach ($timetable->data as $slot) {
+            $slotDay = Carbon::parse($slot->start_time);
+            $days[$slotDay->format('Y-m-d')] ??= $slotDay->format('D j M');
+        }
+        ksort($days);
+
+        // Other timetables to copy slots from, moved onto this event's days
+        // (same weekday and time when the events start on the same weekday)
+        $copySources = EventTimetable::with('event', 'data')
+            ->where('id', '!=', $timetable->id)
+            ->whereHas('data')
+            ->get()
+            ->filter(fn ($source) => $source->event)
+            ->sortByDesc(fn ($source) => $source->event->start)
+            ->take(20)
+            ->map(function ($source) use ($eventStart) {
+                $offset = (int) Carbon::parse($source->event->start)->startOfDay()->diffInDays($eventStart);
+                return [
+                    'id'    => $source->id,
+                    'label' => $source->event->display_name . ' - ' . $source->name
+                        . ' (' . $source->data->count() . ' slots)',
+                    'slots' => $source->data->map(function ($slot) use ($offset) {
+                        $start = Carbon::parse($slot->start_time)->addDays($offset);
+                        return [
+                            'day'  => $start->format('Y-m-d'),
+                            'time' => $start->format('H:i'),
+                            'name' => $slot->name,
+                            'desc' => $slot->desc,
+                        ];
+                    })->values(),
+                ];
+            })
+            ->values();
+
         return view('admin.events.timetables.show')
             ->withEvent($event)
-            ->withTimetable($timetable);
+            ->withTimetable($timetable)
+            ->withDays($days)
+            ->withCopySources($copySources);
     }
 
     /**
