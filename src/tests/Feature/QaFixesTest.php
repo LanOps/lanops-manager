@@ -172,7 +172,7 @@ class QaFixesTest extends TestCase
             ->assertSee(url('/polls/' . $poll->fresh()->slug));
     }
 
-    public function testTimetableSlotEditButtonCopesWithQuotes()
+    public function testTimetableSlotGridCopesWithQuotes()
     {
         $admin = $this->createUser(['admin' => 1]);
         $event = $this->createEventWithTicket()->event;
@@ -191,9 +191,9 @@ class QaFixesTest extends TestCase
             ->assertOk()
             ->getContent();
 
-        // The name and description go into the onclick handler as JavaScript strings, escaped
-        $this->assertStringContainsString("Players\\u0027 choice", $html);
-        $this->assertStringNotContainsString("'Players&#039; choice'", $html);
+        // The name and description go into the slot grid inputs, escaped
+        $this->assertStringContainsString('value="Players&#039; choice"', $html);
+        $this->assertStringContainsString('Line &quot;two&quot;"', $html);
     }
 
     public function testABlankSeatingPlanShortNameFallsBackToTheName()

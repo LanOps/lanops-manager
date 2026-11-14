@@ -138,3 +138,44 @@ body.admin {
 		text-overflow: ellipsis;
 	}
 }
+
+// Timetable slot grid (admin/events/timetables/show)
+.slot-grid .slot-removed input,
+.slot-grid .slot-removed select {
+    text-decoration: line-through;
+    opacity: .55;
+}
+
+.slot-grid .slot-removed td {
+    background-color: var(--bs-danger-bg-subtle);
+}
+
+@media (max-width: 767.98px) {
+    // Stack each slot as a small card: day + time + remove on one line, then name, then description
+    .slot-grid thead {
+        display: none;
+    }
+
+    .slot-grid tbody tr {
+        display: grid;
+        grid-template-columns: 1fr 1fr auto;
+        gap: .375rem;
+        padding: .5rem 0;
+        border-bottom: var(--bs-border-width) solid var(--bs-border-color);
+    }
+
+    .slot-grid tbody td {
+        border: 0;
+        padding: 0;
+    }
+
+    .slot-grid tbody td[data-label="Name"],
+    .slot-grid tbody td[data-label="Description"] {
+        grid-column: 1 / -1;
+    }
+
+    .slot-grid tbody td:last-child {
+        grid-column: 3;
+        grid-row: 1;
+    }
+}

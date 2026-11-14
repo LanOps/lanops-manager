@@ -205,6 +205,10 @@ Route::group(['middleware' => ['admin', 'banned']], function () {
     Route::delete('/admin/events/{event}/timetables/{timetable}', [Admin\Events\TimetablesController::class, 'destroy']);
     Route::post('/admin/events/{event}/timetables/{timetable}/data', [Admin\Events\TimetableDataController::class, 'store']);
     Route::post(
+        '/admin/events/{event}/timetables/{timetable}/slots',
+        [Admin\Events\TimetableDataController::class, 'saveAll']
+    );
+    Route::post(
         '/admin/events/{event}/timetables/{timetable}/data/{data}',
         [Admin\Events\TimetableDataController::class, 'update']
     );

@@ -53,7 +53,7 @@ class QaLowFixesTest extends TestCase
         $slot->forceFill(['event_timetable_id' => $timetable->id, 'start_time' => $event->start, 'name' => 'Quiz'])->save();
         $page = '/admin/events/' . $event->slug . '/timetables/' . $timetable->fresh()->slug;
 
-        $this->actingAs($admin)->get($page)->assertOk()->assertSee($page . '/data/' . $slot->id, false);
+        $this->actingAs($admin)->get($page)->assertOk()->assertSee('value="Quiz"', false);
 
         $this->actingAs($admin)->from($page)->delete($page . '/data/' . $slot->id)
             ->assertRedirect($page)
