@@ -62,25 +62,25 @@ class QaFixesTest extends TestCase
             ]);
     }
 
-    public function testScanningATicketTakesAnAdminToTheParticipantPage()
+    public function testScanningATicketGivesAnAdminTheSignInPage()
     {
         $admin = $this->createUser(['admin' => 1]);
         $ticket = $this->createEventWithTicket();
         $participant = $this->createParticipant($this->createUser(), $ticket, ['qr_token' => 'scan-me']);
         $page = '/admin/events/' . $ticket->event->slug . '/participants/' . $participant->id;
 
-        $this->actingAs($admin)->get('/tickets/retrieve/scan-me')->assertRedirect($page);
+        $this->actingAs($admin)->get('/tickets/retrieve/scan-me')->assertOk()->assertSee($page);
         $this->actingAs($admin)->get($page)->assertOk();
     }
 
-    public function testScanningATicketTakesAnAttendeeToTheEventPage()
+    public function testScanningYourOwnTicketShowsItsDetails()
     {
         $user = $this->createUser();
         $ticket = $this->createEventWithTicket(['status' => 'PUBLISHED']);
         $this->createParticipant($user, $ticket, ['qr_token' => 'scan-me']);
 
         $this->actingAs($user)->get('/tickets/retrieve/scan-me')
-            ->assertRedirect('/events/' . $ticket->event->slug);
+            ->assertOk()->assertSee('Your ticket')->assertSee('/events/' . $ticket->event->slug);
         $this->actingAs($user)->get('/events/' . $ticket->event->slug)->assertOk();
     }
 

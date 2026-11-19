@@ -86,8 +86,11 @@ Route::get('/sitemap', [SitemapController::class, 'renderSitemap']);
 /**
  * Tickets
  */
+// What a ticket's QR code opens. Open to everyone: the page decides how much to show
+Route::get('/tickets/retrieve/{token}', [Events\TicketsController::class, 'retrieve'])
+    ->where('token', '[A-Za-z0-9_-]{1,100}')
+    ->middleware('throttle:60,1');
 Route::group(['middleware' => ['auth', 'banned', 'verified']], function () {
-    Route::get('/tickets/retrieve/{participant:qr_token}', [Events\TicketsController::class, 'retrieve']);
     Route::post('/tickets/purchase/{ticket}', [Events\TicketsController::class, 'purchase']);
 });
 

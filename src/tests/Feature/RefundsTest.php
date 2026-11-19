@@ -180,7 +180,11 @@ class RefundsTest extends TestCase
             ->assertSessionHas('alert-success');
 
         $this->assertNull($seat->fresh()->event_participant_id);
-        $this->actingAs($user)->get('/tickets/retrieve/scan-me')->assertNotFound();
+        // The QR code still opens, to say the ticket is cancelled, and can't be signed in
+        $this->actingAs($user)->get('/tickets/retrieve/scan-me')->assertOk()->assertSee('has been cancelled');
+        $admin = $this->createUser(['admin' => 1]);
+        $this->actingAs($admin)->get('/tickets/retrieve/scan-me')
+            ->assertOk()->assertSee('Cancelled ticket')->assertDontSee('/signin');
         $this->assertNull($ticket->event->fresh()->getEventParticipant($user->id));
     }
 
