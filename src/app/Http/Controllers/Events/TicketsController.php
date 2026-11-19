@@ -82,22 +82,70 @@ class TicketsController extends Controller
     }
 
     /**
-     * Retrieve ticket via QR code
-     * @param  EventParticipant $participant
-     * @return Redirect
+     * The page a ticket's QR code opens. The code holds a random token, so
+     * only someone holding the ticket (or a photo of it) can reach this page.
+     * - Admins get a door page with the holder, ticket, seat and a Sign in button.
+     * - The ticket's owner gets their full ticket details.
+     * - Anyone else, logged in or not, only sees the event, ticket type and
+     *   whether the ticket is valid: no name, seat or purchase details.
+     * Cancelled (refunded) tickets still open, to say so, rather than 404.
+     * @param  string $token
+     * @return \Illuminate\Http\Response
      */
-    public function retrieve(EventParticipant $participant)
+    public function retrieve(string $token)
     {
-        $user = Auth::user();
-        // Event pages are found by slug, not id. Draft and private events are hidden from
-        // non-admins, so look the event up without that, and let its page decide what to show
+        $participant = EventParticipant::withTrashed()
+            ->where('qr_token', $token)
+            ->with(['user', 'ticket', 'seat', 'purchase'])
+            ->first();
+        if (!$participant) {
+            abort(404);
+        }
+        // Draft and private events are hidden from non-admins; the token is proof enough here
         $event = $participant->event()->withoutGlobalScopes()->first();
         if (!$event) {
             abort(404);
         }
-        if ($user->admin == 1) {
-            return Redirect::to('/admin/events/' . $event->slug . '/participants/' . $participant->id);
+
+        $user = Auth::user();
+        if ($user && $user->banned) {
+            $user = null;
         }
-        return Redirect::to('/events/' . $event->slug);
+        if ($user && $user->admin == 1) {
+            $mode = 'admin';
+        } elseif ($user && $participant->user_id == $user->id) {
+            $mode = 'owner';
+        } else {
+            $mode = 'public';
+            if (!$user) {
+                // Logging in from here comes back here, to see your own ticket
+                Redirect::setIntendedUrl(url('/tickets/retrieve/' . $token));
+            }
+        }
+
+        $now = now();
+        if ($participant->trashed()) {
+            $status = 'cancelled';
+        } elseif ($participant->signed_in) {
+            $status = 'signed_in';
+        } elseif ($event->end && $now->greaterThan($event->end)) {
+            $status = 'finished';
+        } else {
+            $status = 'valid';
+        }
+
+        $response = response(view('tickets.scan', [
+            'participant' => $participant,
+            'event'       => $event,
+            'mode'        => $mode,
+            'status'      => $status,
+            'isOn'        => $event->start && $event->end && $now->between($event->start, $event->end),
+            'isUpcoming'  => $event->start && $now->lessThan($event->start),
+            'giftPending' => $participant->gift && !$participant->gift_accepted,
+        ]));
+
+        // Never index or cache a ticket page: what it shows depends on who's looking
+        return $response->header('X-Robots-Tag', 'noindex, nofollow')
+            ->header('Cache-Control', 'no-store, private');
     }
 }
