@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Event;
+use App\Models\EventSeatingPlan;
 use Tests\TestCase;
 
 /**
@@ -71,5 +72,34 @@ class AdminEventsListTest extends TestCase
             ->assertOk()
             ->assertSee('<td>Event Number 01</td>', false)
             ->assertDontSee('<td>Event Number 02</td>', false);
+    }
+
+    protected function addSeats(Event $event): void
+    {
+        // 8 columns x 6 rows = 48 seats, created when the plan is saved
+        $plan = EventSeatingPlan::factory()->make();
+        $plan->forceFill(['event_id' => $event->id, 'status' => 'PUBLISHED'])->save();
+    }
+
+    public function testTicketLimitAndSeatsAreSeparateColumns()
+    {
+        $enough = $this->makeEvent('Enough Seats LAN', '2027-03-01 16:00:00');
+        $enough->forceFill(['capacity' => 40])->save();
+        $this->addSeats($enough);
+
+        $short = $this->makeEvent('Short Seats LAN', '2027-02-01 16:00:00');
+        $short->forceFill(['capacity' => 50])->save();
+        $this->addSeats($short);
+
+        $this->makeEvent('Board Games Day', '2027-01-01 16:00:00');
+
+        $this->actingAs($this->createUser(['admin' => 1]))
+            ->get('/admin/events')
+            ->assertOk()
+            ->assertSee('Ticket Limit')
+            ->assertDontSee('Seats:')
+            ->assertSeeInOrder(['<td>Enough Seats LAN</td>', '<td>40</td>', '48', '<td>Short Seats LAN</td>'], false)
+            ->assertSee('(2 short)')
+            ->assertSee('No seating plan');
     }
 }

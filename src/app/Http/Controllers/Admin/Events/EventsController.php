@@ -37,6 +37,7 @@ class EventsController extends Controller
             ->withUser(Auth::user())
             ->withEvents(
                 Event::withoutGlobalScopes()
+                    ->with('seatingPlans.seats')
                     ->orderBy('start', 'DESC')
                     ->orderBy('id', 'DESC')
                     ->paginate(10)
