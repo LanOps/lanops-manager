@@ -38,7 +38,7 @@ class AdminEventsListTest extends TestCase
         $this->actingAs($this->createUser(['admin' => 1]))
             ->get('/admin/events')
             ->assertOk()
-            ->assertSeeInOrder(['Newest LAN', 'Middle LAN', 'Oldest LAN']);
+            ->assertSeeInOrder(['<td>Newest LAN</td>', '<td>Middle LAN</td>', '<td>Oldest LAN</td>'], false);
     }
 
     public function testDraftAndPrivateEventsAreStillListed()
@@ -50,9 +50,10 @@ class AdminEventsListTest extends TestCase
         $this->actingAs($this->createUser(['admin' => 1]))
             ->get('/admin/events')
             ->assertOk()
-            ->assertSeeInOrder(['Draft LAN', 'Private LAN', 'Public LAN']);
+            ->assertSeeInOrder(['<td>Draft LAN</td>', '<td>Private LAN</td>', '<td>Public LAN</td>'], false);
     }
 
+    // The admin menu lists events too, so look at the table cells only
     public function testOlderEventsMoveToTheNextPage()
     {
         for ($i = 1; $i <= 11; $i++) {
@@ -62,13 +63,13 @@ class AdminEventsListTest extends TestCase
 
         $this->actingAs($admin)->get('/admin/events')
             ->assertOk()
-            ->assertSee('Event Number 11')
-            ->assertSee('Event Number 02')
-            ->assertDontSee('Event Number 01');
+            ->assertSee('<td>Event Number 11</td>', false)
+            ->assertSee('<td>Event Number 02</td>', false)
+            ->assertDontSee('<td>Event Number 01</td>', false);
 
         $this->actingAs($admin)->get('/admin/events?page=2')
             ->assertOk()
-            ->assertSee('Event Number 01')
-            ->assertDontSee('Event Number 02');
+            ->assertSee('<td>Event Number 01</td>', false)
+            ->assertDontSee('<td>Event Number 02</td>', false);
     }
 }
