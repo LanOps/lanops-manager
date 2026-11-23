@@ -31,9 +31,16 @@ class EventsController extends Controller
      */
     public function index()
     {
+        // Every event (drafts and private ones too), newest start date first.
+        // id breaks ties so pages stay stable when two events start together.
         return view('admin.events.index')
             ->withUser(Auth::user())
-            ->withEvents(Event::withoutGlobalScopes()->orderBy('created_at', 'DESC')->paginate(10));
+            ->withEvents(
+                Event::withoutGlobalScopes()
+                    ->orderBy('start', 'DESC')
+                    ->orderBy('id', 'DESC')
+                    ->paginate(10)
+            );
     }
 
     /**
