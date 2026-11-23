@@ -31,7 +31,8 @@
 								<th>Start</th>
 								<th>End</th>
 								<th>Short Description</th>
-								<th>Capacity</th>
+								<th title="Most tickets that can be sold">Ticket Limit</th>
+								<th title="Usable seats across the event's seating plans">Seats</th>
 								<th></th>
 								<th></th>
 							</tr>
@@ -43,7 +44,20 @@
 									<td>{{ date('d-m-y H:i', strtotime($event->start)) }}</td>
 									<td>{{ date('d-m-y H:i', strtotime($event->end)) }}</td>
 									<td>{{ $event->desc_short }}</td>
-									<td class="center">{{ $event->capacity }} <small>Seats:{{ $event->getSeatingCapacity() }}</small></td>
+									@php($seats = $event->getSeatingCapacity())
+									<td>{{ $event->capacity }}</td>
+									<td>
+										@if ($seats === 0)
+											<span class="text-body-secondary">No seating plan</span>
+										@elseif ($event->capacity > $seats)
+											<span class="text-warning-emphasis fw-semibold" title="More tickets can be sold than there are seats">
+												<i class="fa fa-triangle-exclamation"></i> {{ $seats }}
+												<small>({{ $event->capacity - $seats }} short)</small>
+											</span>
+										@else
+											{{ $seats }}
+										@endif
+									</td>
 									<td width="15%">
 										<a href="/admin/events/{{ $event->slug }}"><button type="button" class="btn btn-primary btn-sm w-100">Edit</button></a>
 									</td>
