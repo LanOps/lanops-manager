@@ -12,7 +12,7 @@
                 @if ($nextEventLan)
                     <div class="hero-event-item">
                         <span class="hero-event-type">Next LAN</span>
-                        <h2 class="hero-event-name">{{ $nextEventLan->display_name }}</h2>
+                        <h2 class="hero-event-name"><a href="/events/{{ $nextEventLan->slug }}" class="hero-event-link">{{ $nextEventLan->display_name }}</a></h2>
                         <p class="hero-event-date">
                             {{ date('jS', strtotime($nextEventLan->start)) }} &ndash; {{ date('jS F Y', strtotime($nextEventLan->end)) }}
                         </p>
@@ -45,7 +45,7 @@
                 @if ($nextEventTabletop)
                     <div class="hero-event-item">
                         <span class="hero-event-type">Next Tabletop</span>
-                        <h2 class="hero-event-name">{{ $nextEventTabletop->display_name }}</h2>
+                        <h2 class="hero-event-name"><a href="/events/{{ $nextEventTabletop->slug }}" class="hero-event-link">{{ $nextEventTabletop->display_name }}</a></h2>
                         <p class="hero-event-date">
                             {{ date('jS', strtotime($nextEventTabletop->start)) }} &ndash; {{ date('jS F Y', strtotime($nextEventTabletop->end)) }}
                         </p>

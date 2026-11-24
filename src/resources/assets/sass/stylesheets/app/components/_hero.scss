@@ -180,6 +180,19 @@
     letter-spacing: 1px;
 }
 
+.hero-event-link {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+        color: #fff;
+        text-decoration: underline;
+        text-decoration-thickness: 3px;
+        text-underline-offset: 6px;
+    }
+}
+
 .hero-venue-link {
     color: inherit;
     text-decoration: none;
