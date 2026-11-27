@@ -246,3 +246,85 @@
     text-transform: uppercase;
     margin-top: 5px;
 }
+
+/**
+ * "On Now" bar above the hero, for events that have started (they leave the Next slots)
+ * Dark in both colour modes so it reads as part of the hero.
+ */
+.live-event-bar {
+    background: #111;
+    color: #fff;
+    border-bottom: 3px solid $color_primary;
+    // The fixed header covers the top of the page (the hero sits under it too), so leave room for it
+    padding: 32px 0 10px;
+
+    @media (max-width: 767px) {
+        padding-top: 38px;
+    }
+}
+
+.live-event-bar-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px 16px;
+    text-align: center;
+}
+
+.live-event-bar-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: $color_primary;
+    color: $color_primary_text;
+    font-size: 11px;
+    font-weight: $font-bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+}
+
+.live-event-bar-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    animation: live-event-pulse 1.6s ease-in-out infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+@keyframes live-event-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+}
+
+.live-event-bar-name {
+    font-size: 18px;
+    font-weight: $font-bold;
+
+    a {
+        color: #fff;
+        text-decoration: none;
+
+        &:hover,
+        &:focus {
+            color: $color_primary;
+        }
+    }
+}
+
+.live-event-bar-until {
+    font-size: 14px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.7);
+    margin-left: 6px;
+}
+
+.live-event-bar-links {
+    display: inline-flex;
+    gap: 8px;
+}

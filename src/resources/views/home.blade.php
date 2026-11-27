@@ -6,6 +6,23 @@
     $headings = \App\Models\Event::getNextEventHeadings();
 @endphp
 
+{{-- On now: live events have left the Next slots, so they get a bar of their own at the top --}}
+@foreach ($liveEvents as $liveEvent)
+    <div class="live-event-bar">
+        <div class="container live-event-bar-inner">
+            <span class="live-event-bar-badge"><span class="live-event-bar-dot" aria-hidden="true"></span>On Now</span>
+            <span class="live-event-bar-name">
+                <a href="/events/{{ $liveEvent->slug }}">{{ $liveEvent->display_name }}</a>
+                <span class="live-event-bar-until">until {{ date('jS F', strtotime($liveEvent->end)) }}</span>
+            </span>
+            <span class="live-event-bar-links">
+                <a href="/events/{{ $liveEvent->slug }}#timetable" class="btn btn-sm btn-outline-light">Timetable</a>
+                <a href="/events/{{ $liveEvent->slug }}" class="btn btn-sm btn-orange">View event</a>
+            </span>
+        </div>
+    </div>
+@endforeach
+
 {{-- Hero --}}
 <div id="hero-section" class="hero-section">
     <video id="hero-vid-a" class="hero-slide-video hero-slide-video--active" muted playsinline autoplay preload="auto"></video>
@@ -86,7 +103,7 @@
             </div>
             <div class="col-12 col-md-5">
                 <h2 class="section-heading" style="margin-top:30px;">Event Calendar</h2>
-                @php $futureEvents = $events->filter(fn($e) => $e->start > \Carbon\Carbon::today()); @endphp
+                @php $futureEvents = $events->filter(fn($e) => $e->start > \Carbon\Carbon::now()); @endphp
                 @if ($futureEvents->count() > 0)
                     <ul class="cal-list">
                         @foreach ($futureEvents as $calEvent)

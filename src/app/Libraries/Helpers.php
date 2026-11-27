@@ -155,6 +155,20 @@ class Helpers
     }
 
     /**
+     * Label in front of the next event's name in the navigation: "On Now" once it has started, else "Next Event"
+     * (the navigation keeps the live event so attendees can reach its timetable and seating)
+     * @return String
+     */
+    public static function getNextEventLabel()
+    {
+        $event = self::getNextEvent();
+        if ($event && Carbon::parse($event->start)->isPast()) {
+            return 'On Now';
+        }
+        return 'Next Event';
+    }
+
+    /**
      * Get Next Event Slug
      * @return String
      */

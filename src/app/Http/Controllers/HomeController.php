@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\DB;
-
 use App\Models\Event;
 use App\Models\NewsArticle;
 
@@ -22,18 +20,26 @@ class HomeController extends Controller
             $sliderFiles
         );
 
-        // The next listed event of each type, in home page order; types with nothing coming up are left out
+        // The next listed event of each type that has not started yet, in home page order
+        // (an event that is on now moves the slot on to the one after it); types with nothing coming up are left out
         $nextEvents = [];
         foreach (array_keys(Event::getNextEventHeadings()) as $type) {
-            $next = Event::listed()->where('end', '>=', \Carbon\Carbon::now())
+            $next = Event::listed()->where('start', '>', \Carbon\Carbon::now())
                 ->where('type', $type)
-                ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
+                ->orderBy('start')
+                ->orderBy('id')
                 ->first();
             if ($next) {
                 $nextEvents[$type] = $next;
             }
         }
         $nextLan = $nextEvents[Event::$typeLan] ?? null;
+
+        // Events on right now: they leave the "Next" slots, so a bar above the hero links to them
+        $liveEvents = Event::listed()->where('start', '<=', \Carbon\Carbon::now())
+            ->where('end', '>=', \Carbon\Carbon::now())
+            ->orderBy('start')
+            ->get();
 
         $seoTitle       = config('app.tagline');
         $seoDescription = config('app.seo_description');
@@ -55,9 +61,10 @@ class HomeController extends Controller
         return view("home")
             ->withNextEvent(\App\Libraries\Helpers::getNextEvent())
             ->withNextEvents($nextEvents)
+            ->withLiveEvents($liveEvents)
             ->withNewsArticles(NewsArticle::limit(4)->orderBy('created_at', 'desc')->get())
-            // Only upcoming events are shown in the calendar
-            ->withEvents(Event::listed()->where('start', '>', \Carbon\Carbon::today())->orderBy('created_at', 'DESC')->get())
+            // Only upcoming events (not started yet) are shown in the calendar
+            ->withEvents(Event::listed()->where('start', '>', \Carbon\Carbon::now())->orderBy('created_at', 'DESC')->get())
             ->withSliderVideos($sliderVideos)
         ;
     }

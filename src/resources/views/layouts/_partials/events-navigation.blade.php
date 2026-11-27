@@ -1,5 +1,5 @@
 <li class="nav-item dropdown">
-	<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">Next Event: {{ Helpers::getNextEventName() }}</a>
+	<a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">{{ Helpers::getNextEventLabel() }}: {{ Helpers::getNextEventName() }}</a>
 	<ul class="dropdown-menu">
 		<li><a class="dropdown-item" href="/events/{{ Helpers::getNextEventSlug() }}">Information</a></li>
 		<li><a class="dropdown-item" href="/events/{{ Helpers::getNextEventSlug() }}#purchaseTickets">Tickets</a></li>
