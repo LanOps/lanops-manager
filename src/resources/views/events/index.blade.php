@@ -28,7 +28,7 @@
                         <div class="event-card">
                             <div class="event-card-header">
                                 @if ($event->type)
-                                    <span class="event-card-badge {{ $event->type === 'TABLETOP' ? 'event-card-badge--alt' : '' }}">
+                                    <span class="event-card-badge {{ $event->getTypeBadgeVariant() ? 'event-card-badge--' . $event->getTypeBadgeVariant() : '' }}">
                                         {{ $event->type }}
                                     </span>
                                 @endif

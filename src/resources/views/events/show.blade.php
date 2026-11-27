@@ -14,7 +14,7 @@
 	<div class="container">
 		<a href="{{ url('/events') }}" class="event-detail-back">&larr; All Events</a>
 		@if ($event->type)
-			<span class="event-detail-badge {{ $event->type === 'TABLETOP' ? 'event-detail-badge--alt' : '' }}">{{ $event->type }}</span>
+			<span class="event-detail-badge {{ $event->getTypeBadgeVariant() ? 'event-detail-badge--' . $event->getTypeBadgeVariant() : '' }}">{{ $event->type }}</span>
 		@endif
 		<h1 class="event-detail-title">
 			{{$event->display_name}}

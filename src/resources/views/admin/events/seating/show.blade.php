@@ -159,7 +159,7 @@
 											'draft'=>'Draft',
 											'preview'=>'Preview',
 											'published'=>'Published',
-										), strtolower($seatingPlan->status))->class('form-control')
+										), strtolower($seatingPlan->status))->class('form-select')
 								}}
 						</div>
 					</div>

@@ -61,6 +61,8 @@ class Event extends Model
 
     public static $typeTabletop = 'TABLETOP';
 
+    public static $typeStreaming = 'STREAMING';
+
     protected static function boot()
     {
         parent::boot();
@@ -380,8 +382,35 @@ class Event extends Model
     public static function getTypeArray()
     {
         return [
-            Event::$typeLan         => Event::$typeLan,
-            Event::$typeTabletop    => Event::$typeTabletop,
+            Event::$typeLan         => 'LAN',
+            Event::$typeTabletop    => 'Tabletop',
+            Event::$typeStreaming   => 'Streaming',
         ];
+    }
+
+    /**
+     * Heading for each event type's "next event" slot on the home page, in display order.
+     * @return array<string, string>
+     */
+    public static function getNextEventHeadings()
+    {
+        return [
+            Event::$typeLan         => 'Next LAN',
+            Event::$typeTabletop    => 'Next Tabletop',
+            Event::$typeStreaming   => 'Next Stream',
+        ];
+    }
+
+    /**
+     * Colour variant of the type badge on event cards and the event page ('' is the default orange).
+     * @return string
+     */
+    public function getTypeBadgeVariant()
+    {
+        return match ($this->type) {
+            Event::$typeTabletop    => 'alt',
+            Event::$typeStreaming   => 'stream',
+            default                 => '',
+        };
     }
 }

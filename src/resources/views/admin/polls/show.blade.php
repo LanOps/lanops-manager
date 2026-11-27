@@ -96,7 +96,7 @@
 									'draft'=>'Draft',
 									'preview'=>'Preview',
 									'published'=>'Published'
-								), strtolower($poll->status))->class('form-control')
+								), strtolower($poll->status))->class('form-select')
 						}}
 					</div>
 					<div class="mb-3">
