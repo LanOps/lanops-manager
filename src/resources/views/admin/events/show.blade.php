@@ -106,16 +106,17 @@
 					</div>
 					<div class="row">
 						<div class="col-md-8 col-sm-12">
-							<strong>Venue</strong>
-							<address>
-								@if ($event->venue->display_name) {{ $event->venue->display_name }}<br> @endif
-								@if ($event->venue->address_1) {{ $event->venue->address_1 }}<br> @endif
-								@if ($event->venue->address_2) {{ $event->venue->address_2 }}<br> @endif
-								@if ($event->venue->address_street) {{ $event->venue->address_street }}<br> @endif
-								@if ($event->venue->address_city) {{ $event->venue->address_city }}<br> @endif
-								@if ($event->venue->address_postcode) {{ $event->venue->address_postcode }}<br> @endif
-								@if ($event->venue->address_country) {{ $event->venue->address_country }}<br> @endif
-							</address>
+							<div class="mb-3">
+								{{ html()->label('Venue', 'venue') }}
+								{{ html()->select('venue', Helpers::getVenues(), $event->event_venue_id)->class('form-select') }}
+							</div>
+							@if ($event->venue)
+								<address class="small text-body-secondary">
+									@foreach (['display_name', 'address_1', 'address_2', 'address_street', 'address_city', 'address_postcode', 'address_country'] as $line)
+										@if ($event->venue->$line) {{ $event->venue->$line }}<br> @endif
+									@endforeach
+								</address>
+							@endif
 						</div>
 						<div class="col-md-4 col-sm-12">
 							
