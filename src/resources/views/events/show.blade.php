@@ -235,6 +235,7 @@
 		</div>
 	@endif
 
+	@if ($event->venue)
 	<div class="event-detail-block" id="venue">
 		<a name="venue"></a>
 		<h2 class="section-heading">Venue Information</h2>
@@ -261,6 +262,7 @@
 			</div>
 		</div>
 	</div>
+	@endif
 
 	@if (!empty($event->information))
 		<div class="event-detail-block">

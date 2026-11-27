@@ -30,13 +30,14 @@ class Helpers
      */
     public static function getVenues($obj = false)
     {
-        $venues = \App\Models\EventVenue::all();
+        $venues = \App\Models\EventVenue::orderBy('display_name')->get();
         $return = array();
+        if (!$obj) {
+            // Blank value, so picking None saves no venue (it used to get a made-up id and fail validation)
+            $return[''] = 'None';
+        }
         foreach ($venues as $venue) {
                 $return[$venue->id] = $venue->display_name;
-        }
-        if (!$obj) {
-            $return[] = 'None';
         }
         if ($obj) {
             return json_decode(json_encode($return), false);

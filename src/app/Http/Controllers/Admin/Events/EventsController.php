@@ -74,7 +74,7 @@ class EventsController extends Controller
             'start_date'    => 'required|date_format:Y-m-d',
             'start_time'    => 'required|date_format:H:i',
             'capacity'      => 'required|integer',
-            'venue'         => 'exists:event_venues,id',
+            'venue'         => 'nullable|exists:event_venues,id',
             'type'          => Rule::in(array_keys(Event::getTypeArray())),
         ];
         $messages = [
@@ -104,7 +104,7 @@ class EventsController extends Controller
         $event->end                 = date("Y-m-d H:i:s", strtotime($request->end_date . ' ' . $request->end_time));
         $event->desc_long           = $request->desc_long;
         $event->desc_short          = $request->desc_short;
-        $event->event_venue_id      = @$request->venue;
+        $event->event_venue_id      = $request->filled('venue') ? $request->venue : null;
         $event->capacity            = $request->capacity;
         $event->type                = $request->input('type', Event::$typeLan);
 
@@ -132,7 +132,7 @@ class EventsController extends Controller
             'start_time'        => 'filled|date_format:H:i',
             'status'            => 'in:draft,preview,published,private',
             'capacity'          => 'filled|integer',
-            'venue'             => 'exists:event_venues,id',
+            'venue'             => 'nullable|exists:event_venues,id',
             'type'              => Rule::in(array_keys(Event::getTypeArray())),
         ];
         $messages = [
@@ -193,6 +193,11 @@ class EventsController extends Controller
 
         if (isset($request->capacity)) {
             $event->capacity        = $request->capacity;
+        }
+
+        // Venue can change on any event, published or not; blank means no venue
+        if ($request->has('venue')) {
+            $event->event_venue_id  = $request->filled('venue') ? $request->venue : null;
         }
 
         
