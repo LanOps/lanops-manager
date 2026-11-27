@@ -128,9 +128,13 @@
 							{{ html()->textarea('desc_long', '')->class('form-control')->rows('2') }}
 						</div>
 						<div class="row">
-							<div class="col-lg-6 col-sm-12 mb-3">
+							<div class="col-lg-3 col-sm-6 mb-3">
 								{{ html()->label('Capacity', 'capacity') }}
 								{{ html()->text('capacity', '')->class('form-control') }}
+							</div>
+							<div class="col-lg-3 col-sm-6 mb-3">
+								{{ html()->label('Type', 'type') }}
+								{{ html()->select('type', App\Models\Event::getTypeArray(), App\Models\Event::$typeLan)->class('form-select') }}
 							</div>
 							<div class="col-lg-6 col-sm-12 mb-3">
 								{{ html()->label('Venue', 'venue') }}

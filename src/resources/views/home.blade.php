@@ -2,6 +2,10 @@
 
 @section ('content')
 
+@php
+    $headings = \App\Models\Event::getNextEventHeadings();
+@endphp
+
 {{-- Hero --}}
 <div id="hero-section" class="hero-section">
     <video id="hero-vid-a" class="hero-slide-video hero-slide-video--active" muted playsinline autoplay preload="auto"></video>
@@ -9,69 +13,14 @@
     <div class="hero-content">
         <div class="hero-event-block">
             <div class="hero-events-grid">
-                @if ($nextEventLan)
-                    <div class="hero-event-item">
-                        <span class="hero-event-type">Next LAN</span>
-                        <h2 class="hero-event-name"><a href="/events/{{ $nextEventLan->slug }}" class="hero-event-link">{{ $nextEventLan->display_name }}</a></h2>
-                        <p class="hero-event-date">
-                            {{ date('jS', strtotime($nextEventLan->start)) }} &ndash; {{ date('jS F Y', strtotime($nextEventLan->end)) }}
-                        </p>
-                        <div class="hero-countdown" data-countdown="{{ \Carbon\Carbon::parse($nextEventLan->start)->toIso8601String() }}">
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="d">--</span><span class="hero-countdown-label">days</span></div>
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="h">--</span><span class="hero-countdown-label">hrs</span></div>
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="m">--</span><span class="hero-countdown-label">mins</span></div>
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="s">--</span><span class="hero-countdown-label">secs</span></div>
-                        </div>
-                        @if ($nextEventLan->venue)
-                            @php
-                                $v = $nextEventLan->venue;
-                                $addr = implode(', ', array_filter([$v->address_1, $v->address_2, $v->address_street, $v->address_city, $v->address_postcode]));
-                                $mapsQuery = urlencode(implode(', ', array_filter([$v->display_name, $addr])));
-                            @endphp
-                            <p class="hero-event-venue">
-                                <a href="https://www.google.com/maps/search/?api=1&query={{ $mapsQuery }}" target="_blank" rel="noopener" class="hero-venue-link">
-                                    {{ $v->display_name }}@if($addr)<br><span class="hero-event-address">{{ $addr }}</span>@endif
-                                </a>
-                            </p>
-                        @endif
-                        <a href="/events/{{ $nextEventLan->slug }}#tickets" class="btn btn-orange btn-lg hero-cta">Get Your Ticket</a>
-                    </div>
-                @endif
+                @foreach ($nextEvents as $type => $nextEvent)
+                    @if (!$loop->first)
+                        <div class="hero-event-col-divider"></div>
+                    @endif
+                    @include ('layouts._partials._home.hero-event', ['event' => $nextEvent, 'heading' => $headings[$type]])
+                @endforeach
 
-                @if ($nextEventLan && $nextEventTabletop)
-                    <div class="hero-event-col-divider"></div>
-                @endif
-
-                @if ($nextEventTabletop)
-                    <div class="hero-event-item">
-                        <span class="hero-event-type">Next Tabletop</span>
-                        <h2 class="hero-event-name"><a href="/events/{{ $nextEventTabletop->slug }}" class="hero-event-link">{{ $nextEventTabletop->display_name }}</a></h2>
-                        <p class="hero-event-date">
-                            {{ date('jS', strtotime($nextEventTabletop->start)) }} &ndash; {{ date('jS F Y', strtotime($nextEventTabletop->end)) }}
-                        </p>
-                        <div class="hero-countdown" data-countdown="{{ \Carbon\Carbon::parse($nextEventTabletop->start)->toIso8601String() }}">
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="d">--</span><span class="hero-countdown-label">days</span></div>
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="h">--</span><span class="hero-countdown-label">hrs</span></div>
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="m">--</span><span class="hero-countdown-label">mins</span></div>
-                            <div class="hero-countdown-unit"><span class="hero-countdown-value" data-unit="s">--</span><span class="hero-countdown-label">secs</span></div>
-                        </div>
-                        @if ($nextEventTabletop->venue)
-                            @php
-                                $v = $nextEventTabletop->venue;
-                                $addr = implode(', ', array_filter([$v->address_1, $v->address_2, $v->address_street, $v->address_city, $v->address_postcode]));
-                                $mapsQuery = urlencode(implode(', ', array_filter([$v->display_name, $addr])));
-                            @endphp
-                            <p class="hero-event-venue">
-                                <a href="https://www.google.com/maps/search/?api=1&query={{ $mapsQuery }}" target="_blank" rel="noopener" class="hero-venue-link">
-                                    {{ $v->display_name }}@if($addr)<br><span class="hero-event-address">{{ $addr }}</span>@endif
-                                </a>
-                            </p>
-                        @endif
-                        <a href="/events/{{ $nextEventTabletop->slug }}#tickets" class="btn btn-orange btn-lg hero-cta">Get Your Ticket</a>
-                    </div>
-                @endif
-
-                @if (!$nextEventLan && !$nextEventTabletop)
+                @if (empty($nextEvents))
                     <div class="hero-event-item">
                         <span class="hero-event-type">Gaming Events</span>
                         <h2 class="hero-event-name">Coming Soon</h2>
@@ -89,7 +38,7 @@
 </div>
 
 {{-- Upcoming Events --}}
-@if ($nextEventLan || $nextEventTabletop)
+@if (!empty($nextEvents))
 <div class="featured-events section-padding">
     <div class="container">
         <div class="row">
@@ -99,107 +48,9 @@
         </div>
         <div class="row">
 
-            @if ($nextEventLan)
-            @php
-                $lanCapacity = count($nextEventLan->seatingPlans) > 0
-                    ? $nextEventLan->getSeatingCapacity()
-                    : $nextEventLan->capacity;
-                $lanFilled   = $nextEventLan->eventParticipants->count();
-                $lanRemaining = max($lanCapacity - $lanFilled, 0);
-                $lanPct      = $lanCapacity > 0 ? round(($lanFilled / $lanCapacity) * 100) : 0;
-            @endphp
-            <div class="col-12 {{ $nextEventTabletop ? 'col-md-6' : '' }}">
-                <div class="event-card">
-                    <div class="event-card-header">
-                        <span class="event-card-badge">LAN</span>
-                        <h3 class="event-card-title">{{ $nextEventLan->display_name }}</h3>
-                    </div>
-                    <div class="event-card-body">
-                        <dl class="event-card-meta">
-                            <dt>When</dt>
-                            <dd>{{ date('jS', strtotime($nextEventLan->start)) }} &ndash; {{ date('jS F Y', strtotime($nextEventLan->end)) }}</dd>
-                            @if ($nextEventLan->venue)
-                                @php
-                                    $v = $nextEventLan->venue;
-                                    $addr = implode(', ', array_filter([$v->address_1, $v->address_2, $v->address_street, $v->address_city, $v->address_postcode]));
-                                    $mapsQuery = urlencode(implode(', ', array_filter([$v->display_name, $addr])));
-                                @endphp
-                                <dt>Where</dt>
-                                <dd><a href="https://www.google.com/maps/search/?api=1&query={{ $mapsQuery }}" target="_blank" rel="noopener">{{ $v->display_name }}@if($addr)<br>{{ $addr }}@endif</a></dd>
-                            @endif
-                            @if ($nextEventLan->tickets && $nextEventLan->tickets->count())
-                                <dt>From</dt>
-                                <dd>{{ config('app.currency_symbol') }}{{ $nextEventLan->getCheapestTicket() }}</dd>
-                            @endif
-                        </dl>
-                        @if ($nextEventLan->desc_short)
-                            <div class="event-card-desc">{!! $nextEventLan->desc_short !!}</div>
-                        @endif
-                        <div class="capacity-wrap">
-                            <div class="capacity-bar">
-                                <div class="capacity-fill" style="width: {{ $lanPct }}%"></div>
-                            </div>
-                            <span class="capacity-text">{{ $lanRemaining }} of {{ $lanCapacity }} tickets remaining</span>
-                        </div>
-                    </div>
-                    <div class="event-card-footer">
-                        <a href="/events/{{ $nextEventLan->slug }}" class="btn btn-outline-secondary btn-sm">Details</a>
-                        <a href="/events/{{ $nextEventLan->slug }}#tickets" class="btn btn-orange btn-sm">Book Now</a>
-                    </div>
-                </div>
-            </div>
-            @endif
-
-            @if ($nextEventTabletop)
-            @php
-                $ttCapacity  = count($nextEventTabletop->seatingPlans) > 0
-                    ? $nextEventTabletop->getSeatingCapacity()
-                    : $nextEventTabletop->capacity;
-                $ttFilled    = $nextEventTabletop->eventParticipants->count();
-                $ttRemaining = max($ttCapacity - $ttFilled, 0);
-                $ttPct       = $ttCapacity > 0 ? round(($ttFilled / $ttCapacity) * 100) : 0;
-            @endphp
-            <div class="col-12 {{ $nextEventLan ? 'col-md-6' : '' }}">
-                <div class="event-card">
-                    <div class="event-card-header">
-                        <span class="event-card-badge event-card-badge--alt">TABLETOP</span>
-                        <h3 class="event-card-title">{{ $nextEventTabletop->display_name }}</h3>
-                    </div>
-                    <div class="event-card-body">
-                        <dl class="event-card-meta">
-                            <dt>When</dt>
-                            <dd>{{ date('jS', strtotime($nextEventTabletop->start)) }} &ndash; {{ date('jS F Y', strtotime($nextEventTabletop->end)) }}</dd>
-                            @if ($nextEventTabletop->venue)
-                                @php
-                                    $v = $nextEventTabletop->venue;
-                                    $addr = implode(', ', array_filter([$v->address_1, $v->address_2, $v->address_street, $v->address_city, $v->address_postcode]));
-                                    $mapsQuery = urlencode(implode(', ', array_filter([$v->display_name, $addr])));
-                                @endphp
-                                <dt>Where</dt>
-                                <dd><a href="https://www.google.com/maps/search/?api=1&query={{ $mapsQuery }}" target="_blank" rel="noopener">{{ $v->display_name }}@if($addr)<br>{{ $addr }}@endif</a></dd>
-                            @endif
-                            @if ($nextEventTabletop->tickets && $nextEventTabletop->tickets->count())
-                                <dt>From</dt>
-                                <dd>{{ config('app.currency_symbol') }}{{ $nextEventTabletop->getCheapestTicket() }}</dd>
-                            @endif
-                        </dl>
-                        @if ($nextEventTabletop->desc_short)
-                            <div class="event-card-desc">{!! $nextEventTabletop->desc_short !!}</div>
-                        @endif
-                        <div class="capacity-wrap">
-                            <div class="capacity-bar">
-                                <div class="capacity-fill" style="width: {{ $ttPct }}%"></div>
-                            </div>
-                            <span class="capacity-text">{{ $ttRemaining }} of {{ $ttCapacity }} tickets remaining</span>
-                        </div>
-                    </div>
-                    <div class="event-card-footer">
-                        <a href="/events/{{ $nextEventTabletop->slug }}" class="btn btn-outline-secondary btn-sm">Details</a>
-                        <a href="/events/{{ $nextEventTabletop->slug }}#tickets" class="btn btn-orange btn-sm">Book Now</a>
-                    </div>
-                </div>
-            </div>
-            @endif
+            @foreach ($nextEvents as $nextEvent)
+                @include ('layouts._partials._home.event-card', ['event' => $nextEvent, 'columns' => count($nextEvents)])
+            @endforeach
 
         </div>
     </div>

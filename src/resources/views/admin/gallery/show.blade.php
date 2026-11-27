@@ -108,7 +108,7 @@
 									html()->select('status', array(
 											'draft'=>'Draft',
 											'published'=>'Published',
-										), strtolower($album->status))->class('form-control')
+										), strtolower($album->status))->class('form-select')
 								}}
 							</div>
 							 <div class="col-lg-6 col-sm-12 mb-3">

@@ -44,44 +44,37 @@
 								{{ html()->label('Name', 'event_name') }}
 								{{ html()->text('event_name', $event->display_name)->class('form-control') }}
 							</div>
+							{{-- Two per row so the dropdowns are wide enough to read --}}
 							<div class="row">
-								<div class="col-md-6 col-12">
-									<div class="row">
-										<div class="col-md-6 col-12">
-											<div class="mb-3">
-												{{ html()->label('Capacity', 'capacity') }}
-												{{ html()->text('capacity', $event->capacity)->class('form-control') }}
-											</div>
-										</div>
-										<div class="col-md-6 col-12">
-											<div class="mb-3">
-												{{ html()->label('Seating', 'seating_cap') }}
-												{{ html()->text('seating_cap', $event->getSeatingCapacity())->class('form-control')->disabled() }}
-											</div>
-										</div>
+								<div class="col-6">
+									<div class="mb-3">
+										{{ html()->label('Capacity', 'capacity') }}
+										{{ html()->text('capacity', $event->capacity)->class('form-control') }}
 									</div>
 								</div>
-								<div class="col-md-6 col-12">
-									<div class="row">
-										<div class="col-md-6 col-12">
-											<div class="mb-3">
-												{{ html()->label('Status', 'event_status') }}
-												{{ 
-													html()->select('status', array(
-															'draft'=>'Draft',
-															'preview'=>'Preview',
-															'published'=>'Published',
-															'private' => 'Private'
-														), strtolower($event->status))->class('form-control')
-												}}
-											</div>
-										</div>
-										<div class="col-md-6 col-12">
-											<div class="mb-3">
-												{{ html()->label('Type', 'event_type') }}
-												{{ html()->select('type', App\Models\Event::getTypeArray(), $event->type)->class('form-select') }}
-											</div>
-										</div>
+								<div class="col-6">
+									<div class="mb-3">
+										{{ html()->label('Seating', 'seating_cap') }}
+										{{ html()->text('seating_cap', $event->getSeatingCapacity())->class('form-control')->disabled() }}
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="mb-3">
+										{{ html()->label('Status', 'status') }}
+										{{
+											html()->select('status', array(
+													'draft'=>'Draft',
+													'preview'=>'Preview',
+													'published'=>'Published',
+													'private' => 'Private'
+												), strtolower($event->status))->class('form-select')
+										}}
+									</div>
+								</div>
+								<div class="col-6">
+									<div class="mb-3">
+										{{ html()->label('Type', 'type') }}
+										{{ html()->select('type', App\Models\Event::getTypeArray(), $event->type)->class('form-select') }}
 									</div>
 								</div>
 							</div>

@@ -17,6 +17,7 @@ use App\Http\Controllers\Controller;
 
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Http;
@@ -74,6 +75,7 @@ class EventsController extends Controller
             'start_time'    => 'required|date_format:H:i',
             'capacity'      => 'required|integer',
             'venue'         => 'exists:event_venues,id',
+            'type'          => Rule::in(array_keys(Event::getTypeArray())),
         ];
         $messages = [
             'event_name.required'       => 'Event name is required',
@@ -89,7 +91,8 @@ class EventsController extends Controller
             'desc_long.required'        => 'Long Description is required',
             'capacity.required'         => 'Capacity is required',
             'capacity.integer'          => 'Capacity must be a integer',
-            'venue.exists'              => 'A venue is required'
+            'venue.exists'              => 'A venue is required',
+            'type.in'                   => 'Type must be ' . implode(', ', array_keys(Event::getTypeArray())),
 
         ];
         $this->validate($request, $rules, $messages);
@@ -103,6 +106,7 @@ class EventsController extends Controller
         $event->desc_short          = $request->desc_short;
         $event->event_venue_id      = @$request->venue;
         $event->capacity            = $request->capacity;
+        $event->type                = $request->input('type', Event::$typeLan);
 
         if (!$event->save()) {
             Session::flash('alert-danger', 'Cannot Save Event!');
@@ -129,7 +133,7 @@ class EventsController extends Controller
             'status'            => 'in:draft,preview,published,private',
             'capacity'          => 'filled|integer',
             'venue'             => 'exists:event_venues,id',
-            'type'              => 'in:LAN,TABLETOP',
+            'type'              => Rule::in(array_keys(Event::getTypeArray())),
         ];
         $messages = [
             'event_name.filled'         => 'Event Name cannot be empty',
@@ -145,7 +149,7 @@ class EventsController extends Controller
             'capacity.filled'           => 'Capacity is required',
             'capacity.integer'          => 'Capacity must be a integer',
             'venue.exists'              => 'A venue is required',
-            'type.in'                   => 'Type must be LAN or TABLETOP',
+            'type.in'                   => 'Type must be ' . implode(', ', array_keys(Event::getTypeArray())),
 
         ];
         $this->validate($request, $rules, $messages);

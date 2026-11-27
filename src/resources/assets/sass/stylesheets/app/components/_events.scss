@@ -66,6 +66,11 @@
     color: #fff;
 }
 
+.event-detail-badge--stream {
+    background: $color_stream;
+    color: $color_stream_text;
+}
+
 .event-detail-title {
     color: #fff;
     font-size: 32px;

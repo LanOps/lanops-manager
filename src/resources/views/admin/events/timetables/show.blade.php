@@ -189,7 +189,7 @@
 								html()->select('status', array(
 										'PUBLISHED'=>'Published',
 										'DRAFT'=>'Draft'
-									), strtoupper($timetable->status))->class('form-control')
+									), strtoupper($timetable->status))->class('form-select')
 							}}
 						</div>
 					</div>

@@ -22,10 +22,18 @@ class HomeController extends Controller
             $sliderFiles
         );
 
-        $nextLan = Event::listed()->where('end', '>=', \Carbon\Carbon::now())
-            ->where('type', Event::$typeLan)
-            ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
-            ->first();
+        // The next listed event of each type, in home page order; types with nothing coming up are left out
+        $nextEvents = [];
+        foreach (array_keys(Event::getNextEventHeadings()) as $type) {
+            $next = Event::listed()->where('end', '>=', \Carbon\Carbon::now())
+                ->where('type', $type)
+                ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))
+                ->first();
+            if ($next) {
+                $nextEvents[$type] = $next;
+            }
+        }
+        $nextLan = $nextEvents[Event::$typeLan] ?? null;
 
         $seoTitle       = config('app.tagline');
         $seoDescription = config('app.seo_description');
@@ -46,12 +54,7 @@ class HomeController extends Controller
 
         return view("home")
             ->withNextEvent(\App\Libraries\Helpers::getNextEvent())
-            ->withNextEventLan($nextLan)
-            ->withNextEventTabletop(
-                Event::listed()->where('end', '>=', \Carbon\Carbon::now())
-                    ->where('type', Event::$typeTabletop)
-                    ->orderBy(DB::raw('ABS(DATEDIFF(events.end, NOW()))'))->first()
-            )
+            ->withNextEvents($nextEvents)
             ->withNewsArticles(NewsArticle::limit(4)->orderBy('created_at', 'desc')->get())
             // Only upcoming events are shown in the calendar
             ->withEvents(Event::listed()->where('start', '>', \Carbon\Carbon::today())->orderBy('created_at', 'DESC')->get())
