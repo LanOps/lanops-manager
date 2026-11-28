@@ -265,7 +265,7 @@ class Helpers
         if (!$user) {
             $user = Auth::user();
         }
-        if (!$referralDiscountAmountOverride) {
+        if ($referralDiscountAmountOverride === null) {
             $referralDiscountAmountOverride = config('app.refer_a_friend_discount');
         }
         if (array_key_exists('tickets', $basket)) {
@@ -291,10 +291,17 @@ class Helpers
             }
         }
         if (array_key_exists('referral_discount', $basket) && $basket['referral_discount'] && ($user->getAvailableReferralPurchase() || $skipAvailableReferralsCheck)) {
-            $formattedBasket->total -= $referralDiscountAmountOverride;
-            $formattedBasket->referral_discount_total += $referralDiscountAmountOverride;
-            $formattedBasket->referral_used = true;
+            // A discount can't take the basket below zero. Only take off what is
+            // left to pay, and leave the referral unused on a free basket so it
+            // can still be redeemed on a paid ticket later.
+            $referralDiscount = min($referralDiscountAmountOverride, max($formattedBasket->total, 0));
+            if ($referralDiscount > 0) {
+                $formattedBasket->total -= $referralDiscount;
+                $formattedBasket->referral_discount_total += $referralDiscount;
+                $formattedBasket->referral_used = true;
+            }
         }
+        $formattedBasket->total = max($formattedBasket->total, 0);
         if (array_key_exists('codes', $basket)) {
             if (array_key_exists('referral', $basket['codes']) && User::isValidReferralCode($basket['codes']['referral'], Auth::user())) {
                 $formattedBasket->referral_code = $basket['codes']['referral'];
