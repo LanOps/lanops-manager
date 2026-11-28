@@ -650,4 +650,70 @@ class PaymentsTest extends TestCase
             ->get('/payment/checkout')
             ->assertRedirect('/register/email/verify');
     }
+
+    /**
+     * Give $user an unclaimed referral: someone bought a ticket using their code.
+     */
+    protected function giveUnclaimedReferral($user): void
+    {
+        $buyer = $this->createUser();
+        Purchase::withoutEvents(function () use ($user, $buyer) {
+            (new Purchase())->forceFill([
+                'user_id'                 => $buyer->id,
+                'type'                    => 'Stripe',
+                'transaction_id'          => 'tx_referral',
+                'token'                   => 'pi_referral',
+                'status'                  => 'Success',
+                'basket'                  => [],
+                'total'                   => 30,
+                'total_before_discount'   => 30,
+                'referral_discount_total' => 0,
+                'referral_code_user_id'   => $user->id,
+            ])->save();
+        });
+    }
+
+    protected function basketWithReferral(EventTicket $ticket): array
+    {
+        $basket = $this->basketFor($ticket);
+        $basket[config('app.basket_name')]['referral_discount'] = true;
+
+        return $basket;
+    }
+
+    public function testReferralDiscountCannotTakeTheTotalBelowZero()
+    {
+        config(['app.refer_a_friend_discount' => 10]);
+        $user = $this->createUser();
+        $this->giveUnclaimedReferral($user);
+        $ticket = $this->createEventWithTicket([], ['price' => 4]);
+
+        $this->actingAs($user);
+        $basket = \App\Libraries\Helpers::formatBasket($this->basketWithReferral($ticket)[config('app.basket_name')]);
+
+        $this->assertEquals(0, $basket->total);
+        $this->assertEquals(4, $basket->referral_discount_total);
+        $this->assertTrue($basket->referral_used);
+    }
+
+    public function testFreeTicketDoesNotUseUpAReferralDiscount()
+    {
+        config(['app.refer_a_friend_discount' => 10]);
+        $user = $this->createUser();
+        $this->giveUnclaimedReferral($user);
+        $ticket = $this->createEventWithTicket([], ['price' => 0]);
+
+        $this->actingAs($user)->withSession($this->basketWithReferral($ticket));
+        $basket = \App\Libraries\Helpers::formatBasket($this->basketWithReferral($ticket)[config('app.basket_name')]);
+
+        $this->assertEquals(0, $basket->total);
+        $this->assertEquals(0, $basket->referral_discount_total);
+        $this->assertFalse($basket->referral_used);
+
+        $this->get('/payment/checkout')
+            ->assertOk()
+            ->assertDontSee('-' . config('app.currency_symbol') . '10.00')
+            ->assertDontSee('A referral discount has been applied')
+            ->assertSee(config('app.currency_symbol') . '0.00');
+    }
 }

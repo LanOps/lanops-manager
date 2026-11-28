@@ -12,7 +12,7 @@
 	</div>
 	<div class="row">
 		<div class="col-12 col-md-12">
-			@if ($user->getReferralsUnclaimedCount())
+			@if ($basket->referral_discount_total > 0)
 				<div class="alert alert-info">
 					A referral discount has been applied to the basket!
 				</div>

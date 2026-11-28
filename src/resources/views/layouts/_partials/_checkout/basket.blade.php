@@ -44,9 +44,7 @@
 					<strong>Total:</strong>
 				</td>
 				<td>
-					@if ($basket->total != null)
-						{{ config('app.currency_symbol') }}{{ number_format($basket->total, 2) }}
-					@endif
+					{{ config('app.currency_symbol') }}{{ number_format(max($basket->total, 0), 2) }}
 				</td>
 			</tr>
 		</tbody>
